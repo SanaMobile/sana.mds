@@ -4,7 +4,9 @@
 <pydev_project>
 <pydev_variables_property name="org.python.pydev.PROJECT_VARIABLE_SUBSTITUTION">
 <key>DJANGO_MANAGE_LOCATION</key>
-<value>src/mds/manage.py</value>
+<value>src/sana/manage.py</value>
+<key>DJANGO_SETTINGS_MODULE</key>
+<value>sana.settings</value>
 </pydev_variables_property>
 <pydev_pathproperty name="org.python.pydev.PROJECT_SOURCE_PATH">
 <path>/mds/src</path>

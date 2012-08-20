@@ -9,6 +9,9 @@ import os
 from django.db import models
 from django.conf import settings
 
+from sana.core import models as core
+
+_app = 'mrs'
 
 class Client(models.Model):
     """ Some arbirary way to refer to a client."""
@@ -26,7 +29,7 @@ class ClientEventLog(models.Model):
     
     """
     class Meta:
-        app_label = 'mrs'
+        app_label = _app
         unique_together = (('event_type', 'event_time'),)
     
     client = models.ForeignKey('Client')
@@ -45,7 +48,7 @@ class ClientEventLog(models.Model):
 class Patient(models.Model):
     """ Someone about whom data is collected """
     class Meta:
-        app_label = 'mrs'
+        app_label = _app
     name = models.CharField(max_length=512)
 
     # the remote record identifier for the Patient, i.e. OpenMRS ID
@@ -58,7 +61,7 @@ class Procedure(models.Model):
     """ A series of steps used to collect data observations 
     """
     class Meta:
-        app_label = 'mrs'
+        app_label = _app
     
     title = models.CharField(max_length=255)
     procedure_guid = models.CharField(max_length=255, unique=True)
@@ -72,7 +75,7 @@ class BinaryResource(models.Model):
         encounter
     """
     class Meta:
-        app_label = 'mrs'
+        app_label = _app
         unique_together = (('procedure', 'element_id', 'guid'),)
 
     def __unicode__(self):
@@ -167,7 +170,7 @@ class SavedProcedure(models.Model):
         collected
     """
     class Meta:
-        app_label = 'mrs'
+        app_label = _app
         
     def __init__(self,*pargs,**kwargs):
         models.Model.__init__(self, *pargs, **kwargs)
@@ -212,9 +215,11 @@ class SavedProcedure(models.Model):
     
 class Notification(models.Model):
     """ A message to be sent
+        
+        
     """
     class Meta:
-        app_label = 'mrs'
+        app_label = _app
 
     # some identifier that tells us which client it is (phone #?)
     client = models.CharField(max_length=512)
@@ -241,7 +246,7 @@ class QueueElement(models.Model):
     """ An element that is being processed
     """
     class Meta:
-        app_label = 'mrs'
+        app_label = _app
     procedure = models.ForeignKey('Procedure')
     saved_procedure = models.ForeignKey('SavedProcedure')
 
@@ -252,20 +257,13 @@ class QueueElement(models.Model):
 
 TIME_FORMAT = "%m/%d/%Y %H:%M:%S"
 
-class RequestLog(models.Model):
+class RequestLog(core.RequestLog):
     """
     Logging facility for requests.
     """
     class Meta:
-        app_label = 'mrs'
-
-    def __unicode__(self):
-        return "%s : %s : Duration: %0.4fs" % (self.uri,
-                                 self.timestamp.strftime(TIME_FORMAT),
-                                 self.duration)
-
-    # max keylength of index is 767
-    uri = models.CharField(max_length=767)
-    message = models.TextField()
-    timestamp = models.DateTimeField(auto_now_add=True)
-    duration = models.FloatField()
+        app_label = _app
+        
+    requestlog_ptr = models.OneToOneField(core.RequestLog, 
+                                          parent_link=True,
+                                          related_name="%(app_label)s_%(class)s_related")

@@ -7,8 +7,7 @@ from django.http import HttpResponse
 from django.shortcuts import render_to_response
 from django import forms
 
-from sana.mrs.openmrs import sendToOpenMRS
-from sana.mrs.util import enable_logging
+from sana.api.contrib.openmrs import openmrs16 as openmrs
 from sana.mrs.models import Notification
 
 def chunk( seq, size, pad=None ):
@@ -87,7 +86,7 @@ def procedure_submit(request):
 
         if procedureId == 1:
             procedureId = "Diagnose Cervical Cancer"
-        sendToOpenMRS(patientId, phoneId, procedureId, str(binary.data.path), qas)
+        openmrs.sendToOpenMRS(patientId, phoneId, procedureId, str(binary.data.path), qas)
 
 
     return render_to_response("procedure_submit.html",
@@ -107,6 +106,4 @@ def home(request):
         Sanamobile MDS : Online
     """
     return HttpResponse('Sanamobile MDS : Online')
-
-
 

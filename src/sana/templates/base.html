@@ -4,12 +4,15 @@
     {% block styles %}
     {% endblock %}
     {% block scripts %}
-    <script src="http://code.jquery.com/jquery-1.4.4.min.js"></script>
+    
+    {% load static %}
+    <script src="{% get_static_prefix %}admin/js/jquery.min.js"></script>
     {% endblock %}
   </head>
   <body>
     {% block body %} 
 
     {% endblock %}
+    
   </body>
 </html>

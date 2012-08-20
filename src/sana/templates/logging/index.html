@@ -1,0 +1,231 @@
+{% extends "base.html" %}
+
+{% block styles %}
+{{ block.super }}
+<style>
+
+body
+{
+    background-color: #D2CAB5;
+}
+table.header
+{
+    background-color: #e2baa5;
+    width: 100%;
+}
+.pagelist
+{
+    cssFloat: right;
+    width: 100%;
+    color: #fefefe;
+}
+td.selectp
+{
+    text-decoration:underline;
+}
+
+.err
+{
+    background-color: #ff7777;
+}
+.debug
+{
+    background-color: #affaaa;
+}
+#refresh{
+      cssFloat: right;
+}
+#logs
+{
+    background-color: #ffffff;
+    
+}
+.logheader
+{
+    background-color: #e2baa5;
+    font-weight: bold;
+    width: inherit;
+    padding: 0;
+    border-spacing: 0px;
+    border-collapse: collapse;
+}
+.pagenav
+{
+    color: #1100ff;
+}
+.detail
+{
+    background-color: #eeeeff;
+}
+
+</style>
+{% endblock %}
+
+{% block scripts %}
+    {{ block.super }}
+
+<script type="text/javascript">
+
+    var auto = 0;
+    var pindex = 1;
+    var interval;
+    var start = 1;
+    var limit = 20;
+    
+    function init(){
+        document.getElementById("header-page-"+pindex).style.color = '#4444ff';
+           document.getElementById("footer-page-"+pindex).style.color = '#4444ff';
+           document.getElementById("header-page-"+pindex).style.fontWeight = 'normal';
+           document.getElementById("footer-page-"+pindex).style.fontweight = 'normal';
+           document.getElementById("header-page-"+p).style.color = '#aa00ff';
+           document.getElementById("footer-page-"+p).style.color = '#aa00ff';
+           document.getElementById("header-page-"+pindex).style.fontWeight = 'bold';
+           document.getElementById("footer-page-"+pindex).style.fontweight = 'bold';
+    }
+    
+    function getLogPage(p){
+    	document.getElementById("header-page-"+pindex).style.color = '#4444ff';
+    	   document.getElementById("footer-page-"+pindex).style.color = '#4444ff';
+    	   document.getElementById("header-page-"+pindex).style.fontWeight = 'normal';
+    	   document.getElementById("footer-page-"+pindex).style.fontweight = 'normal';
+    	   pindex = p;
+    	   document.getElementById("header-page-"+p).style.color = '#aa00ff';
+    	   document.getElementById("footer-page-"+p).style.color = '#aa00ff';
+    	   document.getElementById("header-page-"+pindex).style.fontWeight = 'bold';
+    	   document.getElementById("footer-page-"+pindex).style.fontweight = 'bold';
+    	   $('#logs').load( "/core/logs/list/" + "?start=" + pindex +"&limit=" + {{ limit }} );
+    }
+
+    function getLogs(){
+    	   document.getElementById('status').innerHTML = new Date();
+    	   getLogPage(pindex);
+    }
+    
+    
+    function refreshBlock()
+    {   
+        if(auto == 1){
+    	    document.getElementById('refreshB').value = "Click to Start!";
+    	    interval = clearInterval(interval);
+    	    auto = 0;
+    	} else {
+    	    interval = setInterval("getLogs();",3000);
+    	    document.getElementById('refreshB').value = "Click to Stop!";
+	    auto = 1;
+	}
+    }    
+
+    function toggleDetails(id) {
+	if(auto == 1){
+    	    document.getElementById('refreshB').value = "Click to Start!";
+    	    clearInterval();
+    	    auto = 0;
+    	}
+	var detail = $("#log-"+id+"-detail");
+	if(!detail.hasClass("data")) {
+	    getDetails(id, function() { detail.addClass("data"); detail.toggle("slow"); });
+	} else {
+	    detail.toggle("slow");
+	}
+    }
+
+    function showDetail(id) {
+    	jQuery("#log-"+id+"-detail").show();
+    }
+
+    function json_update(msg, callback) {
+    	   id = msg['id'];
+    	   data = msg['data'];
+    	   updateDetails(id,data);
+    	   callback();
+    }
+
+    function getDetails(id, callback) {
+    	   $.getJSON("/core/logs/detail/" + id,{}, 
+    			    function(data) {json_update(data, callback); 
+           });  
+    }
+
+    function buildRowHtml(record) { 
+    	   return ("+" + "&nbsp;<b>"+ record['level_name'] + "&nbsp;" 
+    			    + record['filename'] + ":" + record['line_number'] 
+    			    + "</b> &nbsp;" + record['data']);
+    }
+
+    function updateDetails(id, data) {
+    	var message = '<td colspan="3"><dl>';
+	 
+		for (var i in data) {
+			if("ERROR" == data[i]['level_name']){
+    		    message += '<dd class="err">' + buildRowHtml(data[i]) + "</dd>";
+	        } else if("DEBUG" == data[i]['level_name']){
+    		    message += '<dd class="debug">' + buildRowHtml(data[i]) + "</dd>";
+	        } else
+	    	   message += '<dd>' + buildRowHtml(data[i]) + '</dd>';
+	    	    //message = message + "" + data[i].message + "<br/>";
+	        }
+	    message = message + "</dl></td>";
+        var detail = $("#log-"+id+"-detail");
+	    detail.html(message);
+	    detail.attr('data', data);
+    }
+
+    function hideDetail(id) {
+	    jQuery("#log-"+id+"-detail").hide();
+    }
+    
+    //window.onload = init;
+    
+</script>
+
+{% endblock %} 
+
+{% block body %}
+  {{ block.super }}
+    <table class="header">
+	<tr padding="0" margin="0">
+	    <td colspan="2" ><h1 class="title">Sana mds: Request Log Viewer</h1>{{ start }},{{ range }}, {{ start }}</td>
+	    <td id="counter"></td>
+	</tr>
+	<tr width="100%">
+	    <td width="124px" align="left"><b>Last Updated:</b></td>
+	    <td  id="status" width="360px" align="center"></td>
+	    <td align="right">
+		<input id="refreshB" type="button" onclick="refreshBlock()" value="Click to Auto Refresh!" />
+	    </td>	
+	</tr>
+    </table>
+    
+{% with start as curpage %}
+<table width="100%">
+    <tbody>
+        <tr>
+            <td class="pagenav">Pages:</td> {% for p in range %}
+            <td id="header-page-{{ p }}" onclick="getLogPage('{{ p }}')"
+                class="selectp">{{ p }}</td> {% endfor %}
+        </tr>
+    </tbody>
+</table>
+{% endwith %}
+
+    
+    <div id="logs" width="100%">
+        {% include "logging/list.html" with object_list=objects %}
+	</div>
+	
+{% with start as curpage %}
+<table width="100%">
+    <tbody>
+        <tr>
+            <td class="pagenav">Pages:</td> {% for p in range %}
+            <td id="footer-page-{{ p }}" onclick="getLogPage('{{ p }}')"
+                class="selectp">{{ p }}</td> {% endfor %}
+        </tr>
+    </tbody>
+</table>
+{% endwith %}
+	<div id="footer">
+	</div>
+    <div id="spew"></div>
+{% endblock %}
+

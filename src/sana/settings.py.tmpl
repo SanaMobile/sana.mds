@@ -1,19 +1,15 @@
-"""Django settings for Sana project. 
+"""Django Project configuration variables for Sana.
 
-This file contains the application configuration variablesan is available with
-all default values as: ::
-
-    settings.py.tmpl
-
-and should be renamed to settings.py prior to filling in local values. Once 
-updated, enter the following from the mds installation directory::
+Default values available in settings.py.tmpl should be copied to settings.py 
+prior to filling in local values. Once updated, enter the following from the 
+mds installation directory:
     
     $> ./manage.py syncdb
     
 This will require root privileges. 
     
 :Authors: Sana Development Team
-:Version: 1.1
+:Version: 2.0
 """
 
 DEBUG = True
@@ -72,20 +68,31 @@ USE_I18N = True
 """If you set this to False, Django will make some optimizations so as not to 
 load the internationalization machinery."""
 
-MEDIA_ROOT = ''
-"""Absolute path to the directory that holds media. For a typical Sana 
-deployment use: "/opt/sana/media/"
+
+STATIC_URL = "/static/"
+"""URL that handles the media served from STATIC_ROOT. Make sure to use a
+trailing slash if there is a path component (optional in other cases). """
+
+STATIC_ROOT = '/opt/sana/static/'
+"""Absolute path to the directory that holds static media. Default value: 
+"/opt/sana/static/"
 """
 
-MEDIA_URL = ''
-"""URL that handles the media served from MEDIA_ROOT. Make sure to use a
-trailing slash if there is a path component (optional in other cases). For a 
-typical Sana deployment use: "/mds/media/". """
-
-ADMIN_MEDIA_PREFIX = '/media/'
+ADMIN_MEDIA_PREFIX = '/static/'
 """URL prefix for admin media -- CSS, JavaScript and images. Make sure to use a
-trailing slash. Examples: "http://foo.com/media/", "/media/".
+trailing slash. Default value "/static/admin/".
 """
+
+MEDIA_ROOT = '/opt/sana/media/'
+"""Absolute path to the directory that holds media. Default value: 
+"/opt/sana/media/"
+"""
+
+MEDIA_URL = '/mds/media/'
+"""URL that handles the media served from MEDIA_ROOT. Make sure to use a
+trailing slash if there is a path component (optional in other cases). Default
+value: "/mds/media/". """
+
 
 SECRET_KEY = 'b#%x46e0f=jx%_#-a9b5(4bvxlfz-obm*gs4iu3i6k!034j(mx'
 """Make this unique, and don't share it with anybody. Seriously."""
@@ -115,70 +122,17 @@ forget to use absolute paths, not relative paths.For a typical Sana
 deployment use: "/opt/sana/templates/"."""
 
 INSTALLED_APPS = (
-    'sana.mrs',
+    'sana.rest',
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.sites',
     'django.contrib.admin',
+    'django.contrib.staticfiles',
 )
 """Don't touch this unless you know what you are doing."""
 
-### OpenMRS settings. OpenMRS versions seem to have some difference in submitted 
-### date format. 
-OPENMRS_SERVER_URL = 'http://localhost/openmrs' 
-"""Change localhost when deployed."""
-OPENMRS_DATE_FMT = '%m/%d/%Y %H:%M'
-"""For OpenMRS ver. 1.6. Set to %d/%m/%Y when using OpenMRS 1.7."""
-OPENMRS_REPLYTO = ''
-"""Reply address for notifications from OpenMRS."""
-
-### Clickatell Settings
-CLICKATELL_URI = ''
-"""Example 'http://api.clickatell.com/http/sendmsg?%s'"""
-CLICKATELL_USER = ''
-"""A valid  username."""
-CLICKATELL_PASSWORD = ''
-"""A valid  password."""
-CLICKATELL_API = ''
-"""Refer to Clickatell documentation for this value."""
-
-### Kannel Settings
-KANNEL_URI = ''
-"""URI Example:  'http://127.0.0.1:12121/cgi-bin/sendsms?%s'"""
-KANNEL_USER = ''
-"""A valid  username."""
-KANNEL_PASSWORD = ''
-
-### ZniSMS Settings
-ZNISMS_URL = ''
-"""URI. Example: http://api.znisms.com/post/smsv3.asp?%s"""
-ZNISMS_USER = ''
-"""Consult ZniSMS documentation."""
-ZNISMS_APIKEY = ''
-"""Consult ZniSMS documentation."""
-ZNISMS_SENDERID = ''
-"""Consult ZniSMS documentation."""
-
-### Email Configuration
-EMAIL_HOST = ''             
-"""Outgoing mail server."""
-EMAIL_HOST_USER = ''        
-"""Password for account used to send."""
-EMAIL_HOST_PASSWORD = ''   
-"""Password for account used to send."""
-EMAIL_PORT = ''               
-"""Check with mail host, i.e. gmail uses 587."""  
-EMAIL_USE_TLS = True        
-"""Check with mail host if encryption is supported"""
-
-CONVERT_MEDIA = False
-"""Set to True to convert media; i.e. if you are uploading audio or video."""
-
-FLUSH_SAVEDPROCEDURE = False 
-"""Set to True to flush text data on successful send.""" 
-FLUSH_BINARYRESOURCE = False
-"""Set to True to flush file data on successful send.""" 
-FLUSH_NOTIFICATION = False
-# Set to True to flush notification data on successful send.""" 
-
+try:
+    from local_settings import *
+except ImportError, exp:
+    pass

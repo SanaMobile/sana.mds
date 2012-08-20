@@ -2,21 +2,20 @@
 Created on Feb 29, 2012
 
 :Authors: Sana Dev Team
-:Version: 1.2
+:Version: 2.0
 '''
-import sys, traceback
-import logging
-
-from django import forms
+from django.core.paginator import Paginator, InvalidPage, EmptyPage
 from django.utils.translation import ugettext_lazy as _
 
+
 from piston.handler import BaseHandler
-from piston import resource
 from piston.utils import validate
 
-from sana.api.models import *
+from sana.api.models import RESTModel
 from sana.api.responses import succeed, fail
-from sana.mrs.util import enable_logging
+from sana.api.utils import logstack, printstack
+
+__all__ = ['handler_uri_templates', 'RESTHandler', ]
 
 class UnsupportedCRUDException(Exception):
     def __init__(self, value):
@@ -25,118 +24,99 @@ class UnsupportedCRUDException(Exception):
     def __str__(self):
         return self.value
 
-class DispatchHandler(BaseHandler):
+def get_root(request):
+    host = request.get_host()
+    scheme = 'https' if request.is_secure() else 'http'
+    result = scheme + '://' + host
+    return result
+
+def get_REST_params(request): 
+    get = dict(request.GET.items())
+    limit = int(get.get('limit', 0))
+    start = int(get.get('start', 1))
+    rep = get.get('rep', 'default')
+    return rep, start, limit
+
+     
+class RESTHandler(BaseHandler):
     """Base HTTP handler for Sana api. Uses basic CRUD approach of the  
        django-piston api as a thin wrapper around class specific functions.
     """
+    exclude = ['id', 'created', 'modified']
+    allowed_methods = ('GET',)
+    
+    
     @validate('POST')
     def create(self,request, *args, **kwargs):
         """ POST Request handler. Requires valid form defined by model of  
             extending class.
         """
         try:
-            return succeed(self._create(request, args, kwargs))
-        except:
-            return self._trace(request, args, kwargs)
-    
-    def read(self,request, *args, **kwargs):
+            return succeed(request.form.save().get_representation())
+        except Exception, e:
+            return self.trace(request, e)
+      
+    def read(self,request, uuid=None, related=None):
         """ GET Request handler. No validation is performed. """
         try:
-            return succeed(self._read(request, args, kwargs))
-        except:
-            return self._trace(request, args, kwargs)
+            if uuid and related:
+                response = self.readRelatedByUuid(request,uuid)
+            elif uuid:
+                response = self.readByUuid(request,uuid)
+            else:
+                response = self.readMultiple(request)
+            return succeed(response)  
+        except Exception, e:
+            return self.trace(request, e)
     
     def update(self, request, *args, **kwargs):
-        """ POST Request handler. No validation is performed. """
+        """ PUT Request handler. No validation is performed. """
         try:
-            return succeed(self._update(request, args, kwargs))
-        except:
-            return self._trace(request, args, kwargs)
+            return succeed(BaseHandler.update(self, request, args, kwargs))
+        except Exception, e:
+            return self.trace(request, e)
     
     def delete(self,request, *args, **kwargs):
-        """ POST Request handler. No validation is performed. """
+        """ DELETE Request handler. No validation is performed. """
         try:
-            return succeed(self._delete(request, args, kwargs))
-        except:
-            return self._trace(request, args, kwargs)
+            return succeed(BaseHandler.delete(self, request, args, kwargs))
+        except Exception, e:
+            return self.trace(request, e)
 
-    # The CRUD methods
-    @enable_logging
-    def _create(self,request, *args, **kwargs):
-        # Extending classes should use the following 
-        # request.form.save()
-        raise UnsupportedCRUDException('CREATE not supported')
-    
-    @enable_logging
-    def _read(self,request, *args, **kwargs):
-        raise UnsupportedCRUDException('READ not supported')
-    
-    @enable_logging
-    def _update(self, request, *args, **kwargs):
-        raise UnsupportedCRUDException('UPDATE not supported')
-    
-    @enable_logging
-    def _delete(self,request, *args, **kwargs):
-        raise UnsupportedCRUDException('DELETE not supported')
-
-    @enable_logging
-    def _trace(self,request, *args, **kwargs):
-        et, val, tb = sys.exc_info()
-        trace = traceback.format_tb(tb)
-        error = {'error' : val, 'type': et, 'cause': trace[0]}
-        for tbm in trace:
-            logging.error(tbm)
+    def trace(self,request, error):
+        printstack(error)
+        logstack(self,error)
         return fail(error)
-
-class AuthHandler(BaseHandler):
-    """ Handles auth requests. """
-    allowed_methods = ('GET')
-    def read(self,request, *args, **kwargs):
-        pass
-auth_resource = resource.Resource(AuthHandler)
-
-class ConceptHandler(BaseHandler):
-    """ Handles encounter requests. """
-    allowed_methods = ('GET', 'POST')
-    model = Concept
-concept_resource = resource.Resource(ConceptHandler)
-
-class DeviceHandler(BaseHandler):
-    """ Handles encounter requests. """
-    allowed_methods = ('GET', 'POST')
-    model = Device
-device_resource = resource.Resource(DeviceHandler)
-
-class EncounterHandler(BaseHandler):
-    """ Handles encounter requests. """
-    allowed_methods = ('GET', 'POST')
-    model = Encounter
-encounter_resource = resource.Resource(EncounterHandler)
-
-class NotificationHandler(BaseHandler):
-    """ Handles encounter requests. """
-    allowed_methods = ('GET', 'POST')
-    model = Notification
-notification_resource = resource.Resource(EncounterHandler)
-
-class ObservationHandler(DispatchHandler):
-    allowed_methods = ('GET', 'POST')
-    model = Observation
-observation_resource = resource.Resource(ObservationHandler)
     
-class ProcedureHandler(BaseHandler):
-    allowed_methods = ('GET','POST')
-    model = Procedure
-procedure_resource = resource.Resource(ProcedureHandler)
+    def readMultiple(self, request, *args, **kwargs):
+        
+        rep, start, limit = get_REST_params(request)
+        model = getattr(self,'model')
+        obj_set = model.objects.all()
+        if limit:
+            paginator = Paginator(obj_set, limit, 
+                                  allow_empty_first_page=True)
+            try:
+                objs = paginator.page(start)
+            except (EmptyPage, InvalidPage):
+                objs = paginator.page(paginator.num_pages)       
+        else:
+            objs = obj_set
+        return [ x.get_representation(rep,location=get_root(request)) for x in objs ]
 
-class SubjectHandler(BaseHandler):
-    """ Handles encounter requests. """
-    allowed_methods = ('GET', 'POST')
-    model = Subject
-subject_resource = resource.Resource(SubjectHandler)
-
-class WorkerHandler(BaseHandler):
-    """ Handles encounter requests. """
-    allowed_methods = ('GET', 'POST')
-    model = Worker
-worker_resource = resource.Resource(WorkerHandler)
+    def readByUuid(self,request, uuid, related=None):
+        """ Reads an object from the database using the UUID as a slug and 
+            will return the object along with a set of related objects if 
+            specified.
+            
+            Sending rep='full' will return all fk objects back to the instance.
+        """
+        rep, start, limit = get_REST_params(request)
+        model = getattr(self.__class__, 'model')
+        obj = model.objects.get(uuid=uuid)
+        if related:
+            result = getattr(object, related+'_set', [])
+        else:
+            result = obj.get_representation(rep,location=get_root(request))
+        return result      
+ 
