@@ -95,16 +95,14 @@ class Observation(RESTModel):
         else:
             return None
     
-    def open(self):
+    def open(self, mode="w"):
         if not self.is_complex():
             raise Exception("Attempt to open file for non complex observation")
-        
-        self.value_complex = self._value_complex.field.generate_filename(self, f)
         path, _ = os.path.split(self._value_complex.path)
         # make sure we have the directory structure
         if not os.path.exists(path):
-            os.makedirs(path)
-        return open(self._value_complex.path, "w")
+            self.create_file()
+        return open(self._value_complex.path, mode)
     
     def _generate_filename(self):
         name = '%s-%s' % (self.encounter.uuid, self.node)
@@ -128,8 +126,8 @@ class Observation(RESTModel):
         # make sure we have the directory structure
         if not os.path.exists(path):
             os.makedirs(path)
-        # create the stub and commit if no exceptions
-        open(self._value_complex.path, "w").close()
+            # create the stub and commit if no exceptions
+            open(self._value_complex.path, "w").close()
         self.save()
     
     def complete(self):
