@@ -19,13 +19,15 @@ from django.utils.translation import ugettext_lazy as _
 from piston.handler import BaseHandler
 from piston import doc
 
+from sana.api import do_authenticate
 from sana.api.handlers import RESTHandler
 from sana.api.decorators import logged
 from sana.api.docs.utils import handler_uri_templates
-from sana.api.models import RESTModel
-from sana.api.responses import succeed, fail
+from sana.api.responses import succeed, fail, error
+
+from sana.core.forms import *
 from sana.core.models import *
-from sana.core.signals import done_logging, signal_logger
+from sana.core.signals import done_logging, event_signalhandler
 
 __all__ = ['ConceptHandler', 
            'RelationshipHandler',
@@ -38,10 +40,11 @@ __all__ = ['ConceptHandler',
            'ProcedureHandler',
            'RequestLogHandler',
            'DocHandler' ,
+           'SessionHandler',
            'SubjectHandler',]
 
 
-__signals__ = ( done_logging, signal_logger)
+__signals__ = ( done_logging, event_signalhandler)
 
 class LogHandler(object):
     def __init__(self, model):
@@ -54,40 +57,61 @@ class LogHandler(object):
         self.instance = RequestLog(kwargs)
         
         
-class AuthHandler(BaseHandler):
-    """ Handles auth requests. """
-    allowed_methods = ('GET',)
+class SessionHandler(BaseHandler):
+    """ Handles session auth requests. """
+    allowed_methods = ('GET','POST',)
+    signals = ( done_logging, event_signalhandler)
+    logger = ( done_logging, event_signalhandler)
     
+    def create(self,request):
+        try:
+            success,msg = do_authenticate(request)
+            if success:
+                return succeed(msg)
+            else:
+                return fail(msg)
+        except:
+            return error("Internal Server Error")
     def read(self,request):
-        return http.HttpResponse(request.__dict__)
+        success,msg = do_authenticate(request)
+        if success:
+            return succeed(msg)
+        else:
+            return fail(msg)
     
 @logged
 class ConceptHandler(RESTHandler):
     """ Handles concept requests. """
     allowed_methods = ('GET', 'POST')
     model = Concept
-    signals = __signals__
+    form = ConceptForm
+    signals = ( done_logging, event_signalhandler)
+    logger = ( done_logging, event_signalhandler)
     fields = ("uuid", "name")
 
 class RelationshipHandler(RESTHandler):
     """ Handles concept relationship requests. """
     allowed_methods = ('GET', 'POST')
     model = Relationship
+    form = RelationshipForm
     
 class RelationshipCategoryHandler(RESTHandler):
     """ Handles concept relationship category requests. """
     allowed_methods = ('GET', 'POST')
     model = RelationshipCategory
+    form = RelationshipCategoryForm
 
 class DeviceHandler(RESTHandler):
     """ Handles device requests. """
     allowed_methods = ('GET', 'POST')
     model = Device
+    form = DeviceForm
     
 class EncounterHandler(RESTHandler):
     """ Handles encounter requests. """
     allowed_methods = ('GET', 'POST')
     model = Encounter
+    form = EncounterForm
     fields = ("uuid", "concept", "observation",'subject','procedure')
     #TODO wrap this around the old json.py
 
@@ -95,21 +119,24 @@ class NotificationHandler(RESTHandler):
     """ Handles notification requests. """
     allowed_methods = ('GET', 'POST')
     model = Notification
+    form = NotificationForm
     #TODO wrap this around the old json.py
 
 class ObservationHandler(RESTHandler):
     allowed_methods = ('GET', 'POST')
     model = Observation
+    form = ObservationForm
         
 class ObserverHandler(RESTHandler):
     """ Handles observer requests. """
     allowed_methods = ('GET', 'POST')
     model = Observer
+    form = ObserverForm
     
 class ProcedureHandler(RESTHandler):
     allowed_methods = ('GET', 'POST')
     model = Procedure
-    full = []
+    form = ProcedureForm
     default_rep = ['uuid','author','version', 'name']
     
     def readByUuid(self,request,uuid):
@@ -123,7 +150,8 @@ class RequestLogHandler(RESTHandler):
     """ Handles network request log requests. """
     allowed_methods = ('GET', 'POST')
     model = RequestLog
-    signals = __signals__
+    signals = ( done_logging, event_signalhandler)
+    logger = ( done_logging, event_signalhandler)
     """    
     def readByUuid(self,request,uuid):
         log = self.queryset(request).get(uuid=uuid)
@@ -141,6 +169,9 @@ class SubjectHandler(RESTHandler):
     allowed_methods = ('GET', 'POST')
     fields = ['uuid']
     model = Subject
+    form = SubjectForm
+    signals = ( done_logging, event_signalhandler)
+    logger = ( done_logging, event_signalhandler)
 
    
 class DocHandler(BaseHandler):

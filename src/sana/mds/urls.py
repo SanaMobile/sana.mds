@@ -20,7 +20,7 @@ observation_handler = Resource(ObservationHandler)
 observer_handler = Resource(ObserverHandler)
 procedure_handler = Resource(ProcedureHandler)
 subject_handler = Resource(SubjectHandler)
-requestlog_handler = Resource(RequestLogHandler)
+event_handler = Resource(RequestLogHandler)
 
 # non-restful urls
 urlpatterns = patterns(    
@@ -41,8 +41,8 @@ extra_patterns = patterns(
     url(r'^notification/(?P<uuid>[^/]+)/$', notification_handler, name='notification'),
     
     # request logs
-    url(r'^requestlog/$', requestlog_handler, name='requestlog-list'),
-    url(r'^requestlog/(?P<uuid>[^/]+)/$', requestlog_handler, name='requestlog'),
+    url(r'^requestlog/$', event_handler, name='requestlog-list'),
+    url(r'^requestlog/(?P<uuid>[^/]+)/$', event_handler, name='requestlog'),
     
     # concepts
     url(r'^concept/$', concept_handler, name='concept-list'),

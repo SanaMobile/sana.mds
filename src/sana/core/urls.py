@@ -5,7 +5,6 @@
 :Version: 2.0
 """
 from django.conf.urls.defaults import patterns, url, include
-from django.contrib import admin
 from piston.resource import Resource
 
 from sana.core.handlers import *
@@ -20,9 +19,9 @@ observation_handler = Resource(ObservationHandler)
 observer_handler = Resource(ObserverHandler)
 procedure_handler = Resource(ProcedureHandler)
 subject_handler = Resource(SubjectHandler)
-requestlog_handler = Resource(RequestLogHandler)
-restapi_handler = Resource(DocHandler)
-
+event_handler = Resource(RequestLogHandler)
+doc_handler = Resource(DocHandler)
+session_handler = Resource(SessionHandler)
 
 # non-restful urls
 urlpatterns = patterns(    
@@ -36,26 +35,32 @@ urlpatterns = patterns(
     url(r'^logs/detail/(?P<uuid>[^/]+)/$', 'views.log_detail', name='log-detail'),
                                           
     # docs
-    url(r'^docs/$', restapi_handler, name='core-docs'),     
+    url(r'^docs/$', doc_handler, name='core-docs'),     
               
 )    
 
 extra_patterns = patterns(
     '',
+    # session auth
+    url(r'^session/$', session_handler, name='session-list'),
     
     # notification
     url(r'^notification/$', notification_handler, name='notification-list'),
     url(r'^notification/(?P<uuid>[^/]+)/$', notification_handler, name='notification'),
     
     # request logs   
-    url(r'^requestlog/$', requestlog_handler, name='requestlog-list'),
-    url(r'^requestlog/(?P<uuid>[^/]+)/$', requestlog_handler, name='requestlog'),
+    url(r'^event/$', event_handler, name='requestlog-list'),
+    url(r'^event/(?P<uuid>[^/]+)/$', event_handler, name='requestlog'),
+    
+    # events   
+    url(r'^requestlog/$', event_handler, name='event-list'),
+    url(r'^requestlog/(?P<uuid>[^/]+)/$', event_handler, name='event'),
     
     # concepts
     url(r'^concept/$', concept_handler, name='concept-list'),
     url(r'^concept/(?P<uuid>[^/]+)/$', concept_handler, name='concept'),
-    url(r'^concept/(?P<uuid>[^/]+)/relationship/$', concept_handler, name='concept-relationship', kwargs={'related':'relationship'}),
-    url(r'^concept/(?P<uuid>[^/]+)/procedure/$', concept_handler, name='concept-procedure', kwargs={'related':'procedure'}),
+    url(r'^concept/(?P<uuid>[^/]+)/relationship/$', concept_handler, name='concept-relationships', kwargs={'related':'relationship'}),
+    url(r'^concept/(?P<uuid>[^/]+)/procedure/$', concept_handler, name='concept-procedures', kwargs={'related':'procedure'}),
     
     # concept relationships
     url(r'^relationship/$', relationship_handler,name='relationship-list'),
@@ -74,13 +79,14 @@ extra_patterns = patterns(
     # encounters
     url(r'^encounter/$', encounter_handler, name='encounter-list'),
     url(r'^encounter/(?P<uuid>[^/]+)/$', encounter_handler, name='encounter'),
+    url(r'^encounter/(?P<uuid>[^/]+)/observation/$', concept_handler, name='encounter-observations', kwargs={'related':'observation'}),
     
     # observations
     url(r'^observation/$', observation_handler, name='observation-list'),
     url(r'^observation/(?P<uuid>[^/]+)/$', observation_handler, name='observation'),
     
     # observers
-    url(r'^observer/$', observation_handler, name='observer-list'),
+    url(r'^observer/$', observer_handler, name='observer-list'),
     url(r'^observer/(?P<uuid>[^/]+)/$', observer_handler, name='observer'),
     
     # procedures
@@ -90,6 +96,7 @@ extra_patterns = patterns(
     # subjects
     url(r'^subject/$', subject_handler, name='subject-list'),
     url(r'^subject/(?P<uuid>[^/]+)/$', subject_handler, name='subject'),
+    url(r'^subject/(?P<uuid>[^/]+)/encounter/$', concept_handler, name='subject-encounters', kwargs={'related':'procedure'}),
 )
 
 # add the non-RESTful urls

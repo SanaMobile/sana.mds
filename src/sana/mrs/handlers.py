@@ -13,7 +13,6 @@ import logging
 
 from django.conf import settings
 from django.forms import ValidationError
-from django.utils.translation import ugettext_lazy as _
 from piston.handler import BaseHandler
 
 from sana.core.handlers import RequestLogHandler as BaseRequestHandler
@@ -31,12 +30,16 @@ from sana.api.v1.api import register_saved_procedure
 from sana.mrs.forms import ProcedureSubmitForm
 from sana.mrs.models import RequestLog
 
+from sana.api.signals import EventSignal
+from sana.mrs.signals import event_signalhandler 
+
 @logged
 class AuthHandler(BaseHandler):
     """ Handles status and authentication check requests. For working with
         openMRS versions 1.6+
     """
     allowed_methods = ('GET',)
+    logger = (event_signalhandler, EventSignal())
     
     def read(self,request, *args, **kwargs):
         """Validates user credentials with the backing data store.
@@ -54,25 +57,25 @@ class AuthHandler(BaseHandler):
         try:
             username = request.REQUEST.get("username", None)
             password = request.REQUEST.get("password", None)
-            logging.info("username: " + username)
+            logging.info("username %s" % username)
             omrs = openmrs.OpenMRS(username, password,
                               settings.OPENMRS_SERVER_URL)
             if omrs.validate_credentials(username, password):
-                response = succeed(_("username and password validated!"))
+                response = succeed("username and password validated!")
             else:
-                response = fail(_("username and password combination incorrect!"))
+                response = fail("username and password combination incorrect!")
             logging.debug(response)
         except Exception, e:
-            msg = '%s validate_credentials' % MSG_MDS_ERROR
+            msg = 'validate_credentials' #% MSG_MDS_ERROR
             logging.error('%s %s' % (msg, str(e)))
             response = fail(msg)
-        return render_json_response(response)
+        return response
     
-    
+@logged   
 class SavedProcedureHandler(BaseHandler):
     """ Handles encounter requests. """
     allowed_methods = ('POST')
-    #model = SavedProcedure
+    logger = (event_signalhandler, EventSignal())
     
     def create(self,request, *args, **kwargs):
         logging.info("Received saved procedure submission.")
@@ -111,7 +114,7 @@ class SavedProcedureHandler(BaseHandler):
             for tbm in trace:
                 logging.error(tbm)
             response = fail(error)
-        return render_json_response(response)
+        return response
 
 class EventHandler(BaseHandler):
     
@@ -173,27 +176,36 @@ class RequestLogHandler(BaseRequestHandler):
     allowed_methods = ('GET', 'POST')
     model = RequestLog
     
-    
+@logged    
 class NotificationHandler(BaseHandler):
     """ Handles encounter requests. """
     allowed_methods = ('POST')
+    logger = (event_signalhandler, EventSignal())
     
     def create(self,request, *args, **kwargs):
         return notification_submit(request) 
     
-
+@logged
 class BinaryHandler(BaseHandler):
     allowed_methods = ('POST')
+    logger = (event_signalhandler, EventSignal())
+    
     def create(self,request, *args, **kwargs):
         return binary_submit(request)
-
+    
+@logged
 class BinaryPacketHandler(BaseHandler):
     allowed_methods = ('POST')
+    logger = (event_signalhandler, EventSignal())
+    
     def create(self,request, *args, **kwargs):
         return binarychunk_submit(request)
-
+    
+@logged
 class Base64PacketHandler(BaseHandler):
     allowed_methods = ('POST')
+    logger = (event_signalhandler, EventSignal())
+    
     def create(self,request, *args, **kwargs):
         return binarychunk_hack_submit(request)
     
@@ -202,7 +214,7 @@ class Base64PacketHandler(BaseHandler):
 class PatientHandler(BaseHandler):
     """ Handles patient requests. """
     allowed_methods = ('GET',)
-    #model = Patient
+    logger = (event_signalhandler, EventSignal())
     
     def read(self,request, id=None, **kwargs):
         if id and id != 'list':

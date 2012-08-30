@@ -23,7 +23,7 @@ encounter_handler = Resource(handlers.SavedProcedureHandler)
 notification_handler = Resource(handlers.NotificationHandler)
 subject_handler = Resource(handlers.PatientHandler)
 event_handler = Resource(handlers.EventHandler)
-requestlog_handler = Resource(handlers.RequestLogHandler)
+event_handler = Resource(handlers.RequestLogHandler)
 admin.autodiscover()
 
 urlpatterns = patterns(
@@ -31,9 +31,7 @@ urlpatterns = patterns(
     # Example:
     # (r'^sana/', include('sana.foo.urls')),
     
-    #url(r'^mds/media/(?P<path>.*)$', 'django.views.static.serve',  {'document_root': settings.MEDIA_ROOT }),
-    #url(r'^mds/static/(?P<path>.*)$', 'django.views.static.serve',  {'document_root': settings.STATIC_ROOT }),
-    
+    url(r'^$', 'sana.core.views.home', name="home"),
     url(r'^notifications/$',
         notification_handler,
         name="sana-list-notifications"),
@@ -103,19 +101,19 @@ urlpatterns = patterns(
 
 
     url(r'^log/$',
-        requestlog_handler,
+        event_handler,
         name="log-view"),
     
     url(r'^log/web/$',
-        requestlog_handler,
+        event_handler,
         name="log-web-view"), 
                        
     url(r'^log/list/$',
-        requestlog_handler,
+        event_handler,
         name="requestlog-list"),
                           
     url(r'^log/(?P<uuid>[^/]+)/$',
-        requestlog_handler,
+        event_handler,
         name="requestlog"),
        
 
