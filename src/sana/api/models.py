@@ -4,13 +4,13 @@ Created on Aug 10, 2012
 :author: Sana Development Team
 :version: 2.0
 '''
-from django.conf import settings
 from django.db import models
 
-from sana.api.utils import make_uuid, dictzip, printstack
+from sana.api.utils import make_uuid
 
 class RepresentationException(Exception):
-    pass
+    def __init__(self):
+        super(RepresentationException, "Invalid representation")
 
 class RESTModel(models.Model):
     """ Abstract class holding Common properties for RESTful objects. 
@@ -32,6 +32,8 @@ class RESTModel(models.Model):
     include_link = ('uuid', 'uri')
     include_default = ('uuid', 'uri')
     include_full = ('uuid', 'uri')
+    
+    _include_format = "include_{0}"
         
     uuid = models.SlugField(max_length=36, unique=True, default=make_uuid, editable=False)
     """ A universally unique identifier """
@@ -58,14 +60,15 @@ class RESTModel(models.Model):
         """ Returns a representation of this object. The three 'link', 'default'
             and 'full' methods should be overridden for custom behavior
         """
-        method = '{0}_representation'.format(rep)
+        method = RESTModel._include_format.format(rep)
         callable = getattr(self, method)
         representation = callable(**kwargs)
         return representation
        
     def _get_representation(self, rep, **kwargs):
         representation = {}
-        for field in getattr(self.__class__, 'include_'+rep, ['uuid']):
+        rep = RESTModel._include_format.format(rep)
+        for field in getattr(self.__class__, rep, ['uuid']):
             fieldobj = getattr(self, field)
             if isinstance(field, RESTModel):
                 representation[field] = fieldobj.get_representation(rep=rep)
@@ -89,10 +92,7 @@ class RESTModel(models.Model):
     def default_representation(self, **kwargs):
         """ equivalent to self.get_representation() """
         return self._get_representation('default', **kwargs)
-    
-class RESTPool(models.Model):
-    class Meta:
-        abstract = True
+
         
     
     
