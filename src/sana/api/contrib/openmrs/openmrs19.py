@@ -9,90 +9,32 @@ import logging
 import urllib2
 import cjson
 import time
-import sys, traceback
 
 from django.conf import settings
+
 from sana.api.contrib import handlers
-from sana.api.utils import printstack
+from sana.api.contrib.openmrs import openers
 
-class OpenMRS(object):
-    """Utility class for remote communication with OpenMRS """
+__all__ = ['OpenMRS']
 
-    def __init__(self, username, password, url):
-        """Called when a new OpenMRS object is initialized.
-            
-        Parameters:
-            username
-                A valid user name for authoriztion
-            password
-                A valid user password for authorization
-            url
-                The OpenMRS host root url having the form::
-                
-                    http:<ip or hostname>[:8080 | 80]/openmrs/
-                
-                and defined in the settings.py module
-        """
-        self.username = username
-        self.password = password
-        self.url = url
-
-        self.cookies = cookielib.CookieJar()
-
-        try:
-            password_mgr = urllib2.HTTPPasswordMgrWithDefaultRealm()
-            password_mgr.add_password(None, self.url, self.username, self.password)
-            auth_handler = urllib2.HTTPBasicAuthHandler(password_mgr)
-            self.opener = urllib2.build_opener(
-                auth_handler,
-                urllib2.HTTPCookieProcessor(self.cookies),
-                handlers.MultipartPostHandler)
-        except Exception, e:
-            print "Couldn't initialize openMRS interface, exception: " + str(e)
-
-    def validate_credentials(self, username, password):
-        """Validates OpenMRS authorization for a user by sending a POST request 
-        to the loginServlet( self.url + loginServlet)
-           
-        The following request parameters are sent: ::
-            
-            Parameter     OpenMRS form field   Default Value
-            username      uname                N/A
-            password      pw                   N/A
-            N/A           redirect             /openmrs
-            N/A           refererURL           self.url+index.htm
-            
-        Parameters:
-            username
-                a valid username
-            password
-                a valid password
-        """
-        try:
-            loginParams = urllib.urlencode(
-                {"uname": self.username,
-                 "pw": self.password,
-                 "redirect": "/openmrs",
-                 "refererURL": self.url+"index.htm"
-                 })
-            result = self.opener.open("%sloginServlet" % self.url, loginParams)
-            if result.geturl()==self.url + "index.htm":
-                return True
-            else:
-                return False
-        except Exception, e:
-            et, val, tb = sys.exc_info()
-            trace = traceback.format_tb(tb)
-            error = {'error' : val, 'type': et, 'cause': trace[0]}
-            raise Exception("Credential Validation Exception" % e)
-
-    def validate_patient(self, patient_id):
+class OpenMRS(openers.OpenMRSOpener):
+    """Utility class for remote communication with OpenMRS version 1.9"""
+    _create_session =  None,
+    _read_credentials = "loginServlet",
+    _read_subject = "moduleServlet/ws/rest/v1/patient/{uuid}"
+    _create_subject = "admin/patients/newPatient.form"
+    _create_encounter = "moduleServlet/sana/uploadServlet"
+    _read_encounter = "moduleServlet/ws/rest/v1/encounter/{uuid}"
+    _read_encounter_observations = "moduleServlet/ws/rest/v1/encounter/{uuid}/observation/?v=full", 
+    
+    def validate_patient(self, uuid=""):
         pass
     
-    def getPatient(self,username, password, userid):
-        """Retrieves a patient by id from OpenMRS through the REST module.
+    def getPatient(self,username, password, patientid):
+        """ Retrieves a patient by id from OpenMRS through the Webservices.REST 
+            module.
 
-        OpenMRS url: <host> + moduleServlet/restmodule/api/patient/+userid
+            REST module url: <host> + patient/{patientid}
         
         Parameters:
             username
@@ -103,7 +45,8 @@ class OpenMRS(object):
                 patient identifier
            
         """
-        uri = self.url+'moduleServlet/restmodule/api/patient/'+userid
+        path = self._get_path('_read_subject')
+        uri = self.url + path.format(uuid=patientid)
 
         cookies = cookielib.CookieJar()
         password_mgr = urllib2.HTTPPasswordMgrWithDefaultRealm()
@@ -252,7 +195,7 @@ class OpenMRS(object):
     
             logging.debug("Validating permissions to manage sana queue")
 
-            url = "%smoduleServlet/moca/permissionsServlet" % self.url
+            url = "%smoduleServlet/sana/permissionsServlet" % self.url
             response = self.opener.open(url).read()
             logging.debug("Got result %s" % response)
             resp_msg = cjson.decode(response,True)
@@ -301,97 +244,3 @@ class OpenMRS(object):
                           % saved_procedure_id)
             raise e
         return result, message, encounter
-
-def download_procedure(self, encounter):
-    # OpenMRS procedure retrieval goes here.
-    # Recommend starting by making this return a test procedure.
-    pass
-
-def generateJSONDescriptionFromDict(responses, patientId, phoneId, procedureId):
-    return cjson.encode(
-        {'phoneId': str(phoneId),
-         'patientId': str(patientId),
-         'procedureId': str(procedureId),
-         'questions': responses})
-
-def sendToOpenMRS(patientId, phoneId, procedureId,
-                  filePath, responses, username, password):
-    """Sends procedure data to OpenMRS
-
-    Expects:
-    
-        1. a valid patientId that is registered in OpenMRS already
-        2. a file path to an image
-        3. a QA dict of string question / answer pairs
-    
-    Parameters:
-        patientId
-            The patient id for this encounter
-        phoneId
-            The sending client id. Usually a telephone number.
-        procedureId
-            the id of the procedure used for collecting data
-        filePath
-            THe local path to files which will be uploaded.
-        responses
-            the data text collected
-        username
-            A username(for uploading).
-        password
-            A password(for uploading).
-    """
-    uploadToOpenMRS(
-        patientId,
-        filePath,
-        generateJSONDescriptionFromDict(responses,
-                                        patientId,
-                                        phoneId,
-                                        procedureId),
-        settings.OPENMRS_SERVER_URL,
-        username,
-        password)
-
-
-def uploadToOpenMRS(patientId, filePath, description, url, username, password):
-    """Uploads a file to OpenMRS and tags it on a given patientId's 
-    'Medical Images' tab.
-
-    Parameters:
-        patientId
-            The patientId is the internal patient ID in OpenMRS, NOT the 
-            "Identification Number" that one can search for in OpenMRS.
-        filePath
-            THe local path to files which will be uploaded.
-        description
-            The form data which will be sent. Does not need to be url-safe, 
-            since this method encodes it as such. Double-encoding it will 
-            produce non-desired output. 
-        url
-            The OpenMRS url. ::
-        
-                http://myserver.com/openmrs/
-        username
-            A username(for uploading).
-        password
-            A password(for uploading).
-    
-    """
-    cookies = cookielib.CookieJar()
-
-    opener = urllib2.build_opener(
-        urllib2.HTTPCookieProcessor(cookies),
-        handlers.MultipartPostHandler)
-    loginParams = urllib.urlencode(
-        {"uname": username,
-         "pw": password,
-         "redirect": "/openmrs",
-         "refererURL": url+"index.htm"
-         })
-    opener.open("%sloginServlet" % url, loginParams)
-    getParams = urllib.urlencode({'patientIdentifier': str(patientId),
-                                  'imageDate': time.strftime("%m/%d/%Y"),
-                                  'description': str(description)})
-    postParams = {"medImageFile": open(filePath, "rb")}
-    postUrl = "%smoduleServlet/gmapsimageviewer/formImageUpload?%s" % (url, getParams)
-    opener.open(postUrl, postParams)
-    logging.debug("Done with upload")
