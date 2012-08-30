@@ -13,10 +13,9 @@ import logging
 import urllib
 
 from django.conf import settings
-from sana.api.contrib.smslib.messages import format_sms
 
-def send_clickatell_notification(message_body, phoneId):
-    return ClickatellOpener().open(message_body, phoneId)
+def send_clickatell_notification(message_body, phoneId,formatter=None):
+    return ClickatellOpener().open(message_body, phoneId,formatter=formatter)
 
 class ClickatellOpener:
     
@@ -24,7 +23,7 @@ class ClickatellOpener:
         pass
     
 
-    def open(self,message_body, phoneId):
+    def open(self, n, phoneId, formatter=None):
         """Sends an SMS message to Clickatell http interface
             
         See Clickatell API documentation for full details. 
@@ -51,7 +50,7 @@ class ClickatellOpener:
         """
         result = False
         try:
-            messages = format_sms(message_body)
+            messages = formatter(n) if formatter else n
             for message in messages:
     
                 params = urllib.urlencode({

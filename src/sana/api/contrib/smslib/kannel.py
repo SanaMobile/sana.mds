@@ -13,17 +13,18 @@ import logging
 import urllib
 
 from django.conf import settings
-from sana.api.contrib.smslib.messages import format_sms
 
-def send_kannel_notification(n, phoneId):
-    return KannelOpener().open(n, phoneId)
+__all__ = ['send_kannel_notification', 'KannelOpener']
+
+def send_kannel_notification(n, phoneId, formatter=None):
+    return KannelOpener().open(n, phoneId, formatter=formatter)
 
 class KannelOpener:
     
     def __init__(self):
         pass
     
-    def open(self, n, phoneId):
+    def open(self, n, phoneId, formatter=None):
         """Sends a notification to a phone as one or more sms messages through a
         Kannel SMS gateway.
         
@@ -35,7 +36,7 @@ class KannelOpener:
         """
         result = False
         try:
-            messages = format_sms(n)
+            messages = formatter(n) if formatter else n
             for message in messages:
                 params = urllib.urlencode({
                         'username': settings.KANNEL_USER,

@@ -16,15 +16,15 @@ import urllib
 from django.conf import settings
 from sana.api.contrib.smslib.messages import format_sms
 
-def send_znisms_notification(message_body, phoneId):
-    return ZnisOpener().open(message_body, phoneId)
+def send_znisms_notification(message_body, phoneId, formatter=None):
+    return ZnisOpener().open(message_body, phoneId, formatter=formatter)
 
 class ZnisOpener:
     
     def __init__(self):
         pass
     
-    def open(self, message_body, phoneId):
+    def open(self, message_body, phoneId, formatter=None):
         """Sends an SMS message to ZniSMS http interface
             
         ZniSMS API documentation: http://www.znisms.com/api.pdf
@@ -52,7 +52,7 @@ class ZnisOpener:
         """
         result = False
         try:
-            messages = format_sms(message_body)
+            messages = formatter(message_body) if formatter else message_body
             for message in messages:
     
                 params = urllib.urlencode({

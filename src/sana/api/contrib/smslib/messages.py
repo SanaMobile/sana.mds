@@ -14,7 +14,7 @@ from kannel import send_kannel_notification
 
 SMS_MESSAGE_SIZE = 140
 
-def send_notification(n, phoneId):
+def send_notification(n, phoneId, formatter=None):
     """Sends sms notification
     
     Parameters:
@@ -29,7 +29,7 @@ def send_notification(n, phoneId):
 
     # return send_clickatell_notification(n, phoneId)
     # return send_znisms_notification(n, phoneId)
-    return send_kannel_notification(n, phoneId) # New default
+    return send_kannel_notification(n, phoneId, formatter=formatter) # New default
 
 def format_sms(n):
     """Splits a given notification over a number of SMS messages and attaches
