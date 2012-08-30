@@ -7,9 +7,8 @@ import time
 import cjson
 from django.core.urlresolvers import resolve
 
-from sana.api import LOGGING_ENABLED, LOGGING_START, LOG_SIGNAL, NOTSET, LOG_LEVELS, ERROR
+from sana.api import LOGGING_ENABLED, LOGGING_START, LOG_SIGNAL, NOTSET, LOG_LEVELS, ERROR, LEVEL_CHOICES
 from sana.api.contrib.handlers import ThreadBufferedHandler
-from sana.core.models import RequestLog
 
 class LoggingMiddleware(object):
     """Logs exceptions with tracebacks with the standard logging module.
@@ -29,18 +28,18 @@ class LoggingMiddleware(object):
     
     def process_exception(self, request, exception):
         extra = {'mac':'', 'type':''}
-        logging.error("An unhandled exception occurred: %s" % repr(exception),
+        logging.error("An unhandled exception occurred: %s" % exception,
                       extra=extra)
         if not hasattr(request, LOGGING_ENABLED):
             return
         log = self.buildlog(request)
-        self.send_save(request, log=log)
+        self.send_save(request, event=log)
     
     def process_response(self, request, response):
         if not hasattr(request, LOGGING_ENABLED):
             return response
         log = self.buildlog(request)
-        self.send_save(request,log=log)
+        self.send_save(request,event=log)
         return response
         
     def process_request(self, request):
@@ -57,19 +56,21 @@ class LoggingMiddleware(object):
         records = self._handler.get_records()
         first = records[0] if len(records) > 0 else None
         level =  self._level(records)
+        
+        records = [self._record_to_json(record, first) for record in records]
         if verbose or level >= ERROR:
-            records = [self._record_to_json(record, first) for record in records][:]
+            records = records[:]
         else:
-            records = [self._record_to_json(record, first) for record in records][:1]
-        path = request.path
-        path = resolve(path).url_path    
-        # get correct RequestLog model
-        log = RequestLog(client = request.META['REMOTE_ADDR'],
-                         path=request.path,
-                         messages=cjson.encode(records),
-                         created=start, 
-                         duration=time_taken,
-                         level=level)
+            records = records[:1]
+            
+        resolver = resolve(request.path) 
+        log = { 'client': request.META['REMOTE_ADDR'],
+                'path':request.path,
+                'name':resolver.url_name,
+                'messages':cjson.encode(records),
+                'created':start, 
+                'duration':time_taken,
+                'level':level}
         return log
 
 
