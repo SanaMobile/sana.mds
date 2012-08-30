@@ -1,7 +1,4 @@
-'''
-Core features of the Sana Mobile Dispatch Server
-
-Created on Feb 29, 2012
+''' Core features of the Sana Mobile Dispatch Server
 
 :Authors: Sana Dev Team
 :Version: 2.0
@@ -14,9 +11,12 @@ import logging
 
 from django.core.urlresolvers import get_resolver, get_callable, get_script_prefix, reverse
 from django.conf import settings
+from django.forms.models import modelform_factory
 from django.utils.translation import ugettext_lazy as _
 from piston.utils import validate, rc, decorator
 from django.contrib.auth import authenticate
+
+from sana.api.responses import error, unauthorized, AUTH_SUCCESS, AUTH_FAILURE, AUTH_DISABLED
 
 SIGNALS = 'signals'
 
@@ -54,8 +54,7 @@ crud = ("create", "read","update","delete")
 _MAJOR_VERSION = '2'
 _MINOR_VERSION = '0'
 
-#__all__ = ['version', 'fail', 'succeed', 'validate', 'do_authenticate',
-#           'API_VERSION' ]
+
 
 def version(): 
     return settings.API_VERSION
@@ -63,22 +62,6 @@ def version():
 API_VERSION = {_('API'):settings.API_VERSION } 
 API_CONFIG_ERROR = _('Incorrect dispatch configuration')
 
-
-
-def fail(data):
-    ''' Fail response as a python dict with data '''
-    response = {'status': 'FAILURE',
-                'message': data}
-    return response
-
-def succeed(data):
-    ''' Success response as a python dict with data '''
-    response = {'status': 'SUCCESS',
-                'message': data}
-    return response
-
-def error(data):
-    return fail(data)
 
 def validate(operation='POST'):
     ''' Adds the following attributes to all CRUD requests
@@ -97,8 +80,15 @@ def validate(operation='POST'):
     def wrap(f, handler, request, *a, **kwa):
         # gets the form we will validate
         klass = handler.__class__
-        if hasattr(klass, 'v_form'):
+        if hasattr(klass, 'form'):
+            # want to start encouraging use of form
+            v_form = getattr(klass, 'form')
+        elif hasattr(klass, 'v_form'):
+            # old validate form,v-form, notation
             v_form = getattr(klass, 'v_form')
+        elif hasattr(klass, 'model'):
+            # try to create one on the fly
+            v_form = modelform_factory(model=getattr(klass, 'model'))
         else:
             return error(u'Invalid object')
         # Create the dispatchable form and validate
@@ -129,24 +119,24 @@ def do_authenticate(request):
     """
     uname = ''
     pw = ''
-    result, msg = False, "username and password combination incorrect!"
     if request.method == "POST":
         uname = request.POST['username']
         pw = request.POST['password']
     else:
         uname = request.REQUEST.get("username",'')
         pw = request.REQUEST.get("password",'')
-    logging.info("Authentication attempt from user: %s" % uname)
+        
+    result, msg = False, "Invalid auth. {uname}".format(uname=uname)
     # require non empty username and password    
     if uname and pw:
         user = authenticate(username=uname, password=pw)
         if user is not None:
             if user.is_active:
-                result, msg = True, "username and password validated!"
+                result, msg = True, AUTH_SUCCESS.format(username=uname)
             else:
-                result, msg = False, "Disabled account."
+                result, msg = False, AUTH_DISABLED.format(username=uname)
         else:
-            result, msg = False, ""
+            result, msg = False, AUTH_FAILURE.format(username=uname)
     return result, msg
 
 

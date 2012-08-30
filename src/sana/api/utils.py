@@ -47,6 +47,7 @@ def logstack(handler, e):
     trace = traceback.format_tb(tb)
     for tbm in trace:
         logger.error(tbm)
+    return et, val, tb
 
 def dictzip(keys,values):
     """ zips to lists into a dictionary """
