@@ -37,10 +37,8 @@ from django.conf import settings
 from django.core.mail import send_mail
 from django.shortcuts import render_to_response
 
-from sana.api import succeed, fail
-from sana.api.responses import render_json_response
+from sana.api.responses import render_json_response, succeed, fail
 
-from sana.api.responses.json import *
 from sana.mrs.forms import *
 from sana.api.contrib.openmrs import openmrs16 as openmrs
 from sana.api.contrib.smslib.messages import send_notification
@@ -50,7 +48,7 @@ from sana.api.v1.api import register_binary
 from sana.api.v1.api import register_binary_chunk
 from sana.api.v1.api import register_client_events
 
-from sana.mds.forms import *
+from sana.mrs.forms import *
 from sana.mrs.models import Notification, SavedProcedure
 
 
