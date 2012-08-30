@@ -15,15 +15,12 @@ __all__ = ['ConceptForm', 'RelationshipForm', 'RelationshipCategoryForm',
            'NotificationForm',
            'ObserverForm', 
            'ObservationForm', 
-           'PatientForm', 
-           'ProcedureForm', 
-           'BinaryPacketForm', 
-           'Base64PacketForm', ]
+           'SubjectForm', 
+           'ProcedureForm',  ]
 
 class AuthForm(forms.Form):
     username = forms.CharField()
     password = forms.PasswordInput()
-
 
 class ConceptForm(forms.ModelForm):
     """ A simple concept form 
@@ -57,10 +54,16 @@ class EncounterForm(forms.ModelForm):
         super(EncounterForm, self).__init__(*args,**kwargs)
         if kwargs.has_key('instance'):
             obs = self.initial['instance'].observation_set.all()
-        self.fields['observations'] = forms.ModelMultipleChoiceField(obs)
+        self.fields['observations'] = forms.ModelMultipleChoiceField(obs,required=False)
         
     class Meta:
         model = Encounter
+
+class EventForm(forms.ModelForm):
+    """ A simple event form
+    """
+    class Meta:
+        model = RequestLog
 
 class NotificationForm(forms.Form):
     # TODO(XXX) Use a ModelForm? Type and destinations are the only thing that
