@@ -9,13 +9,14 @@ from django.utils.translation import ugettext_lazy as _
 
 
 from piston.handler import BaseHandler
-from piston.utils import validate
 
-from sana.api.models import RESTModel
-from sana.api.responses import succeed, fail
+#from piston.utils import validate
+
+from sana.api import validate
+from sana.api.responses import succeed, fail, error
 from sana.api.utils import logstack, printstack
 
-__all__ = ['handler_uri_templates', 'RESTHandler', ]
+__all__ = ['RESTHandler', ]
 
 class UnsupportedCRUDException(Exception):
     def __init__(self, value):
@@ -52,7 +53,8 @@ class RESTHandler(BaseHandler):
             extending class.
         """
         try:
-            return succeed(request.form.save().get_representation())
+            instance = request.form.save()          
+            return succeed(instance.get_representation())
         except Exception, e:
             return self.trace(request, e)
       
@@ -68,28 +70,30 @@ class RESTHandler(BaseHandler):
             return succeed(response)  
         except Exception, e:
             return self.trace(request, e)
-    
+        
     def update(self, request, *args, **kwargs):
-        """ PUT Request handler. No validation is performed. """
-        try:
-            return succeed(BaseHandler.update(self, request, args, kwargs))
-        except Exception, e:
-            return self.trace(request, e)
+        """ PUT Request handler."""
+        return self.create(request,args, kwargs)
     
-    def delete(self,request, *args, **kwargs):
+    def delete(self,request, uuid=None):
         """ DELETE Request handler. No validation is performed. """
         try:
-            return succeed(BaseHandler.delete(self, request, args, kwargs))
+            if not uuid:
+                raise Exception("UUID required for delete.")
+            model = getattr(self,'model')
+            model.objects.delete(uuid=uuid)
+            return succeed("Successfully deleted object uuid: {0}".format(uuid))
         except Exception, e:
             return self.trace(request, e)
 
-    def trace(self,request, error):
-        printstack(error)
-        logstack(self,error)
-        return fail(error)
+    def trace(self,request, ex=None):
+        printstack(ex)
+        _,message,_ = logstack(self,ex)
+        return error(message)
     
     def readMultiple(self, request, *args, **kwargs):
-        
+        """ Returns a zero or more length list of objects.
+        """
         rep, start, limit = get_REST_params(request)
         model = getattr(self,'model')
         obj_set = model.objects.all()
@@ -111,7 +115,7 @@ class RESTHandler(BaseHandler):
             
             Sending rep='full' will return all fk objects back to the instance.
         """
-        rep, start, limit = get_REST_params(request)
+        rep, _,_ = get_REST_params(request)
         model = getattr(self.__class__, 'model')
         obj = model.objects.get(uuid=uuid)
         if related:
