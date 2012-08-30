@@ -1,5 +1,4 @@
-"""
-The concept model for the Sana data engine.
+"""Lexicon models for the core data layer.
 
 :Authors: Sana dev team
 :Version: 2.0
@@ -8,7 +7,6 @@ The concept model for the Sana data engine.
 from django.conf import settings
 from django.db import models
 
-from sana.api.utils import make_uuid
 from sana.api.models  import RESTModel
 
 _app = "core"
@@ -23,7 +21,8 @@ class Concept(RESTModel):
     
     include_link = ('uuid', 'uri','name')
     include_default = include_link
-    include_full = ('uuid', 'uri','name', 'description')
+    include_full = ('uuid', 'uri','name', 'display_name','description',
+                    'conceptclass', 'datatype', 'mimetype', 'constraint' )
     
     name = models.CharField(max_length=255, unique=True)
     """ A short unique name."""
@@ -82,6 +81,10 @@ class RelationshipCategory(RESTModel):
     def __unicode__(self):
         return self.name
     
+    include_link = ('uuid', 'uri','name')
+    include_default = include_link
+    include_full = ('uuid', 'uri','name',)
+                    
     name = models.CharField(max_length=64)
     description = models.CharField(max_length=512, blank=True)
     restriction = models.CharField(max_length=512, blank=True)
@@ -92,10 +95,16 @@ class Relationship(RESTModel):
     class Meta:
         app_label = _app
     
+    include_link = ('uuid', 'uri','category', 'to_concept')
+    include_default = include_link
+    include_full = ('uuid', 'uri','from_concept','category', 'to_concept')
+    
     from_concept = models.ForeignKey('Concept', 
-                            related_name='concept_related_from')
+                            related_name='concept_related_from',
+                            to_field='uuid')
     to_concept = models.ForeignKey('Concept', 
-                            related_name="concept_related_to")
+                            related_name="concept_related_to",
+                            to_field='uuid')
     category = models.ForeignKey('RelationshipCategory')
     def __unicode__(self):
         return u'{to} {relationship} {from}'.format(self.to_concept.name, 

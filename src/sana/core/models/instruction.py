@@ -1,5 +1,4 @@
-"""
-The subject model for the Sana data engine.
+""" Represents a single step within a Procedure.
 
 :Authors: Sana dev team
 :Version: 2.0
@@ -12,7 +11,7 @@ class Instruction(models.Model):
     
     class Meta:
         app_label = _app
-    concept = models.ForeignKey('Concept')
+    concept = models.ForeignKey('Concept', to_field='uuid')
     ''' Contextual information about the instruction '''
     
     predicate = models.CharField(max_length=64)

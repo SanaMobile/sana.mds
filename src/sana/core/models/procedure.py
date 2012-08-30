@@ -1,5 +1,4 @@
-"""
-The subject model for the Sana data engine.
+""" A set of instructions for data collection or information dissemination.
 
 :Authors: Sana dev team
 :Version: 2.0
@@ -15,10 +14,9 @@ class Procedure(RESTModel):
     class Meta:
         app_label = _app  
     
-    include_link = ('uuid', 'uri', 'name','concept')
-    include_full = ('uuid', 'name', 'author', 'version', 'uri')
-    include_default = include_link
-    
+    include_default = ('uuid', 'name', 'author', 'version', 'uri')
+    include_link = include_default
+    include_full = include_default
     
     author = models.CharField(max_length=255)
     """ The author of the procedure """
@@ -26,7 +24,7 @@ class Procedure(RESTModel):
     version = models.CharField(max_length=255, default="1.0")
     """ The version string for this instance """
     
-    concept = models.ForeignKey('Concept')
+    concept = models.ForeignKey('Concept', to_field='uuid')
     """ Context term for the object.""" 
     
     src = models.FileField(upload_to='%(app_label)/procedure', blank=True)

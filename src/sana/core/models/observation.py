@@ -1,5 +1,5 @@
-"""
-The observation model for the Sana data engine.
+""" An instance of data collection corresponding to a single step within a 
+Procedure.
 
 :Authors: Sana dev team
 :Version: 2.0
@@ -23,13 +23,17 @@ class Observation(RESTModel):
                                                self.concept.name,
                                                self.value, )
     
-    encounter = models.ForeignKey('Encounter')
+    include_link = ('uuid', 'uri','concept')
+    include_full = ('uuid', 'uri','concept', 'encounter', 'node', 'value')
+    include_default = include_link
+    
+    encounter = models.ForeignKey('Encounter', to_field='uuid')
     """ The instance of a procedure which this observation is associated with. """
     
     node = models.CharField(max_length=255)
     '''Unique node id within the external_id as defined by the original procedure.'''
 
-    concept = models.ForeignKey('Concept')
+    concept = models.ForeignKey('Concept', to_field='uuid')
     """ A dictionary entry which defines the type of information stored.""" 
     
     _value_text = models.CharField(max_length=255)

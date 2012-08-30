@@ -1,5 +1,5 @@
-"""
-The encounter model for the Sana data engine.
+""" An instance of data collection resulting from executing a Procedure
+on a Subject.
 
 :Authors: Sana dev team
 :Version: 2.0
@@ -18,36 +18,29 @@ class Encounter(RESTModel):
                
     def __unicode__(self):
         return "Encounter %s %s" % (self.uuid, self.created)
-
     
-#    # Will need this for date of collection as well - separate from created which 
-#    # marks when brought into existence on the server(needed for QC)
-#    date = models.DateTimeField()
-#    """ The date and time the encounter was completed upon the subject. """
+    include_link = ('uuid', 'uri','modified','subject', 'procedure')
+    include_default = include_link
+    include_full = ('uuid', 'uri','modified','subject', 'procedure', 
+                    'observer', 'device', 'concept')
     
-    procedure = models.ForeignKey('Procedure')
+    procedure = models.ForeignKey('Procedure', to_field='uuid')
     """ The procedure used to collect this encounter """
     
-    observer = models.ForeignKey('Observer')
+    observer = models.ForeignKey('Observer', to_field='uuid')
     """ The entity which collected the data """
     
-    device = models.ForeignKey('Device')
+    device = models.ForeignKey('Device', to_field='uuid')
     """ The client which collected the encounter """
     
-    subject = models.ForeignKey('Subject')
+    subject = models.ForeignKey('Subject', to_field='uuid')
     """ The subject about whom the data was collected """
 
-    concept = models.ForeignKey('Concept')
+    concept = models.ForeignKey('Concept', to_field='uuid')
     """ A contextual term for the encounter."""
 
     #_uploaded = models.BooleanField(default=False)
     #""" Whether the saved procedure was uploaded to a remote queueing server. """
-    
-
-    # EMR Encounter Number
-    # Might be cleaner to make this an integer, but EMR systems in general
-    # might not use an integer as the unique ID of an external_id.
-    #external_id = models.CharField(default="-1", max_length=512)
     
     #TODO move these to a manager class
     def flush(self):

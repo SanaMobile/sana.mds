@@ -1,5 +1,4 @@
-"""
-The subject model for the Sana data engine.
+""" An entity about whom data is collected.
 
 :Authors: Sana dev team
 :Version: 2.0
@@ -13,10 +12,13 @@ class Subject(RESTModel):
 
     class Meta:
         app_label = _app    
-    concept = models.ForeignKey('Concept')
+    
+    include_link = ('uuid', 'uri','concept')
+    include_full = include_link
+    include_default = include_link
+    
+    concept = models.ForeignKey('Concept', to_field='uuid')
     """ A contextual term for the subject.""" 
 
-#    def __unicode__(self):
-#        return "%s, %s" % (self.name_group,self.name)
     
     

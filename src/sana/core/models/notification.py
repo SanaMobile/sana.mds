@@ -8,12 +8,19 @@ import cjson
 
 from django.db import models
 from sana.api.models import RESTModel
+
 _app="core"
+
 class Notification(RESTModel):
     """ A message to be sent """
     
     class Meta:
         app_label = _app
+        
+    include_link = ('uuid', 'uri','address','header', 'message', 'modified')
+    include_default = include_link
+    include_full = include_default
+    
     address = models.CharField(max_length=512)
     """ The recipient address """
     
@@ -25,7 +32,8 @@ class Notification(RESTModel):
     
     delivered = models.BooleanField(default = False)
     """ Set True when delivered """
-
+    
+    #TODO This is likely better moved elsewhere 
     def to_json(self, **kwargs):
         msg = {'address': self.client,
                'subject': self.header,
