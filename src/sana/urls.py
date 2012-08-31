@@ -18,6 +18,7 @@ admin.autodiscover()
 urlpatterns = patterns(
     '',
     url(r'^$', 'sana.core.views.home', name="home"),
+    url(r'^media/(?P<path>.*)$', 'django.views.static.serve',  {'document_root': settings.MEDIA_ROOT }),
     url(r'^core/', include('sana.core.urls', namespace='core')),
     url(r'^mds/', include('sana.mds.urls', namespace='mds')),
     url(r'^mrs/', include('sana.mrs.urls', namespace='mrs')),
