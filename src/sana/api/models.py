@@ -60,7 +60,7 @@ class RESTModel(models.Model):
         """ Returns a representation of this object. The three 'link', 'default'
             and 'full' methods should be overridden for custom behavior
         """
-        method = RESTModel._include_format.format(rep)
+        method = "{0}_representation".format(rep)
         callable = getattr(self, method)
         representation = callable(**kwargs)
         return representation
