@@ -15,9 +15,6 @@ from sana.api.models import RESTModel
 # TODO read this from the config
 TIME_FORMAT = "%m/%d/%Y %H:%M:%S"
 
-
-
-
 _app = "core"
 class RequestLog(RESTModel):
     """
@@ -27,8 +24,8 @@ class RequestLog(RESTModel):
         app_label = _app
         
     include_link = ('uuid', 'name','level')
-    include_full = ('uuid', 'name', 'level','device', 'domain', 'level','message', 'timestamp', 'duration')
-    include_default = ('uuid', 'level', 'path', 'timestamp' )
+    include_full = ('uuid', 'name', 'level','client', 'path', 'level','message', 'timestamp', 'duration')
+    include_default = include_full
     
     # max keylength of index is 767
     client = models.CharField(max_length=16)

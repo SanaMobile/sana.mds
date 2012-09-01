@@ -47,7 +47,7 @@ class Concept(RESTModel):
     
     @property
     def is_complex(self):
-        return not self.datatype == 'blob'
+        return self.datatype == 'complex' or self.datatype == 'blob'
     """ True if this concept requires file storage when used for values """
 
     def add_relationship(self, concept, category):    

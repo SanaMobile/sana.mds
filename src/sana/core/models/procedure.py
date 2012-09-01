@@ -27,7 +27,7 @@ class Procedure(RESTModel):
     concept = models.ForeignKey('Concept', to_field='uuid')
     """ Context term for the object.""" 
     
-    src = models.FileField(upload_to='%(app_label)/procedure', blank=True)
+    src = models.FileField(upload_to='{0}/procedure'.format(_app), blank=True)
     """ File storage location for the procedure """
 
     @property

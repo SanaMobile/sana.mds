@@ -17,11 +17,11 @@ class Observation(RESTModel):
         app_label = _app    
         unique_together = (('encounter', 'node'),)
 
-    def __unicode__(self):
-        return "Observation %s %s %s %s" % (self.encounter.uuid, 
-                                               self.node,
-                                               self.concept.name,
-                                               self.value, )
+    #def __unicode__(self):
+    #    return "Observation %s %s %s %s" % (self.encounter.uuid, 
+    #                                           self.node,
+    #                                           self.concept.name,
+    #                                           str(self.value), )
     
     include_link = ('uuid', 'uri','concept')
     include_full = ('uuid', 'uri','concept', 'encounter', 'node', 'value')
@@ -42,18 +42,19 @@ class Observation(RESTModel):
         url to the file
     """
     
-    _value_complex = models.FileField(upload_to='%(app_label)/observation', blank=True,)
+    _value_complex = models.FileField(upload_to='{0}/observation'.format(_app), blank=True,)
     """ File object holder """
     
     def getvalue(self):
-        if self.is_complex():
+        if self.is_complex:
             return self._value_complex.path
         else:
             return self._value_text
         
     def setvalue(self,value):
-        if self.is_complex():
-            return self._value_complex
+        if self.is_complex:
+            self._value_complex = value
+            self._value_text = "complex_data" 
         else:
             return self._value_text
             
@@ -73,6 +74,16 @@ class Observation(RESTModel):
     # Whether the binary resource was uploaded to a remote queueing
     # server.
     #uploaded = models.BooleanField(default=False)
+    
+    def clean(self):
+        if self.is_complex:
+            self._value_complex.path = self.value
+            self._value_text = "complex_data"
+        else:
+            self._value_complex.path = None
+            self._value_text = self.value
+        super(RESTModel, self).clean()
+        
     
     @property
     def subject(self):
@@ -100,7 +111,7 @@ class Observation(RESTModel):
             return None
     
     def open(self, mode="w"):
-        if not self.is_complex():
+        if not self.is_complex:
             raise Exception("Attempt to open file for non complex observation")
         path, _ = os.path.split(self._value_complex.path)
         # make sure we have the directory structure
