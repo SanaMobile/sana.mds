@@ -17,6 +17,9 @@ This will require root privileges.
 """
 API_VERSION = '1.2'
 
+COMPAT_URLS = ('v1',)
+''' Will include any <version>patterns in top urls.py listed here ''' 
+
 ### OpenMRS settings. OpenMRS versions seem to have some difference in submitted 
 ### date format. 
 OPENMRS_SERVER_URL = 'http://localhost/openmrs' 
@@ -88,6 +91,8 @@ MIMETYPES = (("text/plain", "Text"),
              ("image/jpg","Image"),
              ("audio/3gp","Audio"),
              ("video/3gp", "Video"),
+             ("application/json", "JSON"),
+             ("application/xml", "XML"),
              ("application/octet-stream", "Binary"))
              
 
