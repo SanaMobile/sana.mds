@@ -11,14 +11,11 @@ from django.views.generic.simple import redirect_to
 
 from django.contrib import admin
 
-from sana.api.v1.v2compatlib import redirect_to_v1
-
 admin.autodiscover()
 
 urlpatterns = patterns(
     '',
     url(r'^$', 'sana.core.views.home', name="home"),
-    url(r'^media/(?P<path>.*)$', 'django.views.static.serve',  {'document_root': settings.MEDIA_ROOT }),
     url(r'^core/', include('sana.core.urls', namespace='core')),
     url(r'^mds/', include('sana.mds.urls', namespace='mds')),
     url(r'^mrs/', include('sana.mrs.urls', namespace='mrs')),
@@ -30,9 +27,13 @@ urlpatterns = patterns(
 """The mappings Django uses to send requests to the appropriate handlers."""
 
 if settings.DEBUG:
-    urlpatterns += patterns('django.contrib.staticfiles.views',
+    urlpatterns += patterns(
+        'django.contrib.staticfiles.views',
         url(r'^static/(?P<path>.*)$', 'serve'),
-    )
+        )
+    urlpatterns += patterns('',
+            url(r'^media/(?P<path>.*)$', 'django.views.static.serve',  {'document_root': settings.MEDIA_ROOT }),
+        )
     
 v1patterns = patterns(
     '',
