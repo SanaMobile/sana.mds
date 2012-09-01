@@ -79,7 +79,7 @@ extra_patterns = patterns(
     # encounters
     url(r'^encounter/$', encounter_handler, name='encounter-list'),
     url(r'^encounter/(?P<uuid>[^/]+)/$', encounter_handler, name='encounter'),
-    url(r'^encounter/(?P<uuid>[^/]+)/observation/$', concept_handler, name='encounter-observations', kwargs={'related':'observation'}),
+    url(r'^encounter/(?P<uuid>[^/]+)/observation/$', encounter_handler, name='encounter-observations', kwargs={'related':'observation'}),
     
     # observations
     url(r'^observation/$', observation_handler, name='observation-list'),
@@ -96,7 +96,7 @@ extra_patterns = patterns(
     # subjects
     url(r'^subject/$', subject_handler, name='subject-list'),
     url(r'^subject/(?P<uuid>[^/]+)/$', subject_handler, name='subject'),
-    url(r'^subject/(?P<uuid>[^/]+)/encounter/$', concept_handler, name='subject-encounters', kwargs={'related':'procedure'}),
+    url(r'^subject/(?P<uuid>[^/]+)/encounter/$', subject_handler, name='subject-encounters', kwargs={'related':'procedure'}),
 )
 
 # add the non-RESTful urls

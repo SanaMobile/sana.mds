@@ -4,30 +4,20 @@ Created on Feb 29, 2012
 :Authors: Sana Dev Team
 :Version: 2.0
 '''
-import sys, traceback
 import logging
 import cjson
 
-from django.core.paginator import Paginator
-from django.http import HttpResponse
-from django.shortcuts import render_to_response
-from django.template import RequestContext 
-from django import http
-from django.utils.translation import ugettext_lazy as _
-
-
 from piston.handler import BaseHandler
-from piston import doc
 
-from sana.api import do_authenticate
+from sana.api import do_authenticate, LOGGER
 from sana.api.handlers import RESTHandler
-from sana.api.decorators import logged
+from sana.api.decorators import logged, validate
 from sana.api.docs.utils import handler_uri_templates
 from sana.api.responses import succeed, fail, error
+from sana.api.signals import EventSignal, EventSignalHandler
 
 from sana.core.forms import *
 from sana.core.models import *
-from sana.core.signals import done_logging, event_signalhandler
 
 __all__ = ['ConceptHandler', 
            'RelationshipHandler',
@@ -43,9 +33,6 @@ __all__ = ['ConceptHandler',
            'SessionHandler',
            'SubjectHandler',]
 
-
-__signals__ = ( done_logging, event_signalhandler)
-
 class LogHandler(object):
     def __init__(self, model):
         self.model = RequestLog
@@ -56,12 +43,11 @@ class LogHandler(object):
     def save(self, **kwargs):
         self.instance = RequestLog(kwargs)
         
-        
-class SessionHandler(BaseHandler):
+@logged     
+class SessionHandler(RESTHandler):
     """ Handles session auth requests. """
     allowed_methods = ('GET','POST',)
-    signals = ( done_logging, event_signalhandler)
-    logger = ( done_logging, event_signalhandler)
+    signals = { LOGGER:( EventSignal(), EventSignalHandler(RequestLog))}
     
     def create(self,request):
         try:
@@ -69,9 +55,13 @@ class SessionHandler(BaseHandler):
             if success:
                 return succeed(msg)
             else:
+                logging.warn(msg)
                 return fail(msg)
         except:
-            return error("Internal Server Error")
+            msg = "Internal Server Error"
+            logging.error(msg)
+            return error(msg)
+        
     def read(self,request):
         success,msg = do_authenticate(request)
         if success:
@@ -85,93 +75,93 @@ class ConceptHandler(RESTHandler):
     allowed_methods = ('GET', 'POST')
     model = Concept
     form = ConceptForm
-    signals = ( done_logging, event_signalhandler)
-    logger = ( done_logging, event_signalhandler)
     fields = ("uuid", "name")
+    signals = { LOGGER:( EventSignal(), EventSignalHandler(RequestLog))}
 
 class RelationshipHandler(RESTHandler):
     """ Handles concept relationship requests. """
     allowed_methods = ('GET', 'POST')
     model = Relationship
     form = RelationshipForm
+    signals = { LOGGER:( EventSignal(), EventSignalHandler(RequestLog))}
     
 class RelationshipCategoryHandler(RESTHandler):
     """ Handles concept relationship category requests. """
     allowed_methods = ('GET', 'POST')
     model = RelationshipCategory
     form = RelationshipCategoryForm
+    signals = { LOGGER:( EventSignal(), EventSignalHandler(RequestLog))}
 
+@logged
 class DeviceHandler(RESTHandler):
     """ Handles device requests. """
     allowed_methods = ('GET', 'POST')
     model = Device
     form = DeviceForm
+    signals = { LOGGER:( EventSignal(), EventSignalHandler(RequestLog))}
     
+@logged    
 class EncounterHandler(RESTHandler):
     """ Handles encounter requests. """
     allowed_methods = ('GET', 'POST')
     model = Encounter
     form = EncounterForm
     fields = ("uuid", "concept", "observation",'subject','procedure')
+    signals = { LOGGER:( EventSignal(), EventSignalHandler(RequestLog))}
     #TODO wrap this around the old json.py
 
+@logged
 class NotificationHandler(RESTHandler):
     """ Handles notification requests. """
     allowed_methods = ('GET', 'POST')
     model = Notification
     form = NotificationForm
+    signals = { LOGGER:( EventSignal(), EventSignalHandler(RequestLog))}
     #TODO wrap this around the old json.py
 
+@logged
 class ObservationHandler(RESTHandler):
     allowed_methods = ('GET', 'POST')
     model = Observation
     form = ObservationForm
-        
+    signals = { LOGGER:( EventSignal(), EventSignalHandler(RequestLog))}
+    
+@logged        
 class ObserverHandler(RESTHandler):
     """ Handles observer requests. """
     allowed_methods = ('GET', 'POST')
     model = Observer
     form = ObserverForm
-    
+    signals = { LOGGER:( EventSignal(), EventSignalHandler(RequestLog))}
+
+@logged
 class ProcedureHandler(RESTHandler):
     allowed_methods = ('GET', 'POST')
     model = Procedure
     form = ProcedureForm
-    default_rep = ['uuid','author','version', 'name']
+    signals = { LOGGER:( EventSignal(), EventSignalHandler(RequestLog))}
     
-    def readByUuid(self,request,uuid):
+    def _read_by_uuid(self,request,uuid):
         """ Returns the procedure file instead of the verbose representation on 
             uuid GET requests 
         """
-        model = getattr(self.__class__, 'model')  
-        return open(model.objects.get(uuid=uuid).src.path).read()
+        model = getattr(self.__class__, 'model')
+        obj =  model.objects.get(uuid=uuid)
+        return open(obj.src.path).read()
     
 class RequestLogHandler(RESTHandler):
     """ Handles network request log requests. """
     allowed_methods = ('GET', 'POST')
     model = RequestLog
-    signals = ( done_logging, event_signalhandler)
-    logger = ( done_logging, event_signalhandler)
-    """    
-    def readByUuid(self,request,uuid):
-        log = self.queryset(request).get(uuid=uuid)
-        message = {'id': uuid,
-                    'data': cjson.decode(log.message,True)}
-        
-        return HttpResponse(cjson.encode(message))
-    """
 
-
-    
-
+@logged
 class SubjectHandler(RESTHandler):
     """ Handles subject requests. """
     allowed_methods = ('GET', 'POST')
     fields = ['uuid']
     model = Subject
     form = SubjectForm
-    signals = ( done_logging, event_signalhandler)
-    logger = ( done_logging, event_signalhandler)
+    signals = { LOGGER:( EventSignal(), EventSignalHandler(RequestLog))}
 
    
 class DocHandler(BaseHandler):
