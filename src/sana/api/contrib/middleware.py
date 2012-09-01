@@ -30,13 +30,13 @@ class LoggingMiddleware(object):
         extra = {'mac':'', 'type':''}
         logging.error("An unhandled exception occurred: %s" % exception,
                       extra=extra)
-        if not hasattr(request, LOGGING_ENABLED):
+        if not hasattr(request, LOG_SIGNAL):
             return
         log = self.buildlog(request)
         self.send_save(request, event=log)
     
     def process_response(self, request, response):
-        if not hasattr(request, LOGGING_ENABLED):
+        if not hasattr(request, LOG_SIGNAL):
             return response
         log = self.buildlog(request)
         self.send_save(request,event=log)
@@ -49,7 +49,7 @@ class LoggingMiddleware(object):
 
     def buildlog(self, request, verbose=True):
         time_taken = -1
-        if hasattr(request, LOGGING_START):
+        if hasattr(request, LOG_SIGNAL):
             start = getattr(request, LOGGING_START)
             time_taken = time.time() - start
         

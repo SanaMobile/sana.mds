@@ -12,9 +12,9 @@ from piston.handler import BaseHandler
 
 #from piston.utils import validate
 
-from sana.api import validate
+from sana.api.decorators import validate
 from sana.api.responses import succeed, fail, error
-from sana.api.utils import logstack, printstack
+from sana.api.utils import logstack, printstack, exception_value
 
 __all__ = ['RESTHandler', ]
 
@@ -53,7 +53,7 @@ class RESTHandler(BaseHandler):
             extending class.
         """
         try:
-            instance = request.form.save()          
+            instance = self._create_object(request, args, kwargs)  
             return succeed(instance.get_representation())
         except Exception, e:
             return self.trace(request, e)
@@ -62,36 +62,52 @@ class RESTHandler(BaseHandler):
         """ GET Request handler. No validation is performed. """
         try:
             if uuid and related:
-                response = self.readRelatedByUuid(request,uuid)
+                response = self._read_by_uuid(request,uuid, related=related)
             elif uuid:
-                response = self.readByUuid(request,uuid)
+                response = self._read_by_uuid(request,uuid)
             else:
-                response = self.readMultiple(request)
+                response = self._read_multiple(request)
             return succeed(response)  
         except Exception, e:
             return self.trace(request, e)
         
-    def update(self, request, *args, **kwargs):
-        """ PUT Request handler."""
-        return self.create(request,args, kwargs)
+    def update(self, request, uuid=None):
+        """ PUT Request handler. Allows single item updates only. """
+        try:
+            if not uuid:
+                raise Exception("UUID required for update.")
+            msg = self._update(request, uuid)
+            return succeed(msg)
+        except Exception, e:
+            return self.trace(request, e)
     
     def delete(self,request, uuid=None):
         """ DELETE Request handler. No validation is performed. """
         try:
             if not uuid:
                 raise Exception("UUID required for delete.")
-            model = getattr(self,'model')
-            model.objects.delete(uuid=uuid)
-            return succeed("Successfully deleted object uuid: {0}".format(uuid))
+            msg = self._delete(uuid)
+            return succeed(msg)
         except Exception, e:
             return self.trace(request, e)
 
     def trace(self,request, ex=None):
-        printstack(ex)
-        _,message,_ = logstack(self,ex)
-        return error(message)
+        try:
+            printstack(ex)
+            _,message,_ = logstack(self,ex)
+            return error(message)
+        except:
+            return error(exception_value(ex))
     
-    def readMultiple(self, request, *args, **kwargs):
+    def _create(self,request, *args, **kwargs):
+        data = request.form.cleaned_data
+        klazz = getattr(self,'model')
+        instance = klazz(**data)
+        instance.save()          
+        return instance
+    
+    
+    def _read_multiple(self, request, *args, **kwargs):
         """ Returns a zero or more length list of objects.
         """
         rep, start, limit = get_REST_params(request)
@@ -101,14 +117,14 @@ class RESTHandler(BaseHandler):
             paginator = Paginator(obj_set, limit, 
                                   allow_empty_first_page=True)
             try:
-                objs = paginator.page(start)
+                objs = paginator.page(start).object_list
             except (EmptyPage, InvalidPage):
-                objs = paginator.page(paginator.num_pages)       
+                objs = paginator.page(paginator.num_pages).object_list      
         else:
             objs = obj_set
         return [ x.get_representation(rep,location=get_root(request)) for x in objs ]
 
-    def readByUuid(self,request, uuid, related=None):
+    def _read_by_uuid(self,request, uuid, related=None):
         """ Reads an object from the database using the UUID as a slug and 
             will return the object along with a set of related objects if 
             specified.
@@ -119,8 +135,23 @@ class RESTHandler(BaseHandler):
         model = getattr(self.__class__, 'model')
         obj = model.objects.get(uuid=uuid)
         if related:
-            result = getattr(object, related+'_set', [])
+            rm = obj._meta._name_map[related][0].model
+            result = obj.get_representation(rep,location=get_root(request))
+            objs = rm.objects.filter(**{model.__name__.lower() : obj})
+            result[related] = [ x.get_representation(rep,location=get_root(request)) for x in objs[:]]
         else:
             result = obj.get_representation(rep,location=get_root(request))
         return result      
- 
+
+    def _update(self,request, uuid):
+        model = getattr(self,'model')
+        obj = model.objects.get(uuid=uuid)
+        data = self.flatten_dict(request.POST)
+        
+        msg = "Successfully updated  {0}: {1}".format(model.__class__.__name__,uuid)
+        return msg
+    
+    def _delete(self,uuid):
+        model = getattr(self,'model')
+        model.objects.delete(uuid=uuid)
+        return "Successfully deleted {0}: {1}".format(model.__class__.__name__,uuid)

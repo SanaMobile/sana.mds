@@ -5,10 +5,16 @@ Created on Aug 9, 2012
 :version: 2.0
 '''
 
-from sana.api import LOGGING_ENABLED, LOG_SIGNAL, SIGNALS
+from sana.api import LOGGING_ENABLED, LOG_SIGNAL, SIGNALS, LOGGER, CRUD, crud
+from sana.api.responses import error
+
+
+from django.forms.models import modelform_factory
+from django.utils.translation import ugettext_lazy as _
+from piston.utils import validate, rc, decorator
+
 from django.core.signals import request_finished, got_request_exception, Signal
 from django.db import models
-from sana.api import CRUD, crud
 from sana.api.utils import make_uuid, dictzip
 
 def enable_logging(f):
@@ -21,34 +27,29 @@ def enable_logging(f):
     new_f.func_name = f.func_name
     return new_f
 
-
 CRUD_MAP = dictzip(CRUD,crud)
 
+
+def _signal(klazz, name, f):
+    def new_f(*args, **kwargs):
+        request = args[1]
+        signals = getattr(klazz, SIGNALS, None)
+        signal,callback = signals.get(name, (None,None))
+        if signal and callback:
+            signal.connect(callback)
+        setattr(request, name, signal)
+        return f(*args, **kwargs)
+    new_f.func_name = f.func_name
+    return new_f
 
 def logged(klazz):
     """ Decorator to enable logging on a Piston Handler classes CRUD methods.
         Checks for the 'allowed_methods' class attribute to determine which
-        methods to log. 
+        methods to log.
+        
+        Looks for a (Signal, callable) assigned as the value of the 'logger' 
+        key in the class.
     """
-    def _enable(f):
-        def new_f(*args, **kwargs):
-            request = args[1]
-            signals = getattr(klazz, SIGNALS, None)
-            callback = None
-            signal = None
-            if isinstance(signals, tuple):
-                signal,callback = signals
-            elif isinstance(signals, Signal):
-                signal = signals
-                callback = request_finished
-                
-            if signal and callback:
-                signal.connect(callback)
-            setattr(request, LOG_SIGNAL, signal)
-            setattr(request, LOGGING_ENABLED, True)
-            return f(*args, **kwargs)
-        new_f.func_name = f.func_name
-        return new_f
     # wraps each of the methods declared in the classes 
     # allowed_methods class to enable logging
     methods = getattr(klazz,'allowed_methods',[])
@@ -56,7 +57,7 @@ def logged(klazz):
         attr = CRUD_MAP.get(m,None)
         f = getattr(klazz, attr)
         if f:
-            setattr(klazz, attr, _enable(f))
+            setattr(klazz, attr, _signal(klazz,LOGGER, f))
     return klazz 
 
 def universal(klazz):
@@ -68,5 +69,53 @@ def universal(klazz):
 
 def cacheable(klazz):
     """ Decorator that declares a unique name field to a Model class. """
-    field = models.TextField(blank=True)
-    setattr(klazz,'cache',field)
+    
+    methods = getattr(klazz,'allowed_methods',[])
+    for m in methods:
+        attr = CRUD_MAP.get(m,None)
+        f = getattr(klazz, attr)
+        if f:
+            setattr(klazz, attr, _signal(klazz,f))
+    return klazz
+
+def validate(operation='POST'):
+    ''' Adds the following attributes to all CRUD requests
+        
+        Request.FORM         => the raw dispatchable content
+        Request.CONTENT      => the dispatchable object
+        
+        Adds the following to the form
+        Request.FORMAT       => the output format
+        
+        The Request.$VALUE are field names taken from api.fields module.
+        
+        This implementation requires all requests to have valid form data.
+    '''
+    @decorator
+    def wrap(f, handler, request, *a, **kwa):
+        # gets the form we will validate
+        klass = handler.__class__
+        if hasattr(klass, 'form'):
+            # want to start encouraging use of form
+            v_form = getattr(klass, 'form')
+        elif hasattr(klass, 'v_form'):
+            # old validate form,v-form, notation
+            v_form = getattr(klass, 'v_form')
+        elif hasattr(klass, 'model'):
+            # try to create one on the fly
+            v_form = modelform_factory(model=getattr(klass, 'model'))
+        else:
+            return error(u'Invalid object')
+        # Create the dispatchable form and validate
+        if operation == 'POST':
+            data = getattr(request, operation)
+            form = v_form(data=data)
+            if not form.is_valid():
+                errs = dict((key, [unicode(v) for v in values]) for key,values in form.errors.items())
+                return error(errs)
+        else:
+            data = handler.flatten_dict(getattr(request, operation))
+            form = v_form(data=data,empty_permitted=True)
+        setattr(request, 'form', form)
+        return f(handler, request, *a, **kwa)
+    return wrap

@@ -5,12 +5,6 @@ Created on Aug 11, 2012
 :version: 2.0
 '''
 from django.http import HttpResponse
-from sana.api.utils import printstack
-
-AUTH_SUCCESS = u"Successful authorization, {username}"
-AUTH_FAILURE = u"Unsuccessful authorization, {username}"
-AUTH_DISABLED = u"Disabled account, {username}"
-
 
 def render_json_response(data):
     return JSONResponse(data)

@@ -10,6 +10,7 @@ import os
 import mimetypes
 import uuid, random
 
+import sys,traceback
 from django.conf import settings
 
 def make_uuid():
@@ -31,17 +32,16 @@ def key_generator(self):
     """ Generates a new secret key """
     return "".join([random.choice("abcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*(-_=+)") for i in range(50)])
 
-import sys,traceback
 def printstack(e):
     """ Prints stack trace to console."""
-    et, val, tb = sys.exc_info()
+    _, val, tb = sys.exc_info()
     trace = traceback.format_tb(tb)
     print 'Error: ', e
     print 'Value: ', val
     for tbm in trace:
         print tbm
 
-def logstack(handler, e):
+def logstack(handler, e=None):
     logger = getattr(handler,'logger',logging)
     et, val, tb = sys.exc_info()
     trace = traceback.format_tb(tb)
@@ -78,4 +78,8 @@ def split(fin, path, chunksize=102400):
         fobj.close()
     input.close()
     return partnum
+
+def exception_value(ex=None):
+    return repr(ex) if ex else sys.exc_info()[1]
+    
     
