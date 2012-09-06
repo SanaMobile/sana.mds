@@ -4,6 +4,7 @@ Created on Feb 29, 2012
 :Authors: Sana Dev Team
 :Version: 2.0
 '''
+from django.conf import settings
 from django.core.paginator import Paginator, InvalidPage, EmptyPage
 from django.utils.translation import ugettext_lazy as _
 
@@ -13,7 +14,7 @@ from piston.handler import BaseHandler
 #from piston.utils import validate
 
 from sana.api.decorators import validate
-from sana.api.responses import succeed, fail, error
+from sana.api.responses import succeed, error
 from sana.api.utils import logstack, printstack, exception_value
 
 __all__ = ['RESTHandler', ]
@@ -93,7 +94,8 @@ class RESTHandler(BaseHandler):
 
     def trace(self,request, ex=None):
         try:
-            printstack(ex)
+            if settings.DEBUG:
+                printstack(ex)
             _,message,_ = logstack(self,ex)
             return error(message)
         except:
@@ -145,9 +147,16 @@ class RESTHandler(BaseHandler):
 
     def _update(self,request, uuid):
         model = getattr(self,'model')
-        obj = model.objects.get(uuid=uuid)
-        data = self.flatten_dict(request.POST)
-        
+        if hasattr(request, 'form'):
+            request.form.save()
+        else:
+            obj = model.objects.get(uuid=uuid)
+            data = self.flatten_dict(request.POST)
+            if 'uuid' in data.keys():
+                data.pop('uuid')
+            for k,v in data.items():
+                setattr(obj,k,v)
+            obj.save()
         msg = "Successfully updated  {0}: {1}".format(model.__class__.__name__,uuid)
         return msg
     
