@@ -7,7 +7,7 @@
 from django.conf.urls.defaults import patterns, url, include
 from piston.resource import Resource
 
-from sana.core.handlers import *
+from .handlers import *
 
 concept_handler = Resource(ConceptHandler)
 relationship_handler = Resource(RelationshipHandler)
@@ -19,7 +19,7 @@ observation_handler = Resource(ObservationHandler)
 observer_handler = Resource(ObserverHandler)
 procedure_handler = Resource(ProcedureHandler)
 subject_handler = Resource(SubjectHandler)
-event_handler = Resource(RequestLogHandler)
+event_handler = Resource(EventHandler)
 doc_handler = Resource(DocHandler)
 session_handler = Resource(SessionHandler)
 
@@ -30,6 +30,7 @@ urlpatterns = patterns(
         'views.home',
         name="home"),
     
+    # Web views of logs
     url(r'^logs/$', 'views.log_index', name='log-index'),
     url(r'^logs/list/$', 'views.log_list', name='log-list'),
     url(r'^logs/detail/(?P<uuid>[^/]+)/$', 'views.log_detail', name='log-detail'),
@@ -48,13 +49,9 @@ extra_patterns = patterns(
     url(r'^notification/$', notification_handler, name='notification-list'),
     url(r'^notification/(?P<uuid>[^/]+)/$', notification_handler, name='notification'),
     
-    # request logs   
-    url(r'^event/$', event_handler, name='requestlog-list'),
-    url(r'^event/(?P<uuid>[^/]+)/$', event_handler, name='requestlog'),
-    
     # events   
-    url(r'^requestlog/$', event_handler, name='event-list'),
-    url(r'^requestlog/(?P<uuid>[^/]+)/$', event_handler, name='event'),
+    url(r'^event/$', event_handler, name='event-list'),
+    url(r'^event/(?P<uuid>[^/]+)/$', event_handler, name='event'),
     
     # concepts
     url(r'^concept/$', concept_handler, name='concept-list'),

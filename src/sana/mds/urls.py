@@ -5,10 +5,8 @@
 :Version: 2.0
 """
 from django.conf.urls.defaults import patterns, url
-from django.views.generic.simple import redirect_to
 from piston.resource import Resource
 from sana.mds.handlers import *
-from sana.mds.signals import *
 
 session_handler = Resource(SessionHandler)
 concept_handler = Resource(ConceptHandler)
@@ -42,10 +40,6 @@ extra_patterns = patterns(
     # notification
     url(r'^notification/$', notification_handler, name='notification-list'),
     url(r'^notification/(?P<uuid>[^/]+)/$', notification_handler, name='notification'),
-    
-    # request logs
-    url(r'^requestlog/$', event_handler, name='requestlog-list'),
-    url(r'^requestlog/(?P<uuid>[^/]+)/$', event_handler, name='requestlog'),
     
     # concepts
     url(r'^concept/$', concept_handler, name='concept-list'),
@@ -91,6 +85,12 @@ extra_patterns = patterns(
     # subjects
     url(r'^subject/$', subject_handler, name='subject-list'),
     url(r'^subject/(?P<uuid>[^/]+)/$', subject_handler, name='subject'),
+    
+    # TOTO Remove these
+    # request logs
+    url(r'^requestlog/$', event_handler, name='requestlog-list'),
+    url(r'^requestlog/(?P<uuid>[^/]+)/$', event_handler, name='requestlog'),
+    
     
 )
 

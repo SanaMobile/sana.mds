@@ -10,21 +10,21 @@ from sana.core.models.concept import Relationship as BaseRelationship
 from sana.core.models.concept import Relationship as BaseRelationshipCategory
 from sana.core.models.device import Device as BaseDevice
 from sana.core.models.encounter import Encounter  as BaseEncounter
+from sana.core.models.events import Event as BaseEvent
 from sana.core.models.notification import Notification as BaseNotification
 from sana.core.models.observation import Observation  as BaseObservation
 from sana.core.models.observer import Observer as BaseObserver
 from sana.core.models.procedure import Procedure as BaseProcedure
-from sana.core.models.requestlog import RequestLog as BaseRequestLog
 from sana.core.models.subject import Subject as BaseSubject
 
 __all__ = ['Concept', 'Relationship','RelationshipCategory',
            'Device', 
            'Encounter', 
+           'Event',
            'Notification',
            'Observation', 
            'Observer',
            'Procedure',
-           'RequestLog',
            'Subject',]
 
 class Concept(BaseConcept):
@@ -71,8 +71,8 @@ class Procedure(BaseProcedure):
                              related_name="%(app_label)s_%(class)s_related")
 
 
-class RequestLog(BaseRequestLog):
-    parent_ptr = models.OneToOneField(BaseRequestLog, parent_link=True,
+class Event(BaseEvent):
+    parent_ptr = models.OneToOneField(BaseEvent, parent_link=True,
                              related_name="%(app_label)s_%(class)s_related")
 
 

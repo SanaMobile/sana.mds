@@ -16,14 +16,15 @@ from sana.api.docs.utils import handler_uri_templates
 from sana.api.responses import succeed, fail, error
 from sana.api.signals import EventSignal, EventSignalHandler
 
-from sana.core.forms import *
-from sana.core.models import *
+from .forms import *
+from .models import *
 
 __all__ = ['ConceptHandler', 
            'RelationshipHandler',
            'RelationshipCategoryHandler',
            'DeviceHandler', 
-           'EncounterHandler', 
+           'EncounterHandler',
+           'EventHandler',
            'NotificationHandler', 
            'ObservationHandler', 
            'ObserverHandler',
@@ -109,6 +110,11 @@ class EncounterHandler(RESTHandler):
     fields = ("uuid", "concept", "observation",'subject','procedure')
     signals = { LOGGER:( EventSignal(), EventSignalHandler(RequestLog))}
     #TODO wrap this around the old json.py
+
+class EventHandler(RESTHandler):
+    """ Handles network request log requests. """
+    allowed_methods = ('GET', 'POST')
+    model = Event
 
 @logged
 class NotificationHandler(RESTHandler):
