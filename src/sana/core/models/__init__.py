@@ -9,6 +9,7 @@ required.
 from sana.core.models.concept import Concept, Relationship, RelationshipCategory
 from sana.core.models.device import Device
 from sana.core.models.encounter import Encounter
+from sana.core.models.events import Event
 from sana.core.models.notification import Notification
 from sana.core.models.observation import Observation
 from sana.core.models.observer import Observer
@@ -18,7 +19,8 @@ from sana.core.models.subject import Subject
 
 __all__ = ['Concept', 'Relationship','RelationshipCategory',
            'Device', 
-           'Encounter', 
+           'Encounter',
+           'Event',
            'Notification', 
            'Observation', 
            'Observer',
