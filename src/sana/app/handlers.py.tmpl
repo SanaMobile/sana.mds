@@ -4,19 +4,21 @@ Created on Feb 29, 2012
 :Authors: Sana Dev Team
 :Version: 2.0
 '''
-#must import the local module models for the handlers
-from sana.mds.models import *
 from sana.core import handlers
 from sana.api.decorators import logged
+
+#must import the local module models for the handlers
+from .models import *
 
 __all__ = ['ConceptHandler', 'RelationshipHandler','RelationshipCategoryHandler',
            'DeviceHandler', 
            'EncounterHandler', 
+           'EventHandler',
            'NotificationHandler', 
            'ObservationHandler', 
            'ObserverHandler',
            'ProcedureHandler',
-           'RequestLogHandler',
+           'SessionHandler',
            'SubjectHandler',]
 
 @logged
@@ -48,9 +50,11 @@ class DeviceHandler(handlers.DeviceHandler):
 class EncounterHandler(handlers.EncounterHandler):
     """ Handles encounter requests. """
     model = Encounter
-    
-    def create(self,request,*args,**kwargs):
-        pass
+        
+class EventHandler(handlers.RequestLogHandler):
+    """ Handles network request log requests. """
+    allowed_methods = ('GET', 'POST')
+    model = Event
 
 @logged
 class NotificationHandler(handlers.NotificationHandler):
@@ -74,10 +78,6 @@ class ProcedureHandler(handlers.ProcedureHandler):
     allowed_methods = ('GET', 'POST')
     model = Procedure
 
-class RequestLogHandler(handlers.RequestLogHandler):
-    """ Handles network request log requests. """
-    allowed_methods = ('GET', 'POST')
-    model = RequestLog
 
 
 @logged

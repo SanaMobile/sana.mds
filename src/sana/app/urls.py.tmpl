@@ -7,21 +7,22 @@
 from django.conf.urls.defaults import patterns, url
 from django.views.generic.simple import redirect_to
 from piston.resource import Resource
-from sana.mds.handlers import *
 
+from .handlers import *
 
+session_handler = Resource(SessionHandler)
 concept_handler = Resource(ConceptHandler)
 relationship_handler = Resource(RelationshipHandler)
 relationshipcategory_handler = Resource(RelationshipCategoryHandler)
 device_handler = Resource(DeviceHandler)
 encounter_handler = Resource(EncounterHandler)
+event_handler = Resource(EventHandler)
 notification_handler = Resource(NotificationHandler)
 observation_handler = Resource(ObservationHandler)
 observer_handler = Resource(ObserverHandler)
 procedure_handler = Resource(ProcedureHandler)
 subject_handler = Resource(SubjectHandler)
 requestlog_handler = Resource(RequestLogHandler)
-restapi_handler = Resource(DocHandler)
 
 # non-restful urls
 urlpatterns = patterns(    
@@ -38,18 +39,14 @@ urlpatterns = patterns(
 
 extra_patterns = patterns(
     '',
-    
-    # notification
-    url(r'^notification/$', notification_handler, name='notification-list'),
-    url(r'^notification/(?P<uuid>[^/]+)/$', notification_handler, name='notification'),
-    
-    # request logs
-    url(r'^requestlog/$', requestlog_handler, name='requestlog-list'),
-    url(r'^requestlog/(?P<uuid>[^/]+)/$', requestlog_handler, name='requestlog'),
+    # session auth
+    url(r'^session/$', session_handler, name='session-list'),
     
     # concepts
     url(r'^concept/$', concept_handler, name='concept-list'),
     url(r'^concept/(?P<uuid>[^/]+)/$', concept_handler, name='concept'),
+    url(r'^concept/(?P<uuid>[^/]+)/relationship/$', concept_handler, name='concept-relationships', kwargs={'related':'relationship'}),
+    url(r'^concept/(?P<uuid>[^/]+)/procedure/$', concept_handler, name='concept-procedures', kwargs={'related':'procedure'}),
     
     # concept relationships
     url(r'^relationship/$', relationship_handler,name='relationship-list'),
@@ -68,6 +65,15 @@ extra_patterns = patterns(
     # encounters
     url(r'^encounter/$', encounter_handler, name='encounter-list'),
     url(r'^encounter/(?P<uuid>[^/]+)/$', encounter_handler, name='encounter'),
+    url(r'^encounter/(?P<uuid>[^/]+)/observation/$', encounter_handler, name='encounter-observations', kwargs={'related':'observation'}),
+    
+    # events   
+    url(r'^event/$', event_handler, name='event-list'),
+    url(r'^event/(?P<uuid>[^/]+)/$', event_handler, name='event'),
+    
+    # notification
+    url(r'^notification/$', notification_handler, name='notification-list'),
+    url(r'^notification/(?P<uuid>[^/]+)/$', notification_handler, name='notification'),
     
     # observations
     url(r'^observation/$', observation_handler, name='observation-list'),
@@ -89,111 +95,3 @@ extra_patterns = patterns(
 
 # add the non-RESTful urls
 urlpatterns += extra_patterns
-
-#deprecated bits
-"""
-oldpatterns  = patterns('',
-    url(r'^notifications/$',
-        redirect_to,
-        {'url':'/mds/notification/',},
-        name="sana-list-notifications"),
-
-    url(r'^notifications/submit/$',
-        redirect_to,
-        {'url':'/mds/notification/',},
-        name="sana-api-notification-submit"),
-
-    url(r'^notifications/submit/email/$',
-        redirect_to,
-        {'url':'/mds/notification/',},
-        name="sana-api-email-notification-submit"),
-
-#     url(r'^json/notifications/$',
-#         'sana.mrs.json.notification_list',
-#         name="sana-json-notification-list"),
-
-     url(r'^json/patient/list/$',
-        redirect_to,
-        {'url':'/mds/subject/',},
-         name="sana-json-patient-list"),
-
-     url(r'^json/patient/(?P<id>[0-9-]+)/$',
-        redirect_to,
-        {'url':'/mds/subject/',},
-         name="sana-json-patient-get"),
-
-     #url(r'^json/procedure/list/$',
-     #    'sana.mrs.json.procedure_list',
-     #    name="sana-json-procedure-list"),
-
-    #url(r'^json/procedure/(?P<id>\d+)/$',
-    #    'sana.mrs.json.procedure_get',
-    #    name="sana-json-procedure-get"),
-
-    url(r'^json/validate/credentials/$',
-        'sana.mrs.json.validate_credentials',
-        name = "sana-json-validate-credentials"),
-
-    url(r'^procedure/submit/$',
-        redirect_to,
-        {'url':'/mds/encounter/',},
-        name="sana-html-procedure-submit"),
-
-    url(r'^json/procedure/submit/$',
-        redirect_to,
-        {'url':'/mds/encounter/',},
-        name="sana-json-procedure-submit"),
-
-    url(r'^json/binary/submit/$',
-        redirect_to,
-        {'url':'/mds/observation/',},
-        name="sana-json-binary-submit"),
-
-    url(r'^json/binarychunk/submit/$',
-        redirect_to,
-        {'url':'/mds/observation/',},
-        name="sana-json-binarychunk-submit"),
-
-    url(r'^json/textchunk/submit/$',
-        redirect_to,
-        {'url':'/mds/observation/',},
-        name="sana-json-binarychunk-hack-submit"),
-    
-    url(r'^log-detail/$',
-        redirect_to,
-        {'url':'/mds/requestlog/',},
-        name="log-json-detail-noarg"),
-
-    url(r'^json/eventlog/submit/$',
-        redirect_to,
-        {'url':'/mds/requestlog/',},
-        name="sana-json-eventlog-submit"),
-
-    #Manila Branch  saved procedure syncing    
-    #url(r'^json/saved_procedure/(?P<id>[0-9-]+)/$',
-    #    'sana.mrs.json.saved_procedure_get',
-    #    name="sana-json-saved-procedure-get"),        
-
-    #url(r'^json/sync_encounters/(?P<patient_id>[0-9-]+)/$',
-    #    'sana.mrs.json.syc_encounters',
-    #    name="sana-json-encounters-sync"),
-
-    #url(r'^json/sync_encounters/(?P<patient_id>[0-9-]+)/(?P<encounters>[0-9:-]+)$',
-    #    'sana.mrs.json.syc_encounters',
-    #    name="sana-json-encounters-sync"),
-
-    url(r'^log-detail/(?P<log_id>\d+)$',
-        redirect_to,
-        {'url':'/mds/requestlog/',},
-        name="log-json-detail"),
-
-    url(r'^log/$',
-        redirect_to,
-        {'url':'/mds/requestlog/',}),
-
-    url(r'^log/(?P<object_id>\d+)$',
-        redirect_to,
-        {'url':'/mds/requestlog/',})
-)
-"""
-#urlpatterns += oldpatterns
