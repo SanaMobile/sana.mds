@@ -8,9 +8,10 @@ import logging
 
 #must import the local module models for the handlers
 from sana.mds.models import *
+from sana.api import LOGGER
 from sana.core import handlers
 from sana.api.decorators import logged
-from sana.mds.signals import *
+from sana.api.signals import EventSignal, EventSignalHandler
 
 __all__ = ['ConceptHandler', 'RelationshipHandler','RelationshipCategoryHandler',
            'DeviceHandler', 
@@ -20,28 +21,35 @@ __all__ = ['ConceptHandler', 'RelationshipHandler','RelationshipCategoryHandler'
            'ObserverHandler',
            'ProcedureHandler',
            'RequestLogHandler',
+           'SessionHandler',
            'SubjectHandler',]
 
-# Get an instance of a logger
-
+@logged     
+class SessionHandler(handlers.SessionHandler):
+    """ Handles session auth requests. """
+    allowed_methods = ('GET','POST',)
+    signals = { LOGGER:( EventSignal(), EventSignalHandler(RequestLog))}
+        
 @logged
 class ConceptHandler(handlers.ConceptHandler):
     """ Handles concept requests. """
     allowed_methods = ('GET', 'POST')
     model = Concept
-    logger = (signal_logger, done_logging)
+    signals = { LOGGER:( EventSignal(), EventSignalHandler(RequestLog))}
 
 @logged
 class RelationshipHandler(handlers.RelationshipHandler):
     """ Handles concept relationship requests. """
     allowed_methods = ('GET', 'POST')
     model = Relationship
+    signals = { LOGGER:( EventSignal(), EventSignalHandler(RequestLog))}
     
 @logged
 class RelationshipCategoryHandler(handlers.RelationshipCategoryHandler):
     """ Handles concept relationship category requests. """
     allowed_methods = ('GET', 'POST')
     model = RelationshipCategory
+    signals = { LOGGER:( EventSignal(), EventSignalHandler(RequestLog))}
 
 
 @logged
@@ -49,11 +57,13 @@ class DeviceHandler(handlers.DeviceHandler):
     """ Handles device requests. """
     allowed_methods = ('GET', 'POST')
     model = Device
+    signals = { LOGGER:( EventSignal(), EventSignalHandler(RequestLog))}
 
 @logged
 class EncounterHandler(handlers.EncounterHandler):
     """ Handles encounter requests. """
     model = Encounter
+    signals = { LOGGER:( EventSignal(), EventSignalHandler(RequestLog))}
     
     def create(self,request,*args,**kwargs):
         pass
@@ -63,6 +73,7 @@ class NotificationHandler(handlers.NotificationHandler):
     """ Handles notification requests. """
     allowed_methods = ('GET', 'POST')
     model = Notification
+    signals = { LOGGER:( EventSignal(), EventSignalHandler(RequestLog))}
 
 @logged
 class ObservationHandler(handlers.ObservationHandler):
@@ -74,11 +85,13 @@ class ObserverHandler(handlers.ObserverHandler):
     """ Handles observer requests. """
     allowed_methods = ('GET', 'POST')
     model = Observer
+    signals = { LOGGER:( EventSignal(), EventSignalHandler(RequestLog))}
     
 @logged
 class ProcedureHandler(handlers.ProcedureHandler):
     allowed_methods = ('GET', 'POST')
     model = Procedure
+    signals = { LOGGER:( EventSignal(), EventSignalHandler(RequestLog))}
 
 class RequestLogHandler(handlers.RequestLogHandler):
     """ Handles network request log requests. """
@@ -90,6 +103,7 @@ class RequestLogHandler(handlers.RequestLogHandler):
 class SubjectHandler(handlers.SubjectHandler):
     """ Handles subject requests. """
     model = Subject
+    signals = { LOGGER:( EventSignal(), EventSignalHandler(RequestLog))}
 
     
     

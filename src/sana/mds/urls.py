@@ -10,6 +10,7 @@ from piston.resource import Resource
 from sana.mds.handlers import *
 from sana.mds.signals import *
 
+session_handler = Resource(SessionHandler)
 concept_handler = Resource(ConceptHandler)
 relationship_handler = Resource(RelationshipHandler)
 relationshipcategory_handler = Resource(RelationshipCategoryHandler)
@@ -35,6 +36,8 @@ urlpatterns = patterns(
 #patterns for REST calls
 extra_patterns = patterns(
     '',
+    # session auth
+    url(r'^session/$', session_handler, name='session-list'),
     
     # notification
     url(r'^notification/$', notification_handler, name='notification-list'),
@@ -47,6 +50,8 @@ extra_patterns = patterns(
     # concepts
     url(r'^concept/$', concept_handler, name='concept-list'),
     url(r'^concept/(?P<uuid>[^/]+)/$', concept_handler, name='concept'),
+    url(r'^concept/(?P<uuid>[^/]+)/relationship/$', concept_handler, name='concept-relationships', kwargs={'related':'relationship'}),
+    url(r'^concept/(?P<uuid>[^/]+)/procedure/$', concept_handler, name='concept-procedures', kwargs={'related':'procedure'}),
     
     # concept relationships
     url(r'^relationship/$', relationship_handler,name='relationship-list'),
@@ -65,6 +70,11 @@ extra_patterns = patterns(
     # encounters
     url(r'^encounter/$', encounter_handler, name='encounter-list'),
     url(r'^encounter/(?P<uuid>[^/]+)/$', encounter_handler, name='encounter'),
+    url(r'^encounter/(?P<uuid>[^/]+)/observation/$', encounter_handler, name='encounter-observations', kwargs={'related':'observation'}),
+    
+    # events   
+    url(r'^event/$', event_handler, name='event-list'),
+    url(r'^event/(?P<uuid>[^/]+)/$', event_handler, name='event'),
     
     # observations
     url(r'^observation/$', observation_handler, name='observation-list'),
