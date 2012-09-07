@@ -15,7 +15,7 @@ from django.conf import settings
 from django.forms import ValidationError
 from piston.handler import BaseHandler
 
-from sana.core.handlers import RequestLogHandler as BaseRequestHandler
+from sana.core.handlers import EventHandler as BaseRequestHandler
 
 from sana.api.contrib.openmrs import openmrs16 as openmrs
 from sana.api.responses import succeed, fail

@@ -8,7 +8,7 @@ from django.http import HttpResponse
 from django.core.paginator import Paginator, InvalidPage, EmptyPage
 
 from sana.api import version
-from sana.core.models import RequestLog
+from sana.core.models import Event
 
 def home(request):
     """Top level url
@@ -33,7 +33,7 @@ def _list(request,*args,**kwargs):
     query = dict(request.GET.items())
     start = int(query.get('start', 1))
     limit = int(query.get('limit', 20))
-    objects = RequestLog.objects.all().filter().order_by('-created')
+    objects = Event.objects.all().filter().order_by('-created')
     paginator = Paginator(objects, limit, allow_empty_first_page=True)
     objs = []
     for p in paginator.page(start).object_list.all():
@@ -62,7 +62,7 @@ def log_list(request):
 
 
 def log_detail(request, uuid):
-    log = RequestLog.objects.get(uuid=uuid)
+    log = Event.objects.get(uuid=uuid)
     try:
         print type(log.messages)
         

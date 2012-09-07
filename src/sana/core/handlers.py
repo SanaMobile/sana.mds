@@ -29,26 +29,16 @@ __all__ = ['ConceptHandler',
            'ObservationHandler', 
            'ObserverHandler',
            'ProcedureHandler',
-           'RequestLogHandler',
            'DocHandler' ,
            'SessionHandler',
            'SubjectHandler',]
 
-class LogHandler(object):
-    def __init__(self, model):
-        self.model = RequestLog
-        
-    def __call__(self, **kwargs):
-        return
-     
-    def save(self, **kwargs):
-        self.instance = RequestLog(kwargs)
-        
+   
 @logged     
 class SessionHandler(RESTHandler):
     """ Handles session auth requests. """
     allowed_methods = ('GET','POST',)
-    signals = { LOGGER:( EventSignal(), EventSignalHandler(RequestLog))}
+    signals = { LOGGER:( EventSignal(), EventSignalHandler(Event))}
     
     def create(self,request):
         try:
@@ -77,21 +67,21 @@ class ConceptHandler(RESTHandler):
     model = Concept
     form = ConceptForm
     fields = ("uuid", "name")
-    signals = { LOGGER:( EventSignal(), EventSignalHandler(RequestLog))}
+    signals = { LOGGER:( EventSignal(), EventSignalHandler(Event))}
 
 class RelationshipHandler(RESTHandler):
     """ Handles concept relationship requests. """
     allowed_methods = ('GET', 'POST')
     model = Relationship
     form = RelationshipForm
-    signals = { LOGGER:( EventSignal(), EventSignalHandler(RequestLog))}
+    signals = { LOGGER:( EventSignal(), EventSignalHandler(Event))}
     
 class RelationshipCategoryHandler(RESTHandler):
     """ Handles concept relationship category requests. """
     allowed_methods = ('GET', 'POST')
     model = RelationshipCategory
     form = RelationshipCategoryForm
-    signals = { LOGGER:( EventSignal(), EventSignalHandler(RequestLog))}
+    signals = { LOGGER:( EventSignal(), EventSignalHandler(Event))}
 
 @logged
 class DeviceHandler(RESTHandler):
@@ -99,7 +89,7 @@ class DeviceHandler(RESTHandler):
     allowed_methods = ('GET', 'POST')
     model = Device
     form = DeviceForm
-    signals = { LOGGER:( EventSignal(), EventSignalHandler(RequestLog))}
+    signals = { LOGGER:( EventSignal(), EventSignalHandler(Event))}
     
 @logged    
 class EncounterHandler(RESTHandler):
@@ -108,7 +98,7 @@ class EncounterHandler(RESTHandler):
     model = Encounter
     form = EncounterForm
     fields = ("uuid", "concept", "observation",'subject','procedure')
-    signals = { LOGGER:( EventSignal(), EventSignalHandler(RequestLog))}
+    signals = { LOGGER:( EventSignal(), EventSignalHandler(Event))}
     #TODO wrap this around the old json.py
 
 class EventHandler(RESTHandler):
@@ -122,7 +112,7 @@ class NotificationHandler(RESTHandler):
     allowed_methods = ('GET', 'POST')
     model = Notification
     form = NotificationForm
-    signals = { LOGGER:( EventSignal(), EventSignalHandler(RequestLog))}
+    signals = { LOGGER:( EventSignal(), EventSignalHandler(Event))}
     #TODO wrap this around the old json.py
 
 @logged
@@ -130,7 +120,7 @@ class ObservationHandler(RESTHandler):
     allowed_methods = ('GET', 'POST')
     model = Observation
     form = ObservationForm
-    signals = { LOGGER:( EventSignal(), EventSignalHandler(RequestLog))}
+    signals = { LOGGER:( EventSignal(), EventSignalHandler(Event))}
     
 @logged        
 class ObserverHandler(RESTHandler):
@@ -138,14 +128,14 @@ class ObserverHandler(RESTHandler):
     allowed_methods = ('GET', 'POST')
     model = Observer
     form = ObserverForm
-    signals = { LOGGER:( EventSignal(), EventSignalHandler(RequestLog))}
+    signals = { LOGGER:( EventSignal(), EventSignalHandler(Event))}
 
 @logged
 class ProcedureHandler(RESTHandler):
     allowed_methods = ('GET', 'POST')
     model = Procedure
     form = ProcedureForm
-    signals = { LOGGER:( EventSignal(), EventSignalHandler(RequestLog))}
+    signals = { LOGGER:( EventSignal(), EventSignalHandler(Event))}
     
     def _read_by_uuid(self,request,uuid):
         """ Returns the procedure file instead of the verbose representation on 
@@ -154,11 +144,6 @@ class ProcedureHandler(RESTHandler):
         model = getattr(self.__class__, 'model')
         obj =  model.objects.get(uuid=uuid)
         return open(obj.src.path).read()
-    
-class RequestLogHandler(RESTHandler):
-    """ Handles network request log requests. """
-    allowed_methods = ('GET', 'POST')
-    model = RequestLog
 
 @logged
 class SubjectHandler(RESTHandler):
@@ -167,7 +152,7 @@ class SubjectHandler(RESTHandler):
     fields = ['uuid']
     model = Subject
     form = SubjectForm
-    signals = { LOGGER:( EventSignal(), EventSignalHandler(RequestLog))}
+    signals = { LOGGER:( EventSignal(), EventSignalHandler(Event))}
 
    
 class DocHandler(BaseHandler):

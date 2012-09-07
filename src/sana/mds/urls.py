@@ -19,7 +19,7 @@ observation_handler = Resource(ObservationHandler)
 observer_handler = Resource(ObserverHandler)
 procedure_handler = Resource(ProcedureHandler)
 subject_handler = Resource(SubjectHandler)
-event_handler = Resource(RequestLogHandler)
+event_handler = Resource(EventHandler)
 
 # non-restful urls
 urlpatterns = patterns(    

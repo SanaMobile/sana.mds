@@ -51,7 +51,7 @@ class EncounterHandler(handlers.EncounterHandler):
     """ Handles encounter requests. """
     model = Encounter
         
-class EventHandler(handlers.RequestLogHandler):
+class EventHandler(handlers.EventHandler):
     """ Handles network request log requests. """
     allowed_methods = ('GET', 'POST')
     model = Event

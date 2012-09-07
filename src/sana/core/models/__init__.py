@@ -14,7 +14,6 @@ from sana.core.models.notification import Notification
 from sana.core.models.observation import Observation
 from sana.core.models.observer import Observer
 from sana.core.models.procedure import Procedure
-from sana.core.models.requestlog import RequestLog
 from sana.core.models.subject import Subject
 
 __all__ = ['Concept', 'Relationship','RelationshipCategory',
@@ -25,6 +24,5 @@ __all__ = ['Concept', 'Relationship','RelationshipCategory',
            'Observation', 
            'Observer',
            'Procedure',
-           'RequestLog', 
            'Subject',]
 

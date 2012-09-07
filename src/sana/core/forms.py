@@ -59,7 +59,7 @@ class EventForm(forms.ModelForm):
     """ A simple event form
     """
     class Meta:
-        model = RequestLog
+        model = Event
 
 class NotificationForm(forms.ModelForm):
     """ Form for sending notifications """
@@ -82,12 +82,6 @@ class ProcedureForm(forms.ModelForm):
     """
     class Meta:
         model = Procedure
-
-class RequestLogForm(forms.ModelForm):
-    """ A simple request log form
-    """
-    class Meta:
-        model = RequestLog
      
 class SubjectForm(forms.ModelForm):
     """ A simple subject form

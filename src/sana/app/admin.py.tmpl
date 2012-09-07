@@ -18,5 +18,5 @@ admin.site.register(Observation)
 admin.site.register(Observer)
 admin.site.register(Procedure)
 admin.site.register(Subject)
-admin.site.register(RequestLog)
+admin.site.register(Event)
 
