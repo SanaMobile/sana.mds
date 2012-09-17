@@ -82,4 +82,6 @@ def split(fin, path, chunksize=102400):
 def exception_value(ex=None):
     return repr(ex) if ex else sys.exc_info()[1]
     
-    
+def related_namegen(app,klass):
+    return  "%{app}_%{klass}s_related".format(app=str(app).lower(), 
+                                              klass=str(klass).lower())
