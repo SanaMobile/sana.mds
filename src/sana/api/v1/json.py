@@ -40,7 +40,7 @@ from django.shortcuts import render_to_response
 from sana.api.responses import render_json_response, succeed, fail
 
 from sana.mrs.forms import *
-from sana.api.contrib.openmrs import openmrs16 as openmrs
+from sana.api.contrib.openmrslib import openmrs16 as openmrs
 from sana.api.contrib.smslib.messages import send_notification
 
 from sana.api.v1.api import register_saved_procedure

@@ -13,7 +13,7 @@ from collections import defaultdict
 from django.conf import settings
 
 from sana.mrs.models import SavedProcedure, Client, BinaryResource, ClientEventLog
-from sana.api.contrib.openmrs import openmrs16 as openmrs
+from sana.api.contrib.openmrslib import openmrs16 as openmrs
 from sana.api.encoders.ffmpeg import FFmpeg
 from sana.api.v1.util import flush
 

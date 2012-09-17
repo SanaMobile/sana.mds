@@ -13,7 +13,7 @@ import time
 from django.conf import settings
 
 from sana.api.contrib import handlers
-from sana.api.contrib.openmrs import openers
+from sana.api.contrib.openmrslib import openers
 
 __all__ = ['OpenMRS']
 
