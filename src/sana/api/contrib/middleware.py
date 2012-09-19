@@ -61,7 +61,7 @@ class LoggingMiddleware(object):
         if verbose or level >= ERROR:
             records = records[:]
         else:
-            records = records[:1]
+            records = list(records[:1])
             
         resolver = resolve(request.path) 
         log = { 'client': request.META['REMOTE_ADDR'],
