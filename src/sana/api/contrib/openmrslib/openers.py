@@ -151,7 +151,7 @@ class OpenMRSOpener(object):
             HttpResponse
         """
         path = self.get_path("_create_subject")
-        return self.create(path, response_handler=response_handler, kwargs)
+        return self.create(path, response_handler=response_handler, **kwargs)
         
     def read_subject(self, uuid=None, response_handler=rest_reader, **query):
         """ Wrapper for self.read. Passing the uuid will append it to the 
@@ -160,14 +160,14 @@ class OpenMRSOpener(object):
             call if desired
         """
         path = self.get_path("_read_subject").format(uuid=uuid)
-        return self.read(path, response_handler=response_handler, query)
+        return self.read(path, response_handler=response_handler, **query)
         
     def create_encounter(self, response_handler=rest_reader, **kwargs):
         """ Wrapper for self.create for an encounter. Returns the unread 
             HttpResponse.
         """
         path = self.get_path("_create_encounter")
-        return self.create(path, response_handler=response_handler, kwargs)
+        return self.create(path, response_handler=response_handler, **kwargs)
     
     def read_encounter(self, uuid="", response_handler=rest_reader):
         """ Wrapper for self.read. Passing the uuid will append it to the 
