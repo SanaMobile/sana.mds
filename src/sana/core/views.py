@@ -5,6 +5,7 @@ Created on Aug 3, 2012
 '''
 import cjson
 from django.http import HttpResponse
+from django.conf import settings
 from django.core.paginator import Paginator, InvalidPage, EmptyPage
 
 from sana.api import version
@@ -29,6 +30,7 @@ def home(request):
 from django.shortcuts import render_to_response
 from django.template import RequestContext 
 from sana.api.responses import render_json_response
+
 def _list(request,*args,**kwargs):
     query = dict(request.GET.items())
     start = int(query.get('start', 1))
@@ -49,7 +51,8 @@ def _list(request,*args,**kwargs):
             'limit': limit,
             'start': start,
             "rate": int(query.get('refresh', 5)),
-            'range': range(1, paginator.num_pages + 1) }
+            'range': range(1, paginator.num_pages + 1),
+            "version": settings.API_VERSION }
     return data
 
 def log_index(request,*args,**kwargs):
