@@ -93,7 +93,7 @@ td.selectp
     	   document.getElementById("footer-page-"+p).style.color = '#aa00ff';
     	   document.getElementById("header-page-"+pindex).style.fontWeight = 'bold';
     	   document.getElementById("footer-page-"+pindex).style.fontweight = 'bold';
-    	   $('#logs').load( "/core/logs/list/" + "?start=" + pindex +"&limit=" + {{ limit }} );
+    	   $('#logs').load( "/core/event/" + "?start=" + pindex +"&limit=" + {{ limit }} );
     }
 
     function getLogs(){
@@ -134,14 +134,14 @@ td.selectp
     }
 
     function json_update(msg, callback) {
-    	   id = msg['id'];
-    	   data = msg['data'];
-    	   updateDetails(id,data);
-    	   callback();
+        data = msg['message'];
+        id = data['uuid'];
+    	updateDetails(id,data);
+    	callback();
     }
 
     function getDetails(id, callback) {
-    	   $.getJSON("/core/logs/detail/" + id,{}, 
+    	   $.getJSON("/core/event/" + id,{}, 
     			    function(data) {json_update(data, callback); 
            });  
     }
@@ -149,25 +149,25 @@ td.selectp
     function buildRowHtml(record) { 
     	   return ("+" + "&nbsp;<b>"+ record['level_name'] + "&nbsp;" 
     			    + record['filename'] + ":" + record['line_number'] 
-    			    + "</b> &nbsp;" + record['data']);
+    			    + "</b> &nbsp;" + record['message']);
     }
 
     function updateDetails(id, data) {
-    	var message = '<td colspan="3"><dl>';
-	 
-		for (var i in data) {
-			if("ERROR" == data[i]['level_name']){
-    		    message += '<dd class="err">' + buildRowHtml(data[i]) + "</dd>";
-	        } else if("DEBUG" == data[i]['level_name']){
-    		    message += '<dd class="debug">' + buildRowHtml(data[i]) + "</dd>";
+    	var message = '<td colspan="4"><dl>';
+    	var msg = data['message']
+		for (var i in msg) {
+			if("ERROR" == msg[i]['level_name']){
+    		    message += '<dd class="err">' + buildRowHtml(msg[i]) + "</dd>";
+	        } else if("DEBUG" == msg[i]['level_name']){
+    		    message += '<dd class="debug">' + buildRowHtml(msg[i]) + "</dd>";
 	        } else
-	    	   message += '<dd>' + buildRowHtml(data[i]) + '</dd>';
+	    	   message += '<dd>' + buildRowHtml(msg[i]) + '</dd>';
 	    	    //message = message + "" + data[i].message + "<br/>";
 	        }
 	    message = message + "</dl></td>";
         var detail = $("#log-"+id+"-detail");
 	    detail.html(message);
-	    detail.attr('data', data);
+	    detail.attr('data', msg);
     }
 
     function hideDetail(id) {
@@ -200,9 +200,14 @@ td.selectp
 <table width="100%">
     <tbody>
         <tr>
-            <td class="pagenav">Pages:</td> {% for p in range %}
-            <td id="header-page-{{ p }}" onclick="getLogPage('{{ p }}')"
-                class="selectp">{{ p }}</td> {% endfor %}
+            <td class="pagenav">Go To Page:</td> 
+            <td align="right">
+                <select onchange="getLogPage(value)"> 
+                {% for p in range %}
+                    <option>{{ p }}</option>
+                {% endfor %}
+                </select>
+            </td>
         </tr>
     </tbody>
 </table>
@@ -217,15 +222,20 @@ td.selectp
 <table width="100%">
     <tbody>
         <tr>
-            <td class="pagenav">Pages:</td> {% for p in range %}
-            <td id="footer-page-{{ p }}" onclick="getLogPage('{{ p }}')"
-                class="selectp">{{ p }}</td> {% endfor %}
+            <td class="pagenav">Go To Page:</td> 
+            <td align="right">
+                <select onchange="getLogPage(value)"> 
+                {% for p in range %}
+                    <option>{{ p }}</option>
+                {% endfor %}
+                </select>
+            </td>
         </tr>
     </tbody>
 </table>
 {% endwith %}
 	<div id="footer">
 	</div>
-    <div id="spew"></div>
+    <div id="log-detail-output"></div>
 {% endblock %}
 
