@@ -54,8 +54,11 @@ class Event(RESTModel):
     timestamp = property(fset=settimestamp, fget=gettimestamp)
     
     def getmessage(self):
-        return cjson.decode(self.messages)
-    
+        try:
+            return cjson.decode(self.messages)
+        except:
+            return self.messages
+        
     def setmessage(self, value):
         self.level = cjson.encode(value, True)
         
