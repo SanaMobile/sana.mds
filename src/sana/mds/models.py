@@ -27,55 +27,74 @@ __all__ = ['Concept', 'Relationship','RelationshipCategory',
            'Procedure',
            'Subject',]
 
+_app = 'mds'
+
 class Concept(BaseConcept):
+    class Meta:
+        app_label = _app
     parent_ptr = models.OneToOneField(BaseConcept, parent_link=True,
                              related_name="%(app_label)s_%(class)s_related")
 
 
 class Relationship(BaseRelationship):
+    class Meta:
+        app_label = _app
     parent_ptr = models.OneToOneField(BaseRelationship, parent_link=True,
                              related_name="%(app_label)s_%(class)s_related")
 
 
 class RelationshipCategory(BaseRelationshipCategory):
+    class Meta:
+        app_label = _app
     parent_ptr = models.OneToOneField(BaseRelationshipCategory, parent_link=True,
                              related_name="%(app_label)s_%(class)s_related")
 
 
 class Device(BaseDevice):
+    class Meta:
+        app_label = _app
     parent_ptr = models.OneToOneField(BaseDevice, parent_link=True,
                              related_name="%(app_label)s_%(class)s_related")
 
 
 class Encounter(BaseEncounter):
+    class Meta:
+        app_label = _app
     parent_ptr = models.OneToOneField(BaseEncounter, parent_link=True,
                              related_name="%(app_label)s_%(class)s_related")
 
-
+class Event(BaseEvent):
+    class Meta:
+        app_label = _app
+    parent_ptr = models.OneToOneField(BaseEvent, parent_link=True,
+                             related_name="%(app_label)s_%(class)s_related")
+    
 class Notification(BaseNotification):
+    class Meta:
+        app_label = _app
     parent_ptr = models.OneToOneField(BaseNotification, parent_link=True,
                              related_name="%(app_label)s_%(class)s_related")
 
-
 class Observation(BaseObservation):
+    class Meta:
+        app_label = _app
     parent_ptr = models.OneToOneField(BaseObservation, parent_link=True,
                              related_name="%(app_label)s_%(class)s_related")
 
-
 class Observer(BaseObserver):
+    class Meta:
+        app_label = _app
     parent_ptr = models.OneToOneField(BaseObserver, parent_link=True,
                              related_name="%(app_label)s_%(class)s_related")
 
 class Procedure(BaseProcedure):
+    class Meta:
+        app_label = _app
     parent_ptr = models.OneToOneField(BaseProcedure, parent_link=True,
                              related_name="%(app_label)s_%(class)s_related")
 
-
-class Event(BaseEvent):
-    parent_ptr = models.OneToOneField(BaseEvent, parent_link=True,
-                             related_name="%(app_label)s_%(class)s_related")
-
-
 class Subject(BaseSubject):
+    class Meta:
+        app_label = _app
     parent_ptr = models.OneToOneField(BaseSubject, parent_link=True,
-                                related_name="%(app_label)s_%(class)s_related")
+                             related_name="%(app_label)s_%(class)s_related")
