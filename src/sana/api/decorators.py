@@ -34,7 +34,7 @@ def _signal(klazz, name, f):
     def new_f(*args, **kwargs):
         request = args[1]
         signals = getattr(klazz, SIGNALS, None)
-        signal,callback = signals.get(name, (None,None))
+        signal,callback = signals.get(name, (None,None)) if signals else (None,None)
         if signal and callback:
             signal.connect(callback)
         setattr(request, name, signal)
@@ -52,9 +52,11 @@ def logged(klazz):
     """
     # wraps each of the methods declared in the classes 
     # allowed_methods class to enable logging
-    methods = getattr(klazz,'allowed_methods',[])
+    methods = getattr(klazz,'allowed_methods',CRUD)
     for m in methods:
         attr = CRUD_MAP.get(m,None)
+        if not attr:
+            continue
         f = getattr(klazz, attr)
         if f:
             setattr(klazz, attr, _signal(klazz,LOGGER, f))
