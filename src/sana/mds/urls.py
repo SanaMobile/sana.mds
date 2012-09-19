@@ -86,12 +86,6 @@ extra_patterns = patterns(
     url(r'^subject/$', subject_handler, name='subject-list'),
     url(r'^subject/(?P<uuid>[^/]+)/$', subject_handler, name='subject'),
     
-    # TOTO Remove these
-    # request logs
-    url(r'^requestlog/$', event_handler, name='requestlog-list'),
-    url(r'^requestlog/(?P<uuid>[^/]+)/$', event_handler, name='requestlog'),
-    
-    
 )
 
 # add the non-RESTful urls
