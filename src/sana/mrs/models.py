@@ -257,13 +257,13 @@ class QueueElement(models.Model):
 
 TIME_FORMAT = "%m/%d/%Y %H:%M:%S"
 
-class RequestLog(core.RequestLog):
+class RequestLog(core.Event):
     """
     Logging facility for requests.
     """
     class Meta:
         app_label = _app
         
-    requestlog_ptr = models.OneToOneField(core.RequestLog, 
+    requestlog_ptr = models.OneToOneField(core.Event, 
                                           parent_link=True,
-                                          related_name="%(app_label)s_%(class)s_related")
+                                          related_name="mrs_events_related")
