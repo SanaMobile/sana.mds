@@ -34,76 +34,101 @@ if settings.DEBUG:
     urlpatterns += patterns('',
             url(r'^media/(?P<path>.*)$', 'django.views.static.serve',  {'document_root': settings.MEDIA_ROOT }),
         )
+
+if 'v1' in settings.APICOMPAT_INCLUDE:
+    from piston.resource import Resource
+    from sana.mrs.handlers import *
     
-v1patterns = patterns(
-    '',
+    v1auth_resource = Resource(AuthHandler)
+    v1notification_resource = Resource(NotificationHandler)
+    v1smtp_resource = Resource(SMTPHandler)
+    v1patient_resource = Resource(PatientHandler)
+    v1savedprocedure_resource = Resource(SavedProcedureHandler)
+    v1event_resource = Resource(EventHandler)
+    v1requestlog_resource = Resource(EventHandler)
+    v1binary_resource = Resource(BinaryHandler)
+    v1binarypacket_resource = Resource(BinaryPacketHandler)
+    v1base64packet_resource = Resource(Base64PacketHandler)
+    v1requestlog_resource = Resource(RequestLogHandler)
     
-    url(r'^notifications/$',
-        redirect_to,
-        {'url': '/mrs/notifications/'},
-        name="sana-list-notifications-redirect"),
-
-    url(r'^notifications/submit/$',
-        redirect_to,
-        {'url': '/mrs/notifications/submit/'},
-        name="sana-api-notification-submit-redirect"),
-
-    url(r'^notifications/submit/email/$',
-        redirect_to,
-        {'url': '/mrs/notifications/submit/email/'},
-        name="sana-api-email-notification-submit-redirect"),
-
-     url(r'^json/patient/list/$',
-        redirect_to,
-        {'url': '/mrs/json/patient/list/'},
-         name="sana-json-patient-list-redirect"),
-
-     url(r'^json/patient/(?P<id>[0-9-]+)/$',
-        redirect_to,
-        {'url': '/mrs/json/patient/(?P<id>[0-9-]+)/'},
-         name="sana-json-patient-get-redirect"),
-
-
-    url(r'^json/validate/credentials/$',
-        redirect_to,
-        {'url': '/mrs/json/validate/credentials/',},
-        name = "sana-json-validate-credentials-redirect"),
-
-    url(r'^procedure/submit/$',
-        redirect_to,
-        {'url': '/mrs/json/validate/credentials/'},
-        name="sana-html-procedure-submit-redirect"),
-
-    url(r'^json/procedure/submit/$',
-        redirect_to,
-        {'url': ''},
-        name="sana-json-procedure-submit-redirect"),
-
-    url(r'^json/binary/submit/$',
-        redirect_to,
-        {'url': '/mrs/json/binary/submit/'},
-        name="sana-json-binary-submit-redirect"),
-
-    url(r'^json/binarychunk/submit/$',
-        redirect_to,
-        {'url': '/mrs/json/binarychunk/submit/'},
-        name="sana-json-binarychunk-submit-redirect"),
-
-    url(r'^json/textchunk/submit/$',
-        redirect_to,
-        {'url': '/mrs/json/textchunk/submit/'},
-        name="sana-json-binarychunk-hack-submit-redirect"),
-
-    url(r'^json/eventlog/submit/$',
-        redirect_to,
-        {'url': '/mrs/json/eventlog/submit/'},
-        name="sana-json-eventlog-submit-redirect"),
-)
-
-_compats = {'v1': v1patterns }
-
-if settings.COMPAT_URLS:
-    for compat in settings.COMPAT_URLS:
-        urlpatterns += _compats[compat]
+    v1patterns = patterns(
+        '',
+        
+        url(r'^notifications/$',
+            v1notification_resource,
+            name="sana-list-notifications"),
+    
+        url(r'^notifications/submit/$',
+            v1notification_resource,
+            name="sana-api-notification-submit"),
+    
+        url(r'^notifications/submit/email/$',
+            v1smtp_resource,
+            name="sana-api-email-notification-submit"),
+    
+         url(r'^json/patient/list/$',
+            v1patient_resource,
+             name="sana-json-patient-list"),
+    
+         url(r'^json/patient/(?P<id>[0-9-]+)/$',
+            v1patient_resource,
+            name="sana-json-patient-get"),
+    
+    
+        url(r'^json/validate/credentials/$',
+            v1auth_resource,
+            name = "sana-json-validate-credentials"),
+    
+        url(r'^procedure/submit/$',
+            redirect_to,
+            name="sana-html-procedure-submit"),
+    
+        url(r'^json/procedure/submit/$',
+            redirect_to,
+            name="sana-json-procedure-submit"),
+    
+        url(r'^json/binary/submit/$',
+            v1binary_resource,
+            name="sana-json-binary-submit"),
+    
+        url(r'^json/binarychunk/submit/$',
+            v1binarypacket_resource,
+            name="sana-json-binarychunk-submit"),
+    
+        url(r'^json/textchunk/submit/$',
+            v1base64packet_resource,
+            name="sana-json-binarychunk-hack-submit"),
+    
+        url(r'^json/eventlog/submit/$',
+            v1event_resource,
+            name="sana-json-eventlog-submit"),
+        
+        # LOGGING
+        url(r'^log-detail/$',
+            'sana.api.v1.util.log_json_detail',
+            name="log-json-detail-noarg"),
+    
+        url(r'^log-detail/(?P<log_id>\d+)$',
+            'sana.api.v1.util.log_json_detail',
+            name="log-json-detail"),
+                            
+        url(r'^log/$',
+            v1requestlog_resource,
+            name="log-view"),
+        
+        url(r'^log/web/$',
+            v1requestlog_resource,
+            name="log-web-view"), 
+                           
+        url(r'^log/list/$',
+            v1requestlog_resource,
+            name="requestlog-list"),
+                              
+        url(r'^log/(?P<uuid>[^/]+)/$',
+            v1requestlog_resource,
+            name="requestlog"),
+    )
+    # Add v1 compat urls
+    urlpatterns += v1patterns
         
     
