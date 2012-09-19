@@ -15,13 +15,13 @@ This will require root privileges.
 :Authors: Sana Development Team
 :Version: 2.0
 """
-API_VERSION = '1.2'
+API_VERSION = '2.0'
 
-COMPAT_URLS = ('v1',)
+APICOMPAT_INCLUDE = ('v1',)
 ''' Will include any <version>patterns in top urls.py listed here ''' 
 
-### OpenMRS settings. OpenMRS versions seem to have some difference in submitted 
-### date format. 
+OPENMRS_VERSION = 1.9
+"""Version of OpenMRS used as backend. Default is 1.9"""
 OPENMRS_SERVER_URL = 'http://localhost/openmrs' 
 """Change localhost when deployed."""
 OPENMRS_DATE_FMT = '%m/%d/%Y %H:%M'
