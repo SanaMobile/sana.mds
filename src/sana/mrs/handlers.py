@@ -17,21 +17,22 @@ from piston.handler import BaseHandler
 
 from sana.core.handlers import EventHandler as BaseRequestHandler
 
-from sana.api.contrib.openmrs import openmrs16 as openmrs
+from sana.api import LOGGER
+from sana.api.contrib.openmrslib import openmrs16 as openmrs
 from sana.api.responses import succeed, fail
 from sana.api.decorators import logged
+from sana.api.signals import EventSignal, EventSignalHandler
 
-from sana.api.v1.json import render_json_response, MSG_MDS_ERROR
-from sana.api.v1.json import notification_submit, register_client_events
-from sana.api.v1.json import binary_submit, binarychunk_submit, binarychunk_hack_submit
-from sana.api.v1.json import patient_get, patient_list
-
+from sana.api.v1.json import (render_json_response,
+                              notification_submit, email_notification_submit, 
+                              register_client_events,
+                              binary_submit, binarychunk_submit, 
+                              binarychunk_hack_submit, patient_get, 
+                              patient_list )
+                                   
 from sana.api.v1.api import register_saved_procedure
 from sana.mrs.forms import ProcedureSubmitForm
 from sana.mrs.models import RequestLog
-
-from sana.api.signals import EventSignal
-from sana.mrs.signals import event_signalhandler 
 
 @logged
 class AuthHandler(BaseHandler):
@@ -39,7 +40,7 @@ class AuthHandler(BaseHandler):
         openMRS versions 1.6+
     """
     allowed_methods = ('GET',)
-    logger = (event_signalhandler, EventSignal())
+    signals = { LOGGER:( EventSignal(), EventSignalHandler(RequestLog))}
     
     def read(self,request, *args, **kwargs):
         """Validates user credentials with the backing data store.
@@ -64,7 +65,7 @@ class AuthHandler(BaseHandler):
                 response = succeed("username and password validated!")
             else:
                 response = fail("username and password combination incorrect!")
-            logging.debug(response)
+            logging.debug(response['message'])
         except Exception, e:
             msg = 'validate_credentials' #% MSG_MDS_ERROR
             logging.error('%s %s' % (msg, str(e)))
@@ -74,8 +75,8 @@ class AuthHandler(BaseHandler):
 @logged   
 class SavedProcedureHandler(BaseHandler):
     """ Handles encounter requests. """
-    allowed_methods = ('POST')
-    logger = (event_signalhandler, EventSignal())
+    allowed_methods = ('POST',)
+    signals = { LOGGER:( EventSignal(), EventSignalHandler(RequestLog))}
     
     def create(self,request, *args, **kwargs):
         logging.info("Received saved procedure submission.")
@@ -179,32 +180,40 @@ class RequestLogHandler(BaseRequestHandler):
 @logged    
 class NotificationHandler(BaseHandler):
     """ Handles encounter requests. """
-    allowed_methods = ('POST')
-    logger = (event_signalhandler, EventSignal())
+    allowed_methods = ('POST',)
+    signals = { LOGGER:( EventSignal(), EventSignalHandler(RequestLog))}
     
     def create(self,request, *args, **kwargs):
         return notification_submit(request) 
+@logged    
+class SMTPHandler(BaseHandler):
+    """ Handles encounter requests. """
+    allowed_methods = ('POST',)
+    signals = { LOGGER:( EventSignal(), EventSignalHandler(RequestLog))}
     
+    def create(self,request, *args, **kwargs):
+        return email_notification_submit(request)  
+
 @logged
 class BinaryHandler(BaseHandler):
-    allowed_methods = ('POST')
-    logger = (event_signalhandler, EventSignal())
+    allowed_methods = ('POST',)
+    signals = { LOGGER:( EventSignal(), EventSignalHandler(RequestLog))}
     
     def create(self,request, *args, **kwargs):
         return binary_submit(request)
     
 @logged
 class BinaryPacketHandler(BaseHandler):
-    allowed_methods = ('POST')
-    logger = (event_signalhandler, EventSignal())
+    allowed_methods = ('POST',)
+    signals = { LOGGER:( EventSignal(), EventSignalHandler(RequestLog))}
     
     def create(self,request, *args, **kwargs):
         return binarychunk_submit(request)
     
 @logged
 class Base64PacketHandler(BaseHandler):
-    allowed_methods = ('POST')
-    logger = (event_signalhandler, EventSignal())
+    allowed_methods = ('POST',)
+    signals = { LOGGER:( EventSignal(), EventSignalHandler(RequestLog))}
     
     def create(self,request, *args, **kwargs):
         return binarychunk_hack_submit(request)
@@ -214,7 +223,7 @@ class Base64PacketHandler(BaseHandler):
 class PatientHandler(BaseHandler):
     """ Handles patient requests. """
     allowed_methods = ('GET',)
-    logger = (event_signalhandler, EventSignal())
+    signals = { LOGGER:( EventSignal(), EventSignalHandler(RequestLog))}
     
     def read(self,request, id=None, **kwargs):
         if id and id != 'list':
@@ -222,11 +231,4 @@ class PatientHandler(BaseHandler):
         else:
             return patient_list(request)
         
-    def create(self,request, *args, **kwargs):
-        pass
     
-    def _read(self,request, *args, **kwargs):
-        if args:
-            return patient_get(request, args[0])
-        else:
-            return patient_list(request)

@@ -7,7 +7,7 @@ from django.http import HttpResponse
 from django.shortcuts import render_to_response
 from django import forms
 
-from sana.api.contrib.openmrs import openmrs16 as openmrs
+from sana.api.contrib.openmrslib import openmrs16 as openmrs
 from sana.mrs.models import Notification
 
 def chunk( seq, size, pad=None ):
