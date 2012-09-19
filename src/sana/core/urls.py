@@ -14,14 +14,15 @@ relationship_handler = Resource(RelationshipHandler)
 relationshipcategory_handler = Resource(RelationshipCategoryHandler)
 device_handler = Resource(DeviceHandler)
 encounter_handler = Resource(EncounterHandler)
+event_handler = Resource(EventHandler)
 notification_handler = Resource(NotificationHandler)
 observation_handler = Resource(ObservationHandler)
 observer_handler = Resource(ObserverHandler)
 procedure_handler = Resource(ProcedureHandler)
-subject_handler = Resource(SubjectHandler)
-event_handler = Resource(EventHandler)
-doc_handler = Resource(DocHandler)
 session_handler = Resource(SessionHandler)
+subject_handler = Resource(SubjectHandler)
+
+doc_handler = Resource(DocHandler)
 
 # non-restful urls
 urlpatterns = patterns(    
