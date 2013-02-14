@@ -8,14 +8,20 @@ The observation model for the Sana data engine.
 from django.db import models
 
 from django.contrib.auth.models import User
-from sana.api.models import RESTModel
+from ...api.utils import make_uuid
 
-_app = "core"
-class Observer(RESTModel):
+class Observer(models.Model):
     """ The user who executes the Procedure and collects the Observations """
-        
-    class Meta:
-        app_label = _app
+
+    uuid = models.SlugField(max_length=36, unique=True, default=make_uuid, editable=False)
+    """ A universally unique identifier """
+    
+    created = models.DateTimeField(auto_now_add=True)
+    """ When the object was created """
+    
+    modified = models.DateTimeField(auto_now=True)
+    """ updated on modification """
+
     user = models.OneToOneField(User, unique=True)
     """ A universally unique identifier. See  """
 

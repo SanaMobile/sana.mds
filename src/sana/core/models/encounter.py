@@ -6,23 +6,23 @@ on a Subject.
 """
 
 from django.db import models
-from sana.api.models import RESTModel
+from ...api.utils import make_uuid
 
-_app="core"
-
-class Encounter(RESTModel):
+class Encounter(models.Model):
     """ A completed procedure, where data has been collected
     """
-    class Meta:
-        app_label = _app
                
     def __unicode__(self):
         return "Encounter %s %s" % (self.uuid, self.created)
     
-    include_link = ('uuid', 'uri','modified','subject', 'procedure')
-    include_default = include_link
-    include_full = ('uuid', 'uri','modified','subject', 'procedure', 
-                    'observer', 'device', 'concept')
+    uuid = models.SlugField(max_length=36, unique=True, default=make_uuid, editable=False)
+    """ A universally unique identifier """
+    
+    created = models.DateTimeField(auto_now_add=True)
+    """ When the object was created """
+    
+    modified = models.DateTimeField(auto_now=True)
+    """ updated on modification """
     
     procedure = models.ForeignKey('Procedure', to_field='uuid')
     """ The procedure used to collect this encounter """

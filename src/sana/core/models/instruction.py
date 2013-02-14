@@ -5,12 +5,10 @@
 """
 
 from django.db import models
-_app="core"
+
 ## ?Procedure step. First iteration
 class Instruction(models.Model):
     
-    class Meta:
-        app_label = _app
     concept = models.ForeignKey('Concept', to_field='uuid')
     ''' Contextual information about the instruction '''
     

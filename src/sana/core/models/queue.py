@@ -5,16 +5,23 @@ Created on Aug 9, 2012
 :version: 2.0
 '''
 from django.db import models
-from sana.api.models import RESTModel
+from ...api.utils import make_uuid
 
 QUEUE_STATUS=((0,'Failed Dispatch'))
-_app = "core"
-class QueueElement(RESTModel):
+
+class EncounterQueueElement(models.Model):
     """ An element that is being processed
     """
+
+    uuid = models.SlugField(max_length=36, unique=True, default=make_uuid, editable=False)
+    """ A universally unique identifier """
     
-    class Meta:
-        app_label = _app
+    created = models.DateTimeField(auto_now_add=True)
+    """ When the object was created """
+    
+    modified = models.DateTimeField(auto_now=True)
+    """ updated on modification """
+
     object_url = models.CharField(max_length=512)
     """ The uuid of the cached object """
     

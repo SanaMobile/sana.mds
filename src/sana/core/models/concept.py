@@ -7,22 +7,22 @@
 from django.conf import settings
 from django.db import models
 
-from sana.api.models  import RESTModel
+from ...api.utils import make_uuid
 
-_app = "core"
-
-class Concept(RESTModel):
+class Concept(models.Model):
     """ A unit of knowledge."""
-    class Meta:
-        app_label = _app
     
     def __unicode__(self):
         return self.name
     
-    include_link = ('uuid', 'uri','name')
-    include_default = include_link
-    include_full = ('uuid', 'uri','name', 'display_name','description',
-                    'conceptclass', 'datatype', 'mimetype', 'constraint' )
+    uuid = models.SlugField(max_length=36, unique=True, default=make_uuid, editable=False)
+    """ A universally unique identifier """
+    
+    created = models.DateTimeField(auto_now_add=True)
+    """ When the object was created """
+    
+    modified = models.DateTimeField(auto_now=True)
+    """ updated on modification """
     
     name = models.CharField(max_length=255, unique=True)
     """ A short unique name."""
@@ -72,33 +72,37 @@ class Concept(RESTModel):
             from_concept__category=category,         
             from_concept__to_concept=self)
     
-class RelationshipCategory(RESTModel):
+class RelationshipCategory(models.Model):
     """ A type of relationship between two concepts 
     """
-    class Meta:
-        app_label = _app
         
     def __unicode__(self):
         return self.name
     
-    include_link = ('uuid', 'uri','name')
-    include_default = include_link
-    include_full = ('uuid', 'uri','name',)
+    uuid = models.SlugField(max_length=36, unique=True, default=make_uuid, editable=False)
+    """ A universally unique identifier """
+    
+    created = models.DateTimeField(auto_now_add=True)
+    """ When the object was created """
+    
+    modified = models.DateTimeField(auto_now=True)
+    """ updated on modification """
                     
     name = models.CharField(max_length=64)
     description = models.CharField(max_length=512, blank=True)
     restriction = models.CharField(max_length=512, blank=True)
 
-class Relationship(RESTModel):
+class Relationship(models.Model):
     """ A relationship between two concept instances 
     """
-    class Meta:
-        app_label = _app
+    uuid = models.SlugField(max_length=36, unique=True, default=make_uuid, editable=False)
+    """ A universally unique identifier """
     
-    include_link = ('uuid', 'uri','category', 'to_concept')
-    include_default = include_link
-    include_full = ('uuid', 'uri','from_concept','category', 'to_concept')
+    created = models.DateTimeField(auto_now_add=True)
+    """ When the object was created """
     
+    modified = models.DateTimeField(auto_now=True)
+    """ updated on modification """    
     from_concept = models.ForeignKey('Concept', 
                             related_name='concept_related_from',
                             to_field='uuid')
@@ -106,6 +110,7 @@ class Relationship(RESTModel):
                             related_name="concept_related_to",
                             to_field='uuid')
     category = models.ForeignKey('RelationshipCategory')
+    
     def __unicode__(self):
         return u'{to} {relationship} {from}'.format(self.to_concept.name, 
                                                     self.from_conept.name, 

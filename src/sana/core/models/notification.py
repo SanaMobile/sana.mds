@@ -7,20 +7,20 @@ Notifications for the Sana data engine.
 import cjson
 
 from django.db import models
-from sana.api.models import RESTModel
+from ...api.utils import make_uuid
 
-_app="core"
-
-class Notification(RESTModel):
+class Notification(models.Model):
     """ A message to be sent """
+
+    uuid = models.SlugField(max_length=36, unique=True, default=make_uuid, editable=False)
+    """ A universally unique identifier """
     
-    class Meta:
-        app_label = _app
-        
-    include_link = ('uuid', 'uri','address','header', 'message', 'modified')
-    include_default = include_link
-    include_full = include_default
+    created = models.DateTimeField(auto_now_add=True)
+    """ When the object was created """
     
+    modified = models.DateTimeField(auto_now=True)
+    """ updated on modification """
+
     address = models.CharField(max_length=512)
     """ The recipient address """
     

@@ -5,20 +5,45 @@
 """
 
 from django.db import models
-from sana.api.models import RESTModel
-_app = "core"
-class Subject(RESTModel):
+from ...api.utils import make_uuid
+
+class Subject(models.Model):
     """ The entity about whom data is collected. """
-
     class Meta:
-        app_label = _app    
+        abstract = True
     
-    include_link = ('uuid', 'uri','concept')
-    include_full = include_link
-    include_default = include_link
+    uuid = models.SlugField(max_length=36, unique=True, default=make_uuid, editable=False)
+    """ A universally unique identifier """
     
-    concept = models.ForeignKey('Concept', to_field='uuid')
-    """ A contextual term for the subject.""" 
-
+    created = models.DateTimeField(auto_now_add=True)
+    """ When the object was created """
+    
+    modified = models.DateTimeField(auto_now=True)
+    """ updated on modification """
+    
+class Patient(models.Model): 
+    """ A medical patient 
+    """
+    uuid = models.SlugField(max_length=36, unique=True, default=make_uuid, editable=False)
+    """ A universally unique identifier """
+    
+    created = models.DateTimeField(auto_now_add=True)
+    """ When the object was created """
+    
+    modified = models.DateTimeField(auto_now=True)
+    """ updated on modification """
+    
+    given_name = models.CharField(max_length=64)
+    
+    family_name = models.CharField(max_length=64)
+    
+    dob = models.DateField()
+    
+    @property
+    def age(self):
+        #TODO Have this return calculated current age - dob
+        pass
+    
+    gender = models.CharField(choices=(("M","M"),("F","F")),max_length=2)
     
     

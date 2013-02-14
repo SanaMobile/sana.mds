@@ -6,18 +6,20 @@
 
 from django.db import models
 
-from sana.api.models import RESTModel
-_app = "core"
-class Procedure(RESTModel):
+from ...api.utils import make_uuid
+
+class Procedure(models.Model):
     """ A series of steps used to collect data observations. """
-  
-    class Meta:
-        app_label = _app  
+
+    uuid = models.SlugField(max_length=36, unique=True, default=make_uuid, editable=False)
+    """ A universally unique identifier """
     
-    include_default = ('uuid', 'name', 'author', 'version', 'uri')
-    include_link = include_default
-    include_full = include_default
+    created = models.DateTimeField(auto_now_add=True)
+    """ When the object was created """
     
+    modified = models.DateTimeField(auto_now=True)
+    """ updated on modification """
+   
     author = models.CharField(max_length=255)
     """ The author of the procedure """
     
@@ -27,7 +29,7 @@ class Procedure(RESTModel):
     concept = models.ForeignKey('Concept', to_field='uuid')
     """ Context term for the object.""" 
     
-    src = models.FileField(upload_to='{0}/procedure'.format(_app), blank=True)
+    src = models.FileField(upload_to='core/procedure', blank=True)
     """ File storage location for the procedure """
 
     @property

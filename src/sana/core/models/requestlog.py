@@ -9,23 +9,26 @@ from django.db import models
 from django.conf import settings
 from django.utils.translation import ugettext_lazy as _
 
-from sana.api import ERROR, NOTSET, LOG_LEVELS, LEVEL_CHOICES
-from sana.api.models import RESTModel
+from ...api import NOTSET, LEVEL_CHOICES
+from ...api.utils import make_uuid
 
 # TODO read this from the config
 TIME_FORMAT = "%m/%d/%Y %H:%M:%S"
 
 _app = "core"
-class RequestLog(RESTModel):
+class RequestLog(models.Model):
     """
     Logging facility for requests.
     """
-    class Meta:
-        app_label = _app
         
-    include_link = ('uuid', 'name','level')
-    include_full = ('uuid', 'name', 'level','client', 'path', 'level','message', 'timestamp', 'duration')
-    include_default = include_full
+    uuid = models.SlugField(max_length=36, unique=True, default=make_uuid, editable=False)
+    """ A universally unique identifier """
+    
+    created = models.DateTimeField(auto_now_add=True)
+    """ When the object was created """
+    
+    modified = models.DateTimeField(auto_now=True)
+    """ updated on modification """
     
     # max keylength of index is 767
     client = models.CharField(max_length=16)
