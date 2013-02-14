@@ -6,15 +6,15 @@ required.
 :Version: 2.0
 """
 
-from sana.core.models.concept import Concept, Relationship, RelationshipCategory
-from sana.core.models.device import Device
-from sana.core.models.encounter import Encounter
-from sana.core.models.events import Event
-from sana.core.models.notification import Notification
-from sana.core.models.observation import Observation
-from sana.core.models.observer import Observer
-from sana.core.models.procedure import Procedure
-from sana.core.models.subject import Subject
+from .concept import Concept, Relationship, RelationshipCategory
+from .device import Device
+from .encounter import Encounter
+from .events import Event
+from .notification import Notification
+from .observation import Observation
+from .observer import Observer
+from .procedure import Procedure
+from .subject import Patient
 
 __all__ = ['Concept', 'Relationship','RelationshipCategory',
            'Device', 
@@ -24,5 +24,5 @@ __all__ = ['Concept', 'Relationship','RelationshipCategory',
            'Observation', 
            'Observer',
            'Procedure',
-           'Subject',]
+           'Patient',]
 
