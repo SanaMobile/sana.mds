@@ -1,5 +1,4 @@
 '''
-Created on Feb 29, 2012
 
 :Authors: Sana Dev Team
 :Version: 2.0
@@ -7,7 +6,7 @@ Created on Feb 29, 2012
 
 from django import forms
 
-from sana.core.models import *
+from .models import *
 
 __all__ = ['ConceptForm', 'RelationshipForm', 'RelationshipCategoryForm', 
            'DeviceForm',
@@ -16,7 +15,7 @@ __all__ = ['ConceptForm', 'RelationshipForm', 'RelationshipCategoryForm',
            'NotificationForm',
            'ObserverForm', 
            'ObservationForm', 
-           'SubjectForm', 
+           'PatientForm', 
            'ProcedureForm',
            'SessionForm'  ]
 
@@ -83,9 +82,9 @@ class ProcedureForm(forms.ModelForm):
     class Meta:
         model = Procedure
      
-class SubjectForm(forms.ModelForm):
-    """ A simple subject form
+class PatientForm(forms.ModelForm):
+    """ A simple patient form
     """
     class Meta:
-        model = Subject
+        model = Patient
 
