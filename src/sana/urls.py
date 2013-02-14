@@ -17,8 +17,6 @@ urlpatterns = patterns(
     '',
     url(r'^$', 'sana.core.views.home', name="home"),
     url(r'^core/', include('sana.core.urls', namespace='core')),
-    url(r'^mds/', include('sana.mds.urls', namespace='mds')),
-    url(r'^mrs/', include('sana.mrs.urls', namespace='mrs')),
     # ADMIN
     (r'^admin/', include(admin.site.urls)),
 )
@@ -80,11 +78,11 @@ if 'v1' in settings.APICOMPAT_INCLUDE:
             name = "sana-json-validate-credentials"),
     
         url(r'^procedure/submit/$',
-            redirect_to,
+            v1savedprocedure_resource,
             name="sana-html-procedure-submit"),
     
         url(r'^json/procedure/submit/$',
-            redirect_to,
+            v1savedprocedure_resource,
             name="sana-json-procedure-submit"),
     
         url(r'^json/binary/submit/$',
@@ -105,11 +103,12 @@ if 'v1' in settings.APICOMPAT_INCLUDE:
         
         # LOGGING
         url(r'^log-detail/$',
-            'sana.api.v1.util.log_json_detail',
+            v1requestlog_resource,
+            #'sana.api.v1.util.log_json_detail',
             name="log-json-detail-noarg"),
     
-        url(r'^log-detail/(?P<log_id>\d+)$',
-            'sana.api.v1.util.log_json_detail',
+        url(r'^log-detail/(?P<uuid>\d+)$',
+            v1requestlog_resource,
             name="log-json-detail"),
                             
         url(r'^log/$',
