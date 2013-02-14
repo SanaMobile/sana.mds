@@ -10,7 +10,7 @@ import cjson
 from piston.handler import BaseHandler
 
 from sana.api import do_authenticate, LOGGER
-from sana.api.handlers import RESTHandler
+from sana.api.handlers import DispatchingHandler
 from sana.api.decorators import logged, validate
 from sana.api.docs.utils import handler_uri_templates
 from sana.api.responses import succeed, fail, error
@@ -31,11 +31,11 @@ __all__ = ['ConceptHandler',
            'ProcedureHandler',
            'DocHandler' ,
            'SessionHandler',
-           'SubjectHandler',]
+           'PatientHandler',]
 
    
 @logged     
-class SessionHandler(RESTHandler):
+class SessionHandler(DispatchingHandler):
     """ Handles session auth requests. """
     allowed_methods = ('GET','POST',)
     signals = { LOGGER:( EventSignal(), EventSignalHandler(Event))}
@@ -61,7 +61,7 @@ class SessionHandler(RESTHandler):
             return fail(msg)
     
 @logged
-class ConceptHandler(RESTHandler):
+class ConceptHandler(DispatchingHandler):
     """ Handles concept requests. """
     allowed_methods = ('GET', 'POST')
     model = Concept
@@ -69,14 +69,14 @@ class ConceptHandler(RESTHandler):
     fields = ("uuid", "name")
     signals = { LOGGER:( EventSignal(), EventSignalHandler(Event))}
 
-class RelationshipHandler(RESTHandler):
+class RelationshipHandler(DispatchingHandler):
     """ Handles concept relationship requests. """
     allowed_methods = ('GET', 'POST')
     model = Relationship
     form = RelationshipForm
     signals = { LOGGER:( EventSignal(), EventSignalHandler(Event))}
     
-class RelationshipCategoryHandler(RESTHandler):
+class RelationshipCategoryHandler(DispatchingHandler):
     """ Handles concept relationship category requests. """
     allowed_methods = ('GET', 'POST')
     model = RelationshipCategory
@@ -84,7 +84,7 @@ class RelationshipCategoryHandler(RESTHandler):
     signals = { LOGGER:( EventSignal(), EventSignalHandler(Event))}
 
 @logged
-class DeviceHandler(RESTHandler):
+class DeviceHandler(DispatchingHandler):
     """ Handles device requests. """
     allowed_methods = ('GET', 'POST')
     model = Device
@@ -92,7 +92,7 @@ class DeviceHandler(RESTHandler):
     signals = { LOGGER:( EventSignal(), EventSignalHandler(Event))}
     
 @logged    
-class EncounterHandler(RESTHandler):
+class EncounterHandler(DispatchingHandler):
     """ Handles encounter requests. """
     allowed_methods = ('GET', 'POST')
     model = Encounter
@@ -101,13 +101,13 @@ class EncounterHandler(RESTHandler):
     signals = { LOGGER:( EventSignal(), EventSignalHandler(Event))}
     #TODO wrap this around the old json.py
 
-class EventHandler(RESTHandler):
+class EventHandler(DispatchingHandler):
     """ Handles network request log requests. """
     allowed_methods = ('GET', 'POST')
     model = Event
 
 @logged
-class NotificationHandler(RESTHandler):
+class NotificationHandler(DispatchingHandler):
     """ Handles notification requests. """
     allowed_methods = ('GET', 'POST')
     model = Notification
@@ -116,14 +116,14 @@ class NotificationHandler(RESTHandler):
     #TODO wrap this around the old json.py
 
 @logged
-class ObservationHandler(RESTHandler):
+class ObservationHandler(DispatchingHandler):
     allowed_methods = ('GET', 'POST')
     model = Observation
     form = ObservationForm
     signals = { LOGGER:( EventSignal(), EventSignalHandler(Event))}
     
 @logged        
-class ObserverHandler(RESTHandler):
+class ObserverHandler(DispatchingHandler):
     """ Handles observer requests. """
     allowed_methods = ('GET', 'POST')
     model = Observer
@@ -131,7 +131,7 @@ class ObserverHandler(RESTHandler):
     signals = { LOGGER:( EventSignal(), EventSignalHandler(Event))}
 
 @logged
-class ProcedureHandler(RESTHandler):
+class ProcedureHandler(DispatchingHandler):
     allowed_methods = ('GET', 'POST')
     model = Procedure
     form = ProcedureForm
@@ -146,12 +146,12 @@ class ProcedureHandler(RESTHandler):
         return open(obj.src.path).read()
 
 @logged
-class SubjectHandler(RESTHandler):
+class SubjectHandler(DispatchingHandler):
     """ Handles subject requests. """
     allowed_methods = ('GET', 'POST')
     fields = ['uuid']
-    model = Subject
-    form = SubjectForm
+    model = Patient
+    form = PatientForm
     signals = { LOGGER:( EventSignal(), EventSignalHandler(Event))}
 
    
