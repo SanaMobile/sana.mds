@@ -14,7 +14,7 @@ from .notification import Notification
 from .observation import Observation
 from .observer import Observer
 from .procedure import Procedure
-from .subject import Patient
+from .subject import Subject
 
 __all__ = ['Concept', 'Relationship','RelationshipCategory',
            'Device', 
@@ -24,5 +24,5 @@ __all__ = ['Concept', 'Relationship','RelationshipCategory',
            'Observation', 
            'Observer',
            'Procedure',
-           'Patient',]
+           'Subject',]
 

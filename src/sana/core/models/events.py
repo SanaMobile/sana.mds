@@ -19,6 +19,8 @@ class Event(models.Model):
     """
     Logging facility for requests.
     """
+    class Meta:
+        app_label = "core"
     uuid = models.SlugField(max_length=36, unique=True, default=make_uuid, editable=False)
     """ A universally unique identifier """
     

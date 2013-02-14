@@ -11,6 +11,9 @@ from ...api.utils import make_uuid
 class Device(models.Model):
     """ The entity which is used to collect the data """
     
+    class Meta:
+        app_label = "core"
+        
     uuid = models.SlugField(max_length=36, unique=True, default=make_uuid, editable=False)
     """ A universally unique identifier """
     

@@ -11,7 +11,9 @@ from ...api.utils import make_uuid
 class Encounter(models.Model):
     """ A completed procedure, where data has been collected
     """
-               
+    class Meta:
+        app_label = "core"
+                   
     def __unicode__(self):
         return "Encounter %s %s" % (self.uuid, self.created)
     

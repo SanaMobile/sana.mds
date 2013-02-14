@@ -13,8 +13,9 @@ _app = "core"
 
 class Observation(models.Model):
     """ A piece of data collected about a subject during an external_id"""
-    
-    class Meta:  
+
+    class Meta:
+        app_label = "core"  
         unique_together = (('encounter', 'node'),)
 
     #def __unicode__(self):
@@ -59,9 +60,6 @@ class Observation(models.Model):
     def clean(self):
         if self.is_complex:
             self.value_text = "complex_data"
-        else:
-            self._value_complex.path = None
-            self._value_text = self.value
         super(models.Model, self).clean()
         
     
@@ -116,13 +114,13 @@ class Observation(models.Model):
             name += '-%s' % append
         ext = mimetypes.guess(self.concept.data_type, False)
         fname = '%s%s' % (name, ext)
-        self.value_complex = self._value_complex.field.generate_filename(self, fname)
-        path, _ = os.path.split(self._value_complex.path)
+        self.value_complex = self.value_complex.field.generate_filename(self, fname)
+        path, _ = os.path.split(self.value_complex.path)
         # make sure we have the directory structure
         if not os.path.exists(path):
             os.makedirs(path)
             # create the stub and commit if no exceptions
-            open(self._value_complex.path, "w").close()
+            open(self.value_complex.path, "w").close()
         self.save()
     
     @property

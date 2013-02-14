@@ -12,6 +12,9 @@ from ...api.utils import make_uuid
 class Concept(models.Model):
     """ A unit of knowledge."""
     
+    class Meta:
+        app_label = "core"
+        
     def __unicode__(self):
         return self.name
     
@@ -75,6 +78,8 @@ class Concept(models.Model):
 class RelationshipCategory(models.Model):
     """ A type of relationship between two concepts 
     """
+    class Meta:
+        app_label = "core"
         
     def __unicode__(self):
         return self.name
@@ -95,6 +100,8 @@ class RelationshipCategory(models.Model):
 class Relationship(models.Model):
     """ A relationship between two concept instances 
     """
+    class Meta:
+        app_label = "core"
     uuid = models.SlugField(max_length=36, unique=True, default=make_uuid, editable=False)
     """ A universally unique identifier """
     

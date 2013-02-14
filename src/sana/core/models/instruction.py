@@ -9,6 +9,8 @@ from django.db import models
 ## ?Procedure step. First iteration
 class Instruction(models.Model):
     
+    class Meta:
+        app_label = "core"
     concept = models.ForeignKey('Concept', to_field='uuid')
     ''' Contextual information about the instruction '''
     

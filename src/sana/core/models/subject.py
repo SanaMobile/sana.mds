@@ -7,7 +7,7 @@
 from django.db import models
 from ...api.utils import make_uuid
 
-class Subject(models.Model):
+class AbstractSubject(models.Model):
     """ The entity about whom data is collected. """
     class Meta:
         abstract = True
@@ -21,18 +21,11 @@ class Subject(models.Model):
     modified = models.DateTimeField(auto_now=True)
     """ updated on modification """
     
-class Patient(models.Model): 
-    """ A medical patient 
+class Subject(AbstractSubject): 
+    """ Simple subject implementation as a medical patient. 
     """
-    uuid = models.SlugField(max_length=36, unique=True, default=make_uuid, editable=False)
-    """ A universally unique identifier """
-    
-    created = models.DateTimeField(auto_now_add=True)
-    """ When the object was created """
-    
-    modified = models.DateTimeField(auto_now=True)
-    """ updated on modification """
-    
+    class Meta:
+        app_label = "core"
     given_name = models.CharField(max_length=64)
     
     family_name = models.CharField(max_length=64)

@@ -11,6 +11,8 @@ from ...api.utils import make_uuid
 class Procedure(models.Model):
     """ A series of steps used to collect data observations. """
 
+    class Meta:
+        app_label = "core"
     uuid = models.SlugField(max_length=36, unique=True, default=make_uuid, editable=False)
     """ A universally unique identifier """
     
