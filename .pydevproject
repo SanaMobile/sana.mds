@@ -4,13 +4,15 @@
 <pydev_project>
 <pydev_variables_property name="org.python.pydev.PROJECT_VARIABLE_SUBSTITUTION">
 <key>DJANGO_MANAGE_LOCATION</key>
-<value>src/sana/manage.py</value>
+<value>src/mds/manage.py</value>
 <key>DJANGO_SETTINGS_MODULE</key>
-<value>sana.settings</value>
+<value>mds.settings</value>
 </pydev_variables_property>
-<pydev_pathproperty name="org.python.pydev.PROJECT_SOURCE_PATH">
-<path>/mds/src</path>
-</pydev_pathproperty>
+
 <pydev_property name="org.python.pydev.PYTHON_PROJECT_VERSION">python 2.6</pydev_property>
 <pydev_property name="org.python.pydev.PYTHON_PROJECT_INTERPRETER">Default</pydev_property>
+<pydev_pathproperty name="org.python.pydev.PROJECT_SOURCE_PATH">
+<path>/mds/src</path>
+<path>/mds/libs/src</path>
+</pydev_pathproperty>
 </pydev_project>
