@@ -1,0 +1,22 @@
+<html>
+  <head>
+    <title>{% block title %}Sana MDS{% endblock %}</title>
+    {% block styles %}
+    {% endblock %}
+    {% block scripts %}
+    
+    {% load static %}
+    <!--<script src="{{ MEDIA_URL }}js/jquery.js"></script>-->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.4/jquery.min.js"></script>
+    {% endblock %}
+  </head>
+  <body>
+    {% block header %}{% endblock %}
+    {% block body %}{% endblock %}
+    {% block footer %}
+    <div align="right" width=100%>
+    API Version: {{ version }}
+    </div>
+    {% endblock %} 
+  </body>
+</html>

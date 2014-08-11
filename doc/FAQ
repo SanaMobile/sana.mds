@@ -1,0 +1,52 @@
+This file contains a list of frequently asked questions and troubleshooting
+tips.
+
+1. Where can I get more help?
+
+See the sana-users google group or the wiki, http://sana.mit.edu/wiki. 
+
+2.  Will it work if I install it on something other than Ubuntu 12.04 LTS?
+
+Maybe but we do not officially support other Linux distro's or Ubuntu versions.
+
+3. I want to use sqlite while testing.
+
+Change the DATABASES value in the settings.py file to look like
+
+    DATABASES = {
+        'default': {
+            'NAME': '/var/local/db/sqlite.db',
+            'ENGINE': 'django.db.backends.sqlite3',
+            'USER': '',
+            'PASSWORD': ''
+        },
+    }
+
+(You will need to create the /var/local/db directory and update the perms).
+
+Making sure everything works:
+1. Update the settings.py.
+2. ./manage.py syncdb
+3. ./manage.py shell
+4. At the python prompt:
+>>> from sana.mrs import openmrs
+>>> tester = openmrs.tests(host="<your hostname or IP>", username="<username>, password="<password>")
+>>> tester.run_all()
+>>> tester.run_all()
+>>> tester.run_all()Session open result:  5FD47B4DBC35FDEE4996653AD0080DFE
+Session closed:  
+Session open result:  A28E0DE715D263700F112E667AABEED7
+Creating Patient, ID:  11110021
+Patient ID: 11110021  UUID: 55ee377c-97dc-4095-9ac4-6422ab3f32d9
+Session closed:  
+Fetching  11110021
+Session open result:  789AEAE3E373787B7843BF98C31E95A3
+Patient Fetch by ID: {.....alot of info...}
+Session closed:  
+
+If you get any error messages then something went wrong which may be anything
+from a credential problem to a server timeout, etc. If the server responds you
+should at least see the HttpError message such as:
+
+>>> HTTPError: HTTP Error 401: Unauthorized
+

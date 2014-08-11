@@ -1,0 +1,42 @@
+<VirtualHost *:80>
+    ServerAdmin webmaster@localhost
+    #ServerName example.org
+    
+    DocumentRoot /var/local/www
+    
+    <Directory />
+        Options FollowSymLinks
+        AllowOverride None
+        #Order allow,deny
+        #Deny from all
+    </Directory>
+    
+    <Directory /var/local/www>
+        Options MultiViews Indexes FollowSymLinks
+        Order allow,deny
+        allow from all
+    </Directory>
+
+    ScriptAlias /cgi-bin/ /usr/lib/cgi-bin/
+    <Directory /usr/lib/cgi-bin>
+        AllowOverride None
+        Options +ExecCGI -MultiViews +SymLinksIfOwnerMatch
+        Order allow,deny
+        Allow from all
+    </Directory>
+
+    # Logging section
+    LogLevel warn
+    ErrorLog /var/log/apache2/sana-error.log
+    CustomLog /var/log/apache2/sana-access.log combined
+
+    ####################################################################
+    # OpenMRS section - Uses proxy ajp
+    ####################################################################
+    Include /etc/apache2/conf/openmrs.conf
+
+    ####################################################################
+    # MDS Section - Uses WSGI
+    ####################################################################
+    Include /etc/apache2/conf/mds.conf
+</VirtualHost>
