@@ -20,6 +20,10 @@ API_VERSION = '2.0'
 APICOMPAT_INCLUDE = ('v1',)
 ''' Will include any <version>patterns in top urls.py listed here ''' 
 
+TARGET = "SELF"
+""" If using a separate EMR backend for permanent storage of the data set
+    this to a recognized value. Currently this accepts 'SELF' or 'OPENMRS'
+"""
 OPENMRS_VERSION = 1.9
 """Version of OpenMRS used as backend. Default is 1.9"""
 OPENMRS_SERVER_URL = 'http://localhost/openmrs' 
