@@ -4,6 +4,7 @@
 :version: 2.0
 :copyright: Sana 2012, released under BSD New License(http://sana.mit.edu/license)
 '''
+
 """ 
 Sana mDS(mobile Dispatch Server)
 ================================
@@ -18,5 +19,5 @@ Discussion Groups
     <http://groups.google.com/group/sana-users>`__
     
 :Authors: Sana Development Team
-:Version: 1.1
+:Version: 2.0
 """
