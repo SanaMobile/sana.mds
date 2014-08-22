@@ -18,6 +18,8 @@ def make_uuid():
     """
     return str(uuid.uuid4())
 
+_mimemap = dict(settings.EXTENSIONS)
+
 def guess_fext(mtype):
     """ A wrapper around mimetypes.guess_extension(type,True) with additional 
         types included from settings
@@ -25,8 +27,8 @@ def guess_fext(mtype):
         mtype
             the file mime type
     """
-    _tmp = mimetypes.guess_extension(type)
-    return settings.CONTENT_TYPES.get(type,None) if not _tmp else _tmp
+    _tmp = mimetypes.guess_extension(mtype)
+    return _mimemap.get(mtype,None) if not _tmp else _tmp
 
 def key_generator(self):
     """ Generates a new secret key """
