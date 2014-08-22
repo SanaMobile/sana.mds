@@ -17,6 +17,7 @@ urlpatterns = patterns(
     '',
     url(r'^$', 'core.views.home', name="home"),
     url(r'^core/', include('core.urls', namespace='core')),
+    url(r'^tasks/', include('tasks.urls', namespace='tasks')),
     # ADMIN
     (r'^admin/', include(admin.site.urls)),
 )
