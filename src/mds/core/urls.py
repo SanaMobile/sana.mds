@@ -5,24 +5,8 @@
 :Version: 2.0
 """
 from django.conf.urls.defaults import patterns, url, include
-from piston.resource import Resource
 
-from .handlers import *
-
-concept_handler = Resource(ConceptHandler)
-relationship_handler = Resource(RelationshipHandler)
-relationshipcategory_handler = Resource(RelationshipCategoryHandler)
-device_handler = Resource(DeviceHandler)
-encounter_handler = Resource(EncounterHandler)
-event_handler = Resource(EventHandler)
-notification_handler = Resource(NotificationHandler)
-observation_handler = Resource(ObservationHandler)
-observer_handler = Resource(ObserverHandler)
-procedure_handler = Resource(ProcedureHandler)
-session_handler = Resource(SessionHandler)
-subject_handler = Resource(SubjectHandler)
-
-doc_handler = Resource(DocHandler)
+from .resources import *
 
 # non-restful urls
 urlpatterns = patterns(    
@@ -45,57 +29,59 @@ urlpatterns = patterns(
 extra_patterns = patterns(
     '',
     # session auth
-    url(r'^session/$', session_handler, name='session-list'),
+    url(r'^session/$', rsrc_session, name='session-list'),
     
     # notification
-    url(r'^notification/$', notification_handler, name='notification-list'),
-    url(r'^notification/(?P<uuid>[^/]+)/$', notification_handler, name='notification'),
+    url(r'^notification/$', rsrc_notification, name='notification-list'),
+    url(r'^notification/(?P<uuid>[^/]+)/$', rsrc_notification, name='notification'),
     
     # events   
-    url(r'^event/$', event_handler, name='event-list'),
-    url(r'^event/(?P<uuid>[^/]+)/$', event_handler, name='event'),
+    url(r'^event/$', rsrc_event, name='event-list'),
+    url(r'^event/(?P<uuid>[^/]+)/$', rsrc_event, name='event'),
     
     # concepts
-    url(r'^concept/$', concept_handler, name='concept-list'),
-    url(r'^concept/(?P<uuid>[^/]+)/$', concept_handler, name='concept'),
-    url(r'^concept/(?P<uuid>[^/]+)/relationship/$', concept_handler, name='concept-relationships', kwargs={'related':'relationship'}),
-    url(r'^concept/(?P<uuid>[^/]+)/procedure/$', concept_handler, name='concept-procedures', kwargs={'related':'procedure'}),
+    url(r'^concept/$', rsrc_concept, name='concept-list'),
+    url(r'^concept/(?P<uuid>[^/]+)/$', rsrc_concept, name='concept'),
+    url(r'^concept/(?P<uuid>[^/]+)/relationship/$', rsrc_concept, name='concept-relationships', kwargs={'related':'relationship'}),
+    url(r'^concept/(?P<uuid>[^/]+)/procedure/$', rsrc_concept, name='concept-procedures', kwargs={'related':'procedure'}),
     
     # concept relationships
-    url(r'^relationship/$', relationship_handler,name='relationship-list'),
-    url(r'^relationship/(?P<uuid>[^/]+)/$', relationship_handler,name='relationship'),
+    url(r'^relationship/$', rsrc_relationship,name='relationship-list'),
+    url(r'^relationship/(?P<uuid>[^/]+)/$', rsrc_relationship,name='relationship'),
     
     # concept relationship categories
-    url(r'^relationshipcategory/$', relationshipcategory_handler,
+    url(r'^relationshipcategory/$', rsrc_relationshipcategory,
         name='relationshipcategory-list'),
-    url(r'^relationshipcategory/(?P<uuid>[^/]+)/$', relationshipcategory_handler,
+    url(r'^relationshipcategory/(?P<uuid>[^/]+)/$', rsrc_relationshipcategory,
         name='relationshipcategory'),
     
     # devices
-    url(r'^device/$', device_handler, name='device-list'),
-    url(r'^device/(?P<uuid>[^/]+)/$', device_handler, name='device'),
+    url(r'^device/$', rsrc_device, name='device-list'),
+    url(r'^device/(?P<uuid>[^/]+)/$', rsrc_device, name='device'),
     
     # encounters
-    url(r'^encounter/$', encounter_handler, name='encounter-list'),
-    url(r'^encounter/(?P<uuid>[^/]+)/$', encounter_handler, name='encounter'),
-    url(r'^encounter/(?P<uuid>[^/]+)/observation/$', encounter_handler, name='encounter-observations', kwargs={'related':'observation'}),
+    url(r'^encounter/$', rsrc_encounter, name='encounter-list'),
+    url(r'^encounter/(?P<uuid>[^/]+)/$', rsrc_encounter, name='encounter'),
+    url(r'^encounter/(?P<uuid>[^/]+)/(?P<related>[^/]+)/$', rsrc_encounter, name='encounter-observations', kwargs={'related':'observation'}),
     
     # observations
-    url(r'^observation/$', observation_handler, name='observation-list'),
-    url(r'^observation/(?P<uuid>[^/]+)/$', observation_handler, name='observation'),
+    url(r'^observation/$', rsrc_observation, name='observation-list'),
+    url(r'^observation/(?P<uuid>[^/]+)/$', rsrc_observation, name='observation'),
     
     # observers
-    url(r'^observer/$', observer_handler, name='observer-list'),
-    url(r'^observer/(?P<uuid>[^/]+)/$', observer_handler, name='observer'),
+    url(r'^observer/$', rsrc_observer, name='observer-list'),
+    url(r'^observer/(?P<uuid>[^/]+)/$', rsrc_observer, name='observer'),
     
     # procedures
-    url(r'^procedure/$', procedure_handler, name='procedure-list'),
-    url(r'^procedure/(?P<uuid>[^/]+)/$', procedure_handler, name='procedure'),
+    url(r'^procedure/$', rsrc_procedure, name='procedure-list'),
+    url(r'^procedure/(?P<uuid>[^/]+)/$', rsrc_procedure, name='procedure'),
     
     # subjects
-    url(r'^subject/$', subject_handler, name='subject-list'),
-    url(r'^subject/(?P<uuid>[^/]+)/$', subject_handler, name='subject'),
-    url(r'^subject/(?P<uuid>[^/]+)/encounter/$', subject_handler, name='subject-encounters', kwargs={'related':'procedure'}),
+    url(r'^subject/$', rsrc_subject, name='subject-list'),
+    url(r'^subject/(?P<uuid>[^/]+)/$', rsrc_subject, name='subject'),
+    url(r'^subject/(?P<uuid>[^/]+)/encounter/$', rsrc_subject, name='subject-encounters', kwargs={'related':'procedure'}),
+
+    url(r'^location/$', rsrc_location, name='location-list'),
 )
 
 # add the non-RESTful urls
