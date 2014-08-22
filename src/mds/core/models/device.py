@@ -26,3 +26,7 @@ class Device(models.Model):
     name = models.CharField(max_length=36)
     """ A display name """
 
+    voided = models.BooleanField(default=False)
+
+    def __unicode__(self):
+        return self.name

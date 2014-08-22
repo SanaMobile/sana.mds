@@ -15,7 +15,7 @@ class Encounter(models.Model):
         app_label = "core"
                    
     def __unicode__(self):
-        return "Encounter %s %s" % (self.uuid, self.created)
+        return "%s" % (self.uuid)
     
     uuid = models.SlugField(max_length=36, unique=True, default=make_uuid, editable=False)
     """ A universally unique identifier """
@@ -41,6 +41,12 @@ class Encounter(models.Model):
     concept = models.ForeignKey('Concept', to_field='uuid')
     """ A contextual term for the encounter."""
 
+    voided = models.BooleanField(default=False)
+
+    @property
+    def slug(self):
+	return self.uuid
+
     #_uploaded = models.BooleanField(default=False)
     #""" Whether the saved procedure was uploaded to a remote queueing server. """
     
@@ -58,3 +64,7 @@ class Encounter(models.Model):
             if not complete:
                 break
         return complete
+
+    @models.permalink
+    def get_absolute_url(self):
+    	return ( 'core:encounter', { self.uuid : self.uuid } )

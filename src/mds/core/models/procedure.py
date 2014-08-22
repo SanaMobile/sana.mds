@@ -37,6 +37,8 @@ class Procedure(models.Model):
     src = models.FileField(upload_to='core/procedure', blank=True)
     """ File storage location for the procedure """
 
+    voided = models.BooleanField(default=False)
+
     def __unicode__(self):
         return "%s %s" % (self.title, self.version)
 

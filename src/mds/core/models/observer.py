@@ -15,6 +15,7 @@ class Observer(models.Model):
 
     class Meta:
         app_label = "core"
+        
     uuid = models.SlugField(max_length=36, unique=True, default=make_uuid, editable=False)
     """ A universally unique identifier """
     
@@ -27,4 +28,7 @@ class Observer(models.Model):
     user = models.OneToOneField(User, unique=True)
     """ A universally unique identifier. See  """
 
-    
+    voided = models.BooleanField(default=False)
+
+    def __unicode__(self):
+        return self.user.last_name + ", " + self.user.first_name 

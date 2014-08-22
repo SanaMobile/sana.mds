@@ -7,7 +7,7 @@ Procedure.
 import mimetypes, os
 
 from django.db import models
-from mds.api.utils import make_uuid
+from mds.api.utils import make_uuid, guess_fext
 
 _app = "core"
 
@@ -17,12 +17,13 @@ class Observation(models.Model):
     class Meta:
         app_label = "core"  
         unique_together = (('encounter', 'node'),)
+        ordering = ["-created"]
 
-    #def __unicode__(self):
-    #    return "Observation %s %s %s %s" % (self.encounter.uuid, 
-    #                                           self.node,
-    #                                           self.concept.name,
-    #                                           str(self.value), )
+    def __unicode__(self):
+        return "%s %s %s %s" % (self.subject.full_name, 
+                                               self.node,
+                                               self.concept.name,
+                                               unicode(self.value), )
     uuid = models.SlugField(max_length=36, unique=True, default=make_uuid, editable=False)
     """ A universally unique identifier """
     
@@ -57,11 +58,7 @@ class Observation(models.Model):
     modified = models.DateTimeField(auto_now=True)
     """ updated on modification """
     
-    def clean(self):
-        if self.is_complex:
-            self.value_text = "complex_data"
-        super(models.Model, self).clean()
-        
+    voided = models.BooleanField(default=False)
     
     @property
     def subject(self):
@@ -84,9 +81,24 @@ class Observation(models.Model):
     def data_type(self):
         """ Convenience wrapper around Concept.data_type """
         if self.concept:
-            return self.concept.data_type
+            return self.concept.datatype
         else:
             return None
+    
+    @property
+    def device(self):
+        """ Convenience wrapper around Encounter.device """
+        if self.encounter and self.encounter.device:
+            return self.encounter.device.name
+        else:
+            return None
+    
+    @property
+    def question(self):
+        """ Convenience property for matching the object to the procedure
+            instruction-i.e. the question on a form.
+        """
+        return self.node
     
     def open(self, mode="w"):
         if not self.is_complex:
@@ -99,8 +111,8 @@ class Observation(models.Model):
     
     def _generate_filename(self):
         name = '%s-%s' % (self.encounter.uuid, self.node)
-        ext = mimetypes.guess(self.concept.data_type, False)
-        fname = '%s%s' % (name, ext)
+        ext = guess_fext(self.concept.mimetype)
+        fname = '%s.%s' % (name, ext)
         
         
     def create_file(self, append=None):
@@ -112,7 +124,7 @@ class Observation(models.Model):
         name = '%s-%s' % (self.encounter.uuid, self.node)
         if append:
             name += '-%s' % append
-        ext = mimetypes.guess(self.concept.data_type, False)
+        ext = guess_fext(self.concept.mimetype)
         fname = '%s%s' % (name, ext)
         self.value_complex = self.value_complex.field.generate_filename(self, fname)
         path, _ = os.path.split(self.value_complex.path)
@@ -129,3 +141,20 @@ class Observation(models.Model):
             return True
         else:
             return not self._complex_progress < self._complex_size
+            
+    @property
+    def value(self):
+        if self.is_complex:
+            return self.value_complex
+        else:
+            return self.value_text
+
+    @property
+    def upload_progress(self):
+        if self.is_complex:
+            return "%d/%d" % (self._complex_progress, self._complex_size)
+        else:
+            return u"NA"
+
+    def encounter_uuid(self):
+        return self.encounter.uuid

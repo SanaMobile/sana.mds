@@ -4,6 +4,8 @@
 :Version: 2.0
 """
 import datetime
+import os
+from PIL import Image
 from django.db import models
 from mds.api.utils import make_uuid
 
@@ -21,6 +23,8 @@ class AbstractSubject(models.Model):
     modified = models.DateTimeField(auto_now=True)
     """ updated on modification """
     
+    voided = models.BooleanField(default=False)
+
 class Subject(AbstractSubject): 
     """ Simple subject implementation as a medical patient. 
     """
@@ -47,4 +51,41 @@ class Subject(AbstractSubject):
         else:
             return today.year -self.dob.year
 
-    
+    @property
+    def full_name(self):
+        return u'%s, %s' % (self.family_name,self.given_name)
+
+    def _generate_thumb(self, size=(96,96)):
+        try:
+            pth, fname = os.path.split(self.image.path)
+            thumb_pth = os.path.join(pth, "ico")
+            thumb = os.path.join(thumb_pth,fname)
+            if not os.path.exists(thumb_pth):
+                os.makedirs(thumb_pth)
+            im = Image.open(self.image.path)
+            thim = im.copy()
+            thim.thumbnail(size, Image.ANTIALIAS)
+            thim.save(thumb)
+        except:
+            pass
+
+    @property
+    def thumb_url(self):
+        try:
+            pth, fname = os.path.split(self.image.path)
+            thumb_pth = os.path.join(pth, "ico")
+            thumb = os.path.join(thumb_pth,fname)
+            if not os.path.exists(thumb):
+                self._generate_thumb()
+            url_path, _  = os.path.split(self.image.url)
+            thumb_url_path = os.path.join(url_path, "ico") 
+            return os.path.join(thumb_url_path, fname)
+        except:
+            return self.image.url
+
+    def save(self, *args, **kwargs):
+        super(Subject, self).save(*args, **kwargs)
+        self._generate_thumb()
+
+    def __unicode__(self):
+        return u'%s, %s - %s' % (self.family_name, self.given_name, self.system_id)

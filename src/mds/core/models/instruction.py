@@ -26,6 +26,4 @@ class Instruction(models.Model):
     boolean_operator = models.CharField(max_length=64, blank=True)
     ''' The logical operator to apply when evaluating children if compound.'''
 
-    
-    
-    
+    voided = models.BooleanField(default=False)
