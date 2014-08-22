@@ -7,7 +7,10 @@ Created on Feb 29, 2012
 import logging
 import cjson
 
+from django.contrib.auth import authenticate
+
 from piston.handler import BaseHandler
+from piston.resource import Resource
 
 from mds.api import do_authenticate, LOGGER
 from mds.api.handlers import DispatchingHandler
@@ -41,10 +44,16 @@ class SessionHandler(DispatchingHandler):
     signals = { LOGGER:( EventSignal(), EventSignalHandler(Event))}
     
     def create(self,request):
+        username = request.REQUEST.get('username', 'empty')
+        password = request.REQUEST.get('password','empty')
+        user = authenticate(username=username, password=password)
         try:
             success,msg = do_authenticate(request)
-            if success:
-                return succeed(msg)
+            #if success:
+            #    return succeed(msg)
+            if user is not None:
+                observer = Observer.objects.get(user=user)
+                return succeed(observer.uuid)
             else:
                 logging.warn(msg)
                 return fail(msg)
@@ -89,6 +98,10 @@ class DeviceHandler(DispatchingHandler):
     allowed_methods = ('GET', 'POST')
     model = Device
     form = DeviceForm
+    fields = (
+        "uuid",
+        "name",
+    )
     signals = { LOGGER:( EventSignal(), EventSignalHandler(Event))}
     
 @logged    
@@ -97,11 +110,18 @@ class EncounterHandler(DispatchingHandler):
     allowed_methods = ('GET', 'POST')
     model = Encounter
     form = EncounterForm
-    fields = ("uuid", "concept", "observation",'subject','procedure')
+    fields = ("uuid",
+        "concept", 
+        "observation",
+        ("subject",("uuid",)),
+        "created",
+        "modified",
+        ("procedure",("title","uuid")),
+    )
     signals = { LOGGER:( EventSignal(), EventSignalHandler(Event))}
-    #TODO wrap this around the old json.py
 
-class EventHandler(DispatchingHandler):
+@logged
+class EventHandler(BaseHandler):
     """ Handles network request log requests. """
     allowed_methods = ('GET', 'POST')
     model = Event
@@ -113,13 +133,21 @@ class NotificationHandler(DispatchingHandler):
     model = Notification
     form = NotificationForm
     signals = { LOGGER:( EventSignal(), EventSignalHandler(Event))}
-    #TODO wrap this around the old json.py
 
 @logged
 class ObservationHandler(DispatchingHandler):
     allowed_methods = ('GET', 'POST')
     model = Observation
     form = ObservationForm
+    fields = (
+        "uuid",
+        ("encounter",("uuid")),
+        "node",
+        ("concept",("uuid",)),
+        "value_text",
+        "value_complex",
+        "value",
+    )
     signals = { LOGGER:( EventSignal(), EventSignalHandler(Event))}
     
 @logged        
@@ -128,13 +156,22 @@ class ObserverHandler(DispatchingHandler):
     allowed_methods = ('GET', 'POST')
     model = Observer
     form = ObserverForm
+    fields = ("uuid",
+              ("user",("username","is_superuser")),
+             )
     signals = { LOGGER:( EventSignal(), EventSignalHandler(Event))}
 
 @logged
 class ProcedureHandler(DispatchingHandler):
     allowed_methods = ('GET', 'POST')
     model = Procedure
-    form = ProcedureForm
+    fields = ("uuid",
+              "title",
+              "description",
+              "src",
+              "version",
+              "author",
+             )
     signals = { LOGGER:( EventSignal(), EventSignalHandler(Event))}
     
     def _read_by_uuid(self,request,uuid):
@@ -149,7 +186,14 @@ class ProcedureHandler(DispatchingHandler):
 class SubjectHandler(DispatchingHandler):
     """ Handles subject requests. """
     allowed_methods = ('GET', 'POST')
-    fields = ['uuid']
+    fields = ("uuid",
+              "family_name",
+              "given_name",
+              "gender",
+              "dob",
+              "image",
+              ("location",("name","uuid")),
+             )
     model = Subject
     form = SubjectForm
     signals = { LOGGER:( EventSignal(), EventSignalHandler(Event))}
@@ -165,5 +209,13 @@ class DocHandler(BaseHandler):
         _handled = getattr(self.__class__, 'documents', [])
         return [ handler_uri_templates(x) for x in _handled]
         
-        
+# new stuff
+class LocationHandler(DispatchingHandler):
+    model = Location
+    fields = ("name","uuid","code")
+
+class CompoundFormHandler(object):
+    forms = {}
+    """ A list of 2-tuples representing the names and forms on the page """
+    allowed_methods = ('POST',)
     
