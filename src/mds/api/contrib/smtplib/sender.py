@@ -15,8 +15,7 @@ __all__ = ["send_review_notification",]
 link = "https://0.0.0.0/mds/admin/core/%s/%d/"
 mobile_link = "https://0.0.0.0/mds/core/mobile/%s/%s/"
 
-def send_review_notification(instance,addresses=settings.REVIEW_ADDRESSES,
-    subject=settings.REVIEW_SUBJECT, 
+def send_review_notification(instance,addresses,subject, 
     replyTo=settings.SMTP_REPLYTO,
     template=settings.REVIEW_POST_TEMPLATE,
     auth_user=settings.EMAIL_HOST_USER,
