@@ -95,5 +95,5 @@ class ObservationTask(Task):
     encounter = models.ForeignKey(Encounter, to_field='uuid')
     """Who or what the instruction will be executed on"""
 
-    instruction = models.ForeignKey(Instruction,, to_field='uuid')
+    instruction = models.ForeignKey(Instruction, to_field='uuid')
     """What will be executed."""
