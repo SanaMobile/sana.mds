@@ -31,17 +31,17 @@ class Subject(AbstractSubject):
     class Meta:
         app_label = "core"
     given_name = models.CharField(max_length=64)
-    
+
     family_name = models.CharField(max_length=64)
-    
+
     dob = models.DateTimeField()
-    
+
     gender = models.CharField(choices=(("M","M"),("F","F")),max_length=2)
-    
+
     image = models.ImageField(blank=True, upload_to="core/subject")
-    
+
     location = models.ForeignKey('Location', blank=True, to_field='uuid')
-    
+
     @property
     def age(self):
         """ Convenience wrapper to calculate the age. """
