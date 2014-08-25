@@ -4,7 +4,7 @@
 :Authors: Sana dev team
 :Version: 2.0
 """
-from django.conf.urls.defaults import patterns, url, include
+from django.conf.urls import patterns, url, include
 
 from .resources import *
 
@@ -22,7 +22,7 @@ urlpatterns = patterns(
     url(r'^logs/report/$', 'views.log_report', name='log-report'),
                                           
     # docs
-    url(r'^docs/$', doc_handler, name='core-docs'),     
+    url(r'^docs/$', rsrc_doc, name='core-docs'),     
               
 )    
 

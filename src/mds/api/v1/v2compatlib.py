@@ -12,7 +12,7 @@ import shutil, os
 from django.contrib.auth.models import User, UserManager
 
 from django.views.generic import RedirectView
-from django.views.generic.simple import redirect_to
+#from django.views.generic import redirect_to
 from xml.etree import ElementTree
 from xml.etree.ElementTree import parse
 

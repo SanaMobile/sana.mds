@@ -4,8 +4,11 @@ Created on Aug 3, 2012
 @author: Sana Development
 '''
 import cjson
+import logging
+
 from django.http import HttpResponse
 from django.conf import settings
+from django.contrib.auth import authenticate
 from django.core.paginator import Paginator, InvalidPage, EmptyPage
 from django.shortcuts import render_to_response
 from django.template import RequestContext 
@@ -20,7 +23,7 @@ def home(request):
     Displays ::
         {"path": HttpRequest.path, 
          "host": HttpRequest.get_host(), 
-         "version": sana.api.version, 
+         "version": mds.api.version, 
          "service": "REST"}
     """
     username = request.REQUEST.get('username', 'empty')

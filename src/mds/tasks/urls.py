@@ -4,7 +4,7 @@
 :version: 2.0
 :copyright: Sana 2012, released under BSD New License(http://sana.mit.edu/license)
 '''
-from django.conf.urls.defaults import patterns, url, include
+from django.conf.urls import patterns, url, include
 
 from .resources import etask_rsrc, otask_rsrc, status_rsrc
 
