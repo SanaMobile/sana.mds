@@ -463,7 +463,7 @@ def register_binary_chunk(sp_guid, element_id, element_type, binary_guid,
         #if maybe_convert(binary):
         #    convert_binary(binary)
         if binary.ready_to_upload():
-        v2compatlib.write_complex_data(binary)
+            v2compatlib.write_complex_data(binary)
         #binary = None
         return maybe_upload_procedure(sp)
 
