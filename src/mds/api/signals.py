@@ -87,10 +87,13 @@ class EventSignalHandler(object):
     """
     def __init__(self, model):
         self.model = model
-    
+
     def __call__(self, sender, **kwargs):
+        print self.__class__.__name__, "__call__"
         try:
-            data = sender.get('event')
+            data = kwargs.get('event',None)
+            if not data:
+                return False
             obj = self.model(**data)
             obj.save()
             return True

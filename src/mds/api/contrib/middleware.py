@@ -18,14 +18,14 @@ class LoggingMiddleware(object):
         self._handler = handlers.ThreadBufferedHandler()
         logging.root.setLevel(logging.NOTSET)
         logging.root.addHandler(self._handler)
-        
+
     def send_save(self, request, **kwargs):
         signal =  getattr(request, LOG_SIGNAL, None)
         if not signal:
             return
         else:
-            signal.send(kwargs)
-    
+            signal.send(sender=request.__class__,**kwargs)
+
     def process_exception(self, request, exception):
         extra = {'mac':'', 'type':''}
         logging.error("An unhandled exception occurred: %s" % exception,
@@ -34,7 +34,7 @@ class LoggingMiddleware(object):
             return
         log = self.buildlog(request)
         self.send_save(request, event=log)
-    
+
     def process_response(self, request, response):
         if not hasattr(request, LOG_SIGNAL):
             return response
@@ -62,12 +62,11 @@ class LoggingMiddleware(object):
             records = records[:]
         else:
             records = list(records[:1])
-            
-        resolver = resolve(request.META['PATH_INFO']) 
+        resolver = resolve(request.META['PATH_INFO'])
         log = { 'client': request.META['REMOTE_ADDR'],
                 'path':request.path,
                 'name':resolver.url_name,
-                'messages':cjson.encode(records),
+                'messages': cjson.encode(records),
                 'created':start, 
                 'duration':time_taken,
                 'level':level}

@@ -59,7 +59,7 @@ def logged(klazz):
             continue
         f = getattr(klazz, attr)
         if f:
-            setattr(klazz, attr, _signal(klazz,LOGGER, f))
+            setattr(klazz, attr, _signal(klazz, LOGGER, f))
     return klazz 
 
 def universal(klazz):

@@ -44,7 +44,7 @@ class DispatchingHandler(BaseHandler):
     """
     exclude = ['id', 'created',]
     allowed_methods = ('GET','POST','PUT','DELETE')
-    
+
     def queryset(self, request, uuid=None, **kwargs):
         qs = self.model.objects.all()
         if uuid:
