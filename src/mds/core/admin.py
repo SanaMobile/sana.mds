@@ -75,6 +75,9 @@ class LocationAdmin(admin.ModelAdmin):
     list_display = ('name',)
     list_filter = ('name',)
     
+class EventAdmin(admin.ModelAdmin):
+    model = Event
+
 admin.site.register(Concept, ConceptAdmin)
 admin.site.register(Relationship)
 admin.site.register(RelationshipCategory)
@@ -86,4 +89,4 @@ admin.site.register(Notification)
 admin.site.register(Observer,ObserverAdmin)
 admin.site.register(Procedure,ProcedureAdmin)
 admin.site.register(Subject,SubjectAdmin)
-admin.site.register(Event)
+admin.site.register(Event, EventAdmin)
