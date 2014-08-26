@@ -87,17 +87,3 @@ extra_patterns = patterns(
 # add the non-RESTful urls
 urlpatterns += extra_patterns
 
-    
-    # procedures
-    url(r'^procedure/$', procedure_handler, name='procedure-list'),
-    url(r'^procedure/(?P<uuid>[^/]+)/$', procedure_handler, name='procedure'),
-    
-    # subjects
-    url(r'^subject/$', subject_handler, name='subject-list'),
-    url(r'^subject/(?P<uuid>[^/]+)/$', subject_handler, name='subject'),
-    url(r'^subject/(?P<uuid>[^/]+)/encounter/$', subject_handler, name='subject-encounters', kwargs={'related':'procedure'}),
-)
-
-# add the non-RESTful urls
-urlpatterns += extra_patterns
-
