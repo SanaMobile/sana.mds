@@ -85,7 +85,6 @@ MEDIA_URL = '/mds/media/'
 trailing slash if there is a path component (optional in other cases). Default
 value: "/mds/media/". """
 
-
 SECRET_KEY = 'b#%x46e0f=jx%_#-a9b5(4bvxlfz-obm*gs4iu3i6k!034j(mx'
 """Make this unique, and don't share it with anybody. Seriously."""
 # Older versions of django
@@ -105,6 +104,7 @@ TEMPLATE_LOADERS = (
 MIDDLEWARE_CLASSES = (
     'django.middleware.common.CommonMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
+    'django.contrib.messages.middleware.MessageMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'mds.api.contrib.middleware.LoggingMiddleware',
 )
@@ -114,6 +114,7 @@ ROOT_URLCONF = 'mds.urls'
 """Don't touch this unless you know what you are doing."""
 
 TEMPLATE_DIRS = (
+    '/var/local/',
 )
 """Put strings here, like "/home/html/django_templates" or 
 "C:/www/django/templates". Always use forward slashes, even on Windows. Don't 
@@ -121,14 +122,16 @@ forget to use absolute paths, not relative paths.For a typical Sana
 deployment use: "/opt/sana/templates/"."""
 
 INSTALLED_APPS = (
-    'mds.core',
-    'mds.tasks',
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
+    'django.contrib.messages,'
     'django.contrib.sites',
     'django.contrib.admin',
     'django.contrib.staticfiles',
+    'mds.mrs',
+    'mds.core',
+    'mds.tasks',
 )
 """Don't touch this unless you know what you are doing."""
 
