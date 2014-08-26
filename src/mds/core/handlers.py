@@ -43,7 +43,7 @@ class SessionHandler(DispatchingHandler):
     """ Handles session auth requests. """
     allowed_methods = ('GET','POST',)
     signals = { LOGGER:( EventSignal(), EventSignalHandler(Event))}
-    
+
     def create(self,request):
         username = request.REQUEST.get('username', 'empty')
         password = request.REQUEST.get('password','empty')
@@ -174,7 +174,7 @@ class ProcedureHandler(DispatchingHandler):
               "author",
              )
     signals = { LOGGER:( EventSignal(), EventSignalHandler(Event))}
-    
+
     def _read_by_uuid(self,request,uuid):
         """ Returns the procedure file instead of the verbose representation on 
             uuid GET requests 
@@ -187,19 +187,20 @@ class ProcedureHandler(DispatchingHandler):
 class SubjectHandler(DispatchingHandler):
     """ Handles subject requests. """
     allowed_methods = ('GET', 'POST')
-    fields = ("uuid",
-              "family_name",
-              "given_name",
-              "gender",
-              "dob",
-              "image",
-              ("location",("name","uuid")),
-             )
+    fields = (
+        "uuid",
+        "family_name",
+        "given_name",
+        "gender",
+        "dob",
+        "image",
+        "system_id",
+        ("location",("name","uuid")),
+    )
     model = Subject
     form = SubjectForm
     signals = { LOGGER:( EventSignal(), EventSignalHandler(Event))}
 
-   
 class DocHandler(BaseHandler):
     """ Handles rest api documentation requests. """
     allowed_methods = ('GET',)

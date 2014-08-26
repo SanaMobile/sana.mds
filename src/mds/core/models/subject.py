@@ -42,6 +42,8 @@ class Subject(AbstractSubject):
 
     location = models.ForeignKey('Location', blank=True, to_field='uuid')
 
+    system_id = models.CharField(max_length=64, blank=True)
+
     @property
     def age(self):
         """ Convenience wrapper to calculate the age. """
