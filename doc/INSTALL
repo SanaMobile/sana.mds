@@ -18,6 +18,8 @@ Everything as root(sudo)
        apt-get install python-mysqldb
        apt-get install python-libxml2
        apt-get install python-lxml
+       apt-get install python-django-extensions
+       apt-get install python-imaging
 
 2.  Create /var/local/www if it does not exist. This will be the document root
     where the mds urls and files get served from.
