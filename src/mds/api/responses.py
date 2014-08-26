@@ -5,6 +5,7 @@ Created on Aug 11, 2012
 :version: 2.0
 '''
 from django.http import HttpResponse
+import sys,traceback
 
 def render_json_response(data):
     return JSONResponse(data)
@@ -55,30 +56,28 @@ class JSONResponse(HttpResponse):
         HttpResponse.__init__(self, data, mimetype="application/json; charset=utf-8")
         self['X-JSON'] = data
 
-def fail(data, code=404):
+def fail(data, code=404, errors=[]):
     ''' Fail response as a python dict with data '''
     response = {'status': 'FAILURE',
                 'code' : code,
-                'message': data}
+                'message': data,
+                'errors': errors, }
     return response
 
 def succeed(data, code=200):
     ''' Success response as a python dict with data '''
     response = {'status': 'SUCCESS',
                 'code' : code,
-                'message': data}
+                'message': data, }
     return response
 
-def error(message):
-    return fail(message, Codes.INTERNAL_ERROR)
+def error(exception):
+    errors = traceback.format_exception_only(*sys.exc_info()[:2])
+    response = {'status': 'FAILURE',
+                'code' : 500,
+                'message': None,
+                'errors': errors, }
+    return response
 
 def unauthorized(message):
     return fail(message, Codes.UNAUTHORIZED)
-
-if __name__ == 'main':
-    import cjson
-    data = cjson.encode({'a':'1'})
-    js = JSONResponse(data)
-    print js._headers
-    
-    

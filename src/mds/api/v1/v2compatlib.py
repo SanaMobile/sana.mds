@@ -4,12 +4,19 @@
 :Version: 1.1
 """
 import logging
+from uuid import UUID
+import re
+import cjson as _json
+import shutil, os
+
+from django.contrib.auth.models import User, UserManager
+
 from django.views.generic import RedirectView
-from django.views.generic.simple import redirect_to
+#from django.views.generic import redirect_to
 from xml.etree import ElementTree
 from xml.etree.ElementTree import parse
 
-from mds.core.models import Observation, Concept, Encounter, Subject
+from mds.core import models as v2
 
 _deprecated = ('patientEnrolled',
               "patientId",
@@ -166,30 +173,220 @@ class LProcedureParsable:
     
 lpp = LProcedureParsable
 
-def responses_to_observations(encounter, responses):
-        observations = []
-        for node,data in responses.items():
-            concept = Concept.objects.get(name=data['concept'])
-            answer = data['answer']
+def responses_to_observations(encounter, responses,sort=False,reverse=False):
+    observations = []
+    logging.info("Converting %d observations" % len(responses))
+    # Begin loop over observations
+    for node,data in responses.items():
+        obs = None
+        concept_name = data.get('concept', None)
+        logging.info("" + node + ":"+concept_name)
+        if not concept_name:
+            logging.debug("No concept_name")
+            continue
+        try:
+            concept = v2.Concept.objects.get(name=concept_name)
+        except:
+            logging.error("Unable to find concept with name: %s" % concept_name)
+            continue
+                
+        answer = data['answer']
+        uuid = data['uuid']
+        if concept and concept.is_complex:
+            logging.info("Got complex concept: node: %s, answer: %s" % (node,answer))
+            if not answer or answer == "":
+                continue
             answer, _, additional = answer.partition(',')
-            if concept.is_complex():
-                while True:
-                    value_text = "complex data"
-                    obs = Observation(encounter=encounter,
-                              node=node,
-                              concept=concept,
-                              value_text=value_text)
-                    observations.append(obs)
-                    answer, _, additional = answer.partition(',')
-                    if not additional:
-                        break
-            else:
-                obs = Observation(encounter=encounter,
-                              node=node,
-                              concept=concept,
-                              value_text=answer)
+            # Begin Complex obs loop
+            while True:
+                value_text = "complex data"
+                try:
+                    obs = v2.Observation.objects.get(
+                          uuid=uuid)
+                    obs.encounter=encounter
+                    obs.node=node
+                    obs.concept=concept
+                    obs.value_text=value_text
+                    obs.save()
+                    logging.debug("Updated complex observation: %s" % obs.uuid)
+                except:
+                    logging.info("Creating new complex obs for encounter: %s" % encounter.uuid)
+                    obs = v2.Observation.objects.create(
+                          uuid=data['uuid'],
+                          encounter=encounter,
+                          node=node,
+                          concept=concept,
+                          value_text=answer)
+                    obs.save()
+                    logging.debug("Created complex observation: %s" % obs.uuid)
                 observations.append(obs)
-        return observations
+                answer, _, additional = answer.partition(',') if answer else None
+                if not additional:
+                    break
+                # End complex obs loop
+        else:
+            answer = answer if answer else 'no response'
+            try:
+                obs = v2.Observation.objects.get(
+                          uuid=uuid)
+                obs.encounter=encounter
+                obs.node=node
+                obs.concept=concept
+                obs.value_text = answer
+                obs.save()
+                logging.debug("Updated observation: %s" % obs.uuid)
+            except:
+                logging.info("Creating new obs for encounter: %s" % encounter.uuid)
+                obs = v2.Observation.objects.create(
+                          uuid=uuid,
+                          encounter=encounter,
+                          node=node,
+                          concept=concept,
+                          value_text=answer)
+                obs.save()
+                logging.debug("Created observation: %s" % obs.uuid)
+            observations.append(obs)
+            # END LOOP    
+    if sort:
+        sorted_observations = sort_by_node(observations)
+        logging.info("Return %d sorted observations" % len(sorted_observations))
+        for x in sorted_observations:
+            x.save()
+        observations = sorted_observations
+    return observations
+
+def sort_by_node(observations,descending=True):
+    npaths = []
+    for x in observations:
+        ids = x.node.split("_")
+        if len(ids) == 1:
+            if x.node.isdigit():
+                npaths.append((x, int(x.node), 0))
+            else:
+                npaths.append((x, int(x.node[:-1]), x.node[-1:]))
+        else:
+            npaths.append((x,int(ids[0]),int(ids[1])))
+    npaths_sorted = sorted(npaths,key=lambda pth: pth[2], reverse=descending)
+    node_tuples = sorted(npaths_sorted,key=lambda pth: pth[1],reverse=descending)
+    sorted_observations = [x[0] for x in node_tuples]
+    return sorted_observations
+    #sorted_keys = ["%d%s" % (x[1],x[2] if x[2] else str(x[0]) for x in node_tuples ]
+    #max_length = 0
+    #for node in nodes:
+    #    max_length = max(len(x),max_length)
+    #sorted_ids = None
+    #return None
+
+_regex = re.compile('^[a-f0-9]{8}-?[a-f0-9]{4}-?4[a-f0-9]{3}-?[89ab][a-f0-9]{3}-?[a-f0-9]{12}\Z', re.I)
+
+def validate_uuid(v):
+    try:
+        UUID(v)
+        return True
+    except:
+        return False
+    return True
+
+def get_v2(klazz,v,field):
+    obj = None
+    if validate_uuid(v):
+        obj = klazz.objects.get(uuid=v)
+    else:
+        obj = klazz.objects.get(**{ field : v })
+    return obj
+
+def get_or_create_v2(klazz,v,field, data={}):
+    obj = None
+    if validate_uuid(v):
+        # Assume a get call if we pass the uuid
+        obj = klazz.objects.get(uuid=v)
+    else:
+        data[field] = v
+        obj,_  = klazz.objects.get_or_create(**data)
+    return obj
+
+
+def spform_to_encounter(form):
+    savedproc_guid  = form['savedproc_guid']
+    procedure_guid = form['procedure_guid']
+    responses = form['responses']
+    phone = form['phone']
+    username = form['username']
+    password = form['password']
+    patientId = form['subject']
+
+    procedure = get_v2(v2.Procedure,procedure_guid,"title")
+    # check if they are an SA in which case we have a device
+    # otherwise we fall back to the old behavior
+    try:
+        observer = get_v2(v2.Observer, username, "user__username")
+    except:
+        observer = get_v2(v2.Observer, username, "user__username")
+    # if SA use the assigned device otherwise fall back to the old
+    # behavior
+    try:
+        if isinstance(observer,v2.Observer):
+            device = observer.device
+        else:
+            device = get_or_create_v2(v2.Device, phone, "name")
+    except:
+        device = get_or_create_v2(v2.Device, phone, "name")
+
+    subject = get_v2(v2.Subject, patientId, "system_id")
+    concept = get_v2(v2.Concept,"ENCOUNTER","name")
+    
+    encounter,created = v2.Encounter.objects.get_or_create(uuid=savedproc_guid,
+		    procedure=procedure,
+		    observer=observer,
+		    device=device,
+		    subject=subject,
+		    concept=concept)
+    data = strip_deprecated_observations(_json.decode(responses))
+    return encounter, data,created
+                                                            
+def sp_to_encounter(sp, subject):
+    procedure = get_v2(v2.Procedure, sp.procedure_guid,"title")
+    observer = get_v2(v2.Observer, sp.upload_username, "user__username")
+    device = get_v2(v2.Device, sp.client.name,"name")
+    #subject = get_v2(Subject, patientId, "system_id")
+    concept = get_v2(v2.Concept,"ENCOUNTER","name")
+    
+    
+    encounter,created = v2.Encounter.objects.get_or_create(
+		    uuid=sp.guid,
+		    procedure=procedure,
+		    observer=observer,
+		    device=device,
+		    subject=subject,
+		    concept=concept)
+    data = strip_deprecated_observations(_json.decode(sp.responses))
+    return encounter, data, created
+    
+def write_complex_data(br):
+    #encounter = v2.Encounter.objects.get(uuid=br.procedure.guid)
+    obs = v2.Observation.objects.get(encounter=br.procedure.guid,
+				     node=br.element_id)
+    if not obs.concept.is_complex:
+	return
+    #obs.value_complex = obs.value_complex.field.generate_filename(obs, fname)
+    path, _ = os.path.split(obs.value_complex.path)
+    if not os.path.exists(path):
+        os.makedirs(path)
+    open(obs.value_complex.path,"w").close()
+    obs._complex_size = br.total_size
+    obs.save()
+    # make sure we have the directory structure
+    #pathIn = "%s%s" % (settings.MEDIA_ROOT ,br.data.name)
+    #pathOut = "%s%s" % (settings.MEDIA_ROOT, obs.value_complex.name)
+    #if not os.path.exists(path):
+    #    os.makedirs(path)
+    os.rename(br.data.path,obs.value_complex.path)
+
+    # Successfully renamed so we update the progress
+    obs._complex_progress = br.upload_progress
+    obs.save()
+    #shutil.copyfile(pathIn,pathOut)
+
 
 def render_response_v1(response, version=2):
     """ Renders a response into version 1 compatible format

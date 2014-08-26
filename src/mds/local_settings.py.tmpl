@@ -20,6 +20,10 @@ API_VERSION = '2.0'
 APICOMPAT_INCLUDE = ('v1',)
 ''' Will include any <version>patterns in top urls.py listed here ''' 
 
+TARGET = "SELF"
+""" If using a separate EMR backend for permanent storage of the data set
+    this to a recognized value. Currently this accepts 'SELF' or 'OPENMRS'
+"""
 OPENMRS_VERSION = 1.9
 """Version of OpenMRS used as backend. Default is 1.9"""
 OPENMRS_SERVER_URL = 'http://localhost/openmrs' 
@@ -68,6 +72,11 @@ EMAIL_PORT = ''
 EMAIL_USE_TLS = True        
 """Check with mail host if encryption is supported"""
 
+REVIEW_POST_TEMPLATE = "Data requiring review has been uploaded:\n\nDesktop: %s\n\nMobile: %s"
+REVIEW_SUBJECT="Review required"
+SMTP_REPLYTO = "admin@localhost.com"
+REVIEW_ADDRESSES = []
+
 CONVERT_MEDIA = False
 """Set to True to convert media; i.e. if you are uploading audio or video."""
 
@@ -94,5 +103,12 @@ MIMETYPES = (("text/plain", "Text"),
              ("application/json", "JSON"),
              ("application/xml", "XML"),
              ("application/octet-stream", "Binary"))
+EXTENSIONS = (("text/plain", "txt"),
+             ("image/jpg","jpg"),
+             ("audio/3gp","3gp"),
+             ("video/3gp", "3gp"),
+             ("application/json", "json"),
+             ("application/xml", "xml"),
+             ("application/octet-stream", "bin"))
              
 

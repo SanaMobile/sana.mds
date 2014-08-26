@@ -48,6 +48,8 @@ class Concept(models.Model):
     
     constraint = models.CharField(max_length=255, blank=True)
     
+    voided = models.BooleanField(default=False)
+    
     @property
     def is_complex(self):
         return self.datatype == 'complex' or self.datatype == 'blob'

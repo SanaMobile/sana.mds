@@ -4,7 +4,8 @@ Created on Aug 10, 2012
 :author: Sana Development Team
 :version: 2.0
 '''
-from django.http import urljoin, iri_to_uri
+from urlparse import urljoin
+from django.utils.encoding import iri_to_uri
 
 from django.core.urlresolvers import get_resolver, get_callable, get_script_prefix
 

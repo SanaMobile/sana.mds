@@ -35,6 +35,8 @@ class Notification(models.Model):
     delivered = models.BooleanField(default = False)
     """ Set True when delivered """
     
+    voided = models.BooleanField(default=False)
+    
     #TODO This is likely better moved elsewhere 
     def to_json(self, **kwargs):
         msg = {'address': self.client,

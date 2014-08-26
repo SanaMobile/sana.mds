@@ -6,8 +6,8 @@
 """
 
 from django.conf import settings
-from django.conf.urls.defaults import patterns, url, include
-from django.views.generic.simple import redirect_to
+from django.conf.urls import patterns, url, include
+#from django.views.generic.simple import redirect_to
 
 from django.contrib import admin
 
@@ -15,8 +15,9 @@ admin.autodiscover()
 
 urlpatterns = patterns(
     '',
-    url(r'^$', 'core.views.home', name="home"),
-    url(r'^core/', include('core.urls', namespace='core')),
+    url(r'^$', 'mds.core.views.home', name="home"),
+    url(r'^core/', include('mds.core.urls', namespace='core')),
+    url(r'^tasks/', include('mds.tasks.urls', namespace='tasks')),
     # ADMIN
     (r'^admin/', include(admin.site.urls)),
 )

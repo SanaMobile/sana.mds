@@ -28,7 +28,7 @@ class RESTModel(models.Model):
     """
     class Meta:
         abstract = True
-        
+        ordering = ['created']
     include_link = ('uuid', 'uri')
     include_default = ('uuid', 'uri')
     include_full = ('uuid', 'uri')

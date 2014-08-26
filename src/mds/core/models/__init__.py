@@ -10,6 +10,7 @@ from .concept import Concept, Relationship, RelationshipCategory
 from .device import Device
 from .encounter import Encounter
 from .events import Event
+from .instruction import Instruction
 from .location import Location
 from .notification import Notification
 from .observation import Observation
@@ -21,6 +22,7 @@ __all__ = ['Concept', 'Relationship','RelationshipCategory',
            'Device', 
            'Encounter',
            'Event',
+           'Instruction',
            'Location',
            'Notification', 
            'Observation', 

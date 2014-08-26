@@ -4,8 +4,11 @@ Created on Aug 3, 2012
 @author: Sana Development
 '''
 import cjson
+import logging
+
 from django.http import HttpResponse
 from django.conf import settings
+from django.contrib.auth import authenticate
 from django.core.paginator import Paginator, InvalidPage, EmptyPage
 from django.shortcuts import render_to_response
 from django.template import RequestContext 
@@ -20,15 +23,25 @@ def home(request):
     Displays ::
         {"path": HttpRequest.path, 
          "host": HttpRequest.get_host(), 
-         "version": sana.api.version, 
+         "version": mds.api.version, 
          "service": "REST"}
     """
-    return HttpResponse(cjson.encode({'service':'REST',
-                         'version': version(),
-                         'path': request.path,
-                         'host':request.get_host()
-                         }))
-    
+    username = request.REQUEST.get('username', 'empty')
+    password = request.REQUEST.get('password','empty')
+    user = authenticate(username=username, password=password)
+    if user is not None:
+        return HttpResponse(cjson.encode( {
+               'status':'SUCCESS',
+               'code':200,
+               'message': version()}))
+    else:
+        message = unicode('UNAUTHORIZED:Invalid credentials!')
+        logging.warn(message)
+        logging.debug(u'User' + username)
+        return HttpResponse(cjson.encode({
+                'status':'FAIL',
+                'code':401, 
+                'message': message}))
     
 
 def _list(request,*args,**kwargs):
@@ -73,15 +86,21 @@ def log_report(request):
 
 def log_detail(request, uuid):
     log = Event.objects.get(uuid=uuid)
-    try:
-        print type(log.messages)
+    data = []
+    messages = cjson.decode(log.messages)
+    for m in messages:
+        try:
+            m['message'] = cjson.decode(m['message'])
+        except:
+            pass
         
-        for x in log.messages:
-            x['message'] = cjson.decode(x)
-            print x['message']
-    except:
-        data = log.message
-    message = {'id': uuid, 'data': data }
+        data.append(m)
+#           m['message']  = cjson.decode(m['message'])
+#            data.append(m)
+#        except:
+            
+            
+    message = { 'message': data, 'uuid': uuid, }
     return HttpResponse(cjson.encode(message))
 
 def log(request,*args,**kwargs):

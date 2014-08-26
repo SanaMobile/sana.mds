@@ -5,12 +5,16 @@
 """
 
 from django.db import models
+from mds.api.utils import make_uuid
 
 ## ?Procedure step. First iteration
 class Instruction(models.Model):
     
     class Meta:
         app_label = "core"
+    uuid = models.SlugField(max_length=36, unique=True, default=make_uuid, 
+        editable=False)
+
     concept = models.ForeignKey('Concept', to_field='uuid')
     ''' Contextual information about the instruction '''
     
@@ -26,6 +30,4 @@ class Instruction(models.Model):
     boolean_operator = models.CharField(max_length=64, blank=True)
     ''' The logical operator to apply when evaluating children if compound.'''
 
-    
-    
-    
+    voided = models.BooleanField(default=False)

@@ -6,7 +6,7 @@ Created on Aug 9, 2012
 '''
 
 from . import LOGGING_ENABLED, LOG_SIGNAL, SIGNALS, LOGGER, CRUD, crud
-from .responses import error
+from .responses import error, fail
 
 
 from django.forms.models import modelform_factory
@@ -110,11 +110,10 @@ def validate(operation='POST'):
             return error(u'Invalid object')
         # Create the dispatchable form and validate
         if operation == 'POST':
-            data = getattr(request, operation)
-            form = v_form(data=data)
+            form = v_form(request.POST,request.FILES) if request.FILES else v_form(request.POST)
             if not form.is_valid():
-                errs = dict((key, [unicode(v) for v in values]) for key,values in form.errors.items())
-                return error(errs)
+                errs = form.errors.keys();
+                return fail(None, errors=errs)
         else:
             data = handler.flatten_dict(getattr(request, operation))
             form = v_form(data=data,empty_permitted=True)
