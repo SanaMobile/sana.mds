@@ -1,0 +1,277 @@
+{% load url from future %}
+<!DOCTYPE HTML>
+<html> 
+  <head>
+    {% block meta %}
+    <meta content="text/html; charset=UTF-8" http-equiv="content-type" />
+    <meta charset="utf-8" />
+    {% endblock meta %}
+
+    <title>{% block title %}{%endblock %}</title>
+    {% load static %}
+    {% get_static_prefix as STATIC_PREFIX %}
+    
+  {% block style %}
+    <!-- <link href='http://fonts.googleapis.com/css?family=Source+Sans+Pro:200,300,400' rel='stylesheet' /> -->
+    <link rel="stylesheet" href="{{ STATIC_PREFIX }}css/jquery-ui.css">
+    <link rel="stylesheet" href="{{ STATIC_PREFIX }}web/css/lib/fontello.css" />
+    <link rel="stylesheet" href="{{ STATIC_PREFIX }}web/css/lib/normalize.css" />
+    <link rel="stylesheet" href="{{ STATIC_PREFIX }}web/css/index.css">
+    <link rel="stylesheet" href="{{ STATIC_PREFIX }}web/css/sidebar.css" />
+  {% endblock style %}
+
+  {% block script %}
+  <script src="{{ STATIC_PREFIX }}js/jquery-1.10.1.js"></script>
+  <script src="{{ STATIC_PREFIX }}js/jquery-ui.js"></script>
+  <script src="{{ STATIC_PREFIX }}js/jquery.serializejson.js"></script>
+  <script src="{{ STATIC_PREFIX }}js/core.js"></script>
+  <script src="{{ STATIC_PREFIX }}web/js/jquery.cookie.js"></script>
+  <script src="{{ STATIC_PREFIX }}web/js/console.js"></script>
+  <script src="{{ STATIC_PREFIX }}web/js/functions.js" />
+  <script>
+    var procedure = "303a113c-6345-413f-88cb-aa6c4be3a07d";
+    var subject = null;
+    var device = "2fc0a9f7-384b-4d97-8c1c-aa08f0e12105";
+    var concept = "266d8a8f-9178-4616-bcea-896194379059";
+    var encounter = null;
+    var auth = {
+        "csrftoken" : $.cookie("csrftoken"),
+        "sessionid" : $.cookie("sessionid"),
+    };
+
+    var data = {
+            procedure : procedure,
+            subject : subject,
+            device : device,
+            concept : concept,
+            encounter : encounter
+    };
+
+    function getData(){
+        return data;
+    }
+
+    function clearData(){
+        data = {
+            procedure : null,
+            subject : null,
+            device : null,
+            concept : null,
+            encounter : null,
+        };
+    }
+
+    function setSubject(value){
+        data['subject'] = value;
+        subject = value;
+    }
+
+    function setDevice(value){
+        data['device'] = value;
+    }
+
+    function setConcept(value){
+        concept = value;
+    }
+
+    function setEncounter(value){
+        encounter = value;
+    }
+
+    function linkSuccess(data){
+        window.load(data);
+    }
+
+    function linkFail(data){
+       alert("Failed getting page." + data);
+    }
+
+    function getHeaders(){
+        headers = {
+            "csrftoken" : $.cookie("csrftoken"),
+            "sessionid" : $.cookie("sessionid"),
+        };
+        return headers;
+    }
+
+    function webIntake(){
+        var url = '/mds/web/encounter/';
+        var data = {
+            procedure : procedure,
+            subject : subject,
+            device : device,
+            concept : concept
+        };
+        headers = {
+            "csrftoken" : $.cookie("csrftoken"),
+            "sessionid" : $.cookie("sessionid"),
+        };
+        getPageWithHeaders(url,data,auth);
+    }
+
+    function webRegister(){
+        var url = '/mds/web/register/';
+        subject = null;
+        var data = {
+            subject : subject,
+            device : device,
+        };
+        headers = {
+            "csrftoken" : $.cookie("csrftoken"),
+            "sessionid" : $.cookie("sessionid"),
+        };
+        getPageWithHeaders(url,data,auth);
+    }
+
+    function webTask(){
+        var url = '/mds/web/etask/';
+        data = {
+            subject : subject,
+            device : device,
+        };
+        headers = {
+            "csrftoken" : $.cookie("csrftoken"),
+            "sessionid" : $.cookie("sessionid"),
+        };
+        getPageWithHeaders(url,data,auth);
+    }
+
+    function setMode(value){
+        $.cookie("mode",value, {'path':'/'});
+    }
+    function setSessionDevice(value){
+        $.cookie("mode",value);
+    }
+    function setSessionSubject(value){
+        $.cookie("mode",value);
+    }
+    function setSessionEncounter(value){
+        $.cookie("mode",value);
+    }
+    function setRegisterNew(value){
+        $.cookie("register", value);
+    }
+    function isNew(){
+        return $.cookie("register");
+    }
+  </script>
+
+  {% endblock script %}
+  <script type="text/javascript">
+    root="";
+    {% block flavorscript %}
+      $(function(){
+      //$( "input[type='date']" ).datepicker({ dateFormat: 'mm/dd/yy', changeYear: true });
+        $('input[type="date"]').datepicker({ dateFormat: 'yy-mm-dd', changeYear: true , yearRange : "c-100:c+05"}).prop('type','text');
+        $('input[type="date"]').prop('type','text');
+    });
+    // Workaround for safari issues
+    $(function() {
+      $( "select[multiple='multiple']").selectable();
+      $( "select[multiple='multiple']").on("selectablestart", function (event, ui) {
+        event.originalEvent.ctrlKey = true;
+      });
+    });
+
+    {% endblock flavorscript %}
+  </script>
+  </head>
+<body class="jquery-ui page-template-default">
+<div class="wrapper jsc-sidebar-content jsc-sidebar-pushed">
+  <section class="main-content">
+<!--
+  <nav>
+    <a href="#" class="icon-menu link-menu jsc-sidebar-trigger"></a>
+  </nav>
+-->
+  <div class="main-content-header">
+    {% block header %}{% endblock %}
+  </div>
+  <div class="main-content-body">
+    <div class="main-content-body-inner">
+      {% block content %}{% endblock %}
+    </div>
+  <div>
+  {% block footer %}
+  <div data-role="footer" data-position="fixed" class="jqm-footer">
+    {% block flavorfooter %}
+    {% include "web/messages.html" %}
+    {% include "web/errors.html" %}
+    {% endblock flavorfooter %}
+  </div>
+{% endblock footer %}
+  </section>
+</div>
+<nav class="sidebar jsc-sidebar" id="jsi-nav" data-sidebar-options="">
+    <ul class="sidebar-list">
+        {% url 'web:portal' as webportal %}
+        <li><a href="{{ webportal }}">Home</a></li>
+    <li>
+    <h4>Patients</h4>
+    <ul class="sidebar-list">
+        {% url 'web:register-patient' as newpatient %}
+        <li><a href="{{ newpatient }}">Register Patient</a></li>
+        {% url 'web:encounter' as webencounter %}
+        <li><a href="{{ webencounter }}">Enter Intake</a></li>
+    </ul>
+    </li>
+    <li>
+    <h4>Tasks</h4>
+    <ul class="sidebar-list">
+        {% url 'web:encounter-task' as webtask %}
+        <li><a href="{{ webtask }}" id="id_task_nav" target="_blank">Assign Task</a></li>
+        {% url 'web:encounter-task-list' as webtasklist %}
+        <li><a href="{{ webtasklist }}">View Status</a></li>
+    </ul>
+    </li>
+    <li>
+    <h4>Admin</h4>
+    <ul class="sidebar-list">
+        {% url 'web:log-index' as weblogs %}
+        <li><a href="{{ weblogs }}">Logs</a></li>
+        {% url 'admin:index' as adminindex %}
+        <li><a href="javascript:window.open('{{ adminindex }}')">Default Admin</a></li>
+    </ul>
+    </li>
+    </ul>
+</nav>
+  <script src="{{ STATIC_PREFIX }}web/js/sidebar.min.js"></script>
+  <script>
+     var menuStatic = false;
+     var menuVisible = true;
+     function toggleSideBar(){
+         if(menuStatic){
+
+         } else {
+            if(menuVisible){
+                stdout('pull');
+            } else {
+                stdout('push');
+            }
+            menuVisible = !menuVisible;
+         }
+     }
+    $('#jsi-nav').sidebar({
+                trigger: '.jsc-sidebar-trigger',
+                scrollbarDisplay: true,
+                pullCb: toggleSideBar,
+                pushCb: toggleSideBar
+            });
+/*
+    $('#jsc-sidebar-trigger').on('click', function (e) {
+            e.preventDefault();
+            if(!menuStatic){
+                if(menuVisible){
+                    $('#jsi-nav').data('sidebar').pull();
+                }  else {
+                    $('#jsi-nav').data('sidebar').push();
+                }
+            }
+        });
+*/
+        $('#jsi-nav').data('sidebar').push();
+
+  </script>
+
+  </body>
+</html>

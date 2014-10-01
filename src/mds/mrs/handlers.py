@@ -30,7 +30,8 @@ from mds.api.v1.json import (render_json_response,
                               binary_submit, binarychunk_submit, 
                               binarychunk_hack_submit, patient_get, 
                               patient_list, parseOne, parseAll )
-                                   
+
+from mds.api.v1.v2compatlib import spform_to_encounter, responses_to_observations      
 from mds.api.v1.api import register_saved_procedure
 from .forms import ProcedureSubmitForm
 from .models import RequestLog
@@ -109,7 +110,21 @@ class SavedProcedureHandler(BaseHandler):
                                                        phone,
                                                        username,
                                                        password)
-                
+            
+            
+            encounter, data, created = spform_to_encounter(form.cleaned_data)
+            encounter.save()
+            logging.debug("Saved encounter: " + encounter.uuid)
+	    observations = responses_to_observations(encounter, data,sort=True)
+	    
+	    for obs in observations:
+	        obs.save()
+	        
+	        if obs.is_complex:
+	            obs.create_file()
+	        
+	    #result, message = True, encounter
+            
             if result:
                 response = succeed("Successfully saved the procedure: %s" % message)
                 logging.info("Saved procedure successfully registered.")

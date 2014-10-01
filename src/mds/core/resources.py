@@ -9,6 +9,7 @@ __all__ = [
     'rsrc_device',
     'rsrc_location',
     'rsrc_subject',
+    'rsrc_surgicalsubject',
     'rsrc_observer',
     'rsrc_procedure',
     'rsrc_encounter',
@@ -25,6 +26,7 @@ rsrc_relationshipcategory = Resource(RelationshipCategoryHandler)
 rsrc_device = Resource(DeviceHandler)
 rsrc_location = Resource(LocationHandler)
 rsrc_subject = Resource(SubjectHandler)
+rsrc_surgicalsubject = Resource(SurgicalSubjectHandler)
 rsrc_observer = Resource(ObserverHandler)
 rsrc_procedure = Resource(ProcedureHandler)
 

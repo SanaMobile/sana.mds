@@ -319,13 +319,13 @@ def spform_to_encounter(form):
     # check if they are an SA in which case we have a device
     # otherwise we fall back to the old behavior
     try:
-        observer = get_v2(v2.Observer, username, "user__username")
+        observer = get_v2(v2.SurgicalAdvocate, username, "user__username")
     except:
         observer = get_v2(v2.Observer, username, "user__username")
     # if SA use the assigned device otherwise fall back to the old
     # behavior
     try:
-        if isinstance(observer,v2.Observer):
+        if isinstance(observer,v2.SurgicalAdvocate):
             device = observer.device
         else:
             device = get_or_create_v2(v2.Device, phone, "name")

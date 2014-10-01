@@ -31,4 +31,37 @@ class Observer(models.Model):
     voided = models.BooleanField(default=False)
 
     def __unicode__(self):
-        return self.user.last_name + ", " + self.user.first_name 
+        return unicode(self.user)
+        
+# Extend observer class
+class Surgeon(Observer):
+    class Meta:
+        app_label = "core"
+    """ Extension of Observer class representing individuals
+        performing surgical operations.
+    """
+    device = models.ForeignKey('core.Device',blank=True)
+    email = models.EmailField(blank=True)
+    @property
+    def number(self):
+        return self.device.name if self.device else "990009999"
+        
+class SurgicalAdvocate(Observer):
+    class Meta:
+        app_label = "core"
+    """ Extension of Observer class representing workers
+        who will perform in home follow up visits
+    """
+    device = models.ForeignKey('core.Device', blank=True)
+    location = models.ForeignKey('core.Location',blank=True)
+    
+    @property
+    def number(self):
+        return self.device.name if self.device else "990009999"
+
+    @property
+    def location_code(self):
+        return self.location.code if self.location else "00000000"
+
+    def __unicode__(self):
+        return u'%s - %s' % (self.location_code,self.user)

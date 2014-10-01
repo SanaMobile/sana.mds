@@ -1,0 +1,10 @@
+{% extends "web/base.html" %}
+{% block script %}
+  {{ block.super }}
+  <script>
+    setMode("verbose");
+  </script>
+{% endblock %}
+{% block header %}
+<h3>Welcome</h3>
+{% endblock %}

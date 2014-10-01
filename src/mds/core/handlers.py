@@ -35,7 +35,9 @@ __all__ = ['ConceptHandler',
            'ProcedureHandler',
            'DocHandler' ,
            'SessionHandler',
-           'SubjectHandler',]
+           'SubjectHandler',
+           'SurgicalSubjectHandler',
+           'LocationHandler']
 
    
 @logged     
@@ -221,3 +223,45 @@ class CompoundFormHandler(object):
     """ A list of 2-tuples representing the names and forms on the page """
     allowed_methods = ('POST',)
     
+    def create(request, *args, **kwargs):
+        cleaned = {}
+        for k,v in getattr(self.__class__, "forms", {}).items():
+            form = v(request.ITEMS[k])
+            form.full_clean()
+            cleaned[k] = form
+            
+    def __call__(self):
+        pass
+
+@logged
+class SurgicalSubjectHandler(DispatchingHandler):
+    """ Handles subject requests. """
+    allowed_methods = ('GET', 'POST')
+    #fields = ['uuid']
+    #exclude = ("location")
+    fields = ("uuid",
+              "family_name",
+              "given_name",
+              "gender",
+              "dob",
+              "image",
+              "system_id",
+              ("location",("name","uuid")),
+                "house_number",
+                "family_number", 
+                "national_id",
+                "contact_one",
+                "contact_two",
+                "contact_three",
+                "contact_four",
+             )
+    model = SurgicalSubject
+    form = SurgicalSubjectForm
+    signals = { LOGGER:( EventSignal(), EventSignalHandler(Event))}
+
+def intake_handler(request,*args,**kwargs):
+    pass
+
+
+
+

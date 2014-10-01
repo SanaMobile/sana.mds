@@ -22,9 +22,11 @@ urlpatterns = patterns(
     url(r'^logs/report/$', 'views.log_report', name='log-report'),
                                           
     # docs
-    url(r'^docs/$', rsrc_doc, name='core-docs'),     
-              
-)    
+    url(r'^docs/$', rsrc_doc, name='core-docs'),
+    url(r'^login/$', 'django.contrib.auth.views.login'),
+    url(r'^mobile/authenticate/$', 'views.mobile_authenticate', name='mobile-authenticate'),
+
+)
 
 extra_patterns = patterns(
     '',
@@ -80,6 +82,11 @@ extra_patterns = patterns(
     url(r'^subject/$', rsrc_subject, name='subject-list'),
     url(r'^subject/(?P<uuid>[^/]+)/$', rsrc_subject, name='subject'),
     url(r'^subject/(?P<uuid>[^/]+)/encounter/$', rsrc_subject, name='subject-encounters', kwargs={'related':'procedure'}),
+
+    # surgical subjects
+    url(r'^surgicalsubject/$', rsrc_surgicalsubject, name='surgical-subject-list'),
+    url(r'^surgicalsubject/(?P<uuid>[^/]+)/$', rsrc_surgicalsubject, name='surgical-subject'),
+    url(r'^surgicalsubject/(?P<uuid>[^/]+)/encounter/$', rsrc_surgicalsubject, name='surgical-subject-encounters', kwargs={'related':'procedure'}),
 
     url(r'^location/$', rsrc_location, name='location-list'),
 )

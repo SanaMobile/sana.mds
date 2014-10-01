@@ -1,0 +1,68 @@
+/*! Copyright 2014 jQuery Foundation and other contributors
+ * Includes:
+ * - normalize.css v1.0.1 | MIT License | git.io/normalize
+ * - Font Awesome - http://fortawesome.github.com/Font-Awesome - CC BY 3.0
+ */
+
+/* ==========================================================================
+   HTML5 display definitions
+   ========================================================================== */
+
+* {
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
+}
+
+/*
+ * Corrects `block` display not defined in IE 6/7/8/9 and Firefox 3.
+ */
+
+article,
+aside,
+details,
+figcaption,
+figure,
+footer,
+header,
+hgroup,
+nav,
+section,
+summary {
+    display: block;
+}
+
+#sidebar,
+.sidebar-left,
+.sidebar-right {
+    padding: 20px;
+    width: 29%;
+}
+
+#sidebar,
+.sidebar-right {
+    float: right;
+    margin-right: -25px;
+    position: relative;
+    -webkit-border-image: -webkit-linear-gradient(#ffffff, #e7e7e7 15%, #e7e7e7 85%, #ffffff);
+    border-image: linear-gradient(#ffffff, #e7e7e7 15%, #e7e7e7 85%, #ffffff);
+    box-shadow: inset 15px 0 5px -16px #e7e7e7;
+    background-image: -webkit-radial-gradient(left, #f2f2f2, #ffffff 80%);
+    background-image: radial-gradient(left, #f2f2f2, #ffffff 80%);
+    border: 0;
+    border-left: 1px solid #efefef;
+}
+
+
+.content-right #sidebar,
+.sidebar-left {
+    float: left;
+    border-left: 0;
+    border-right: 1px solid #e7e7e7;
+    margin: -20px 0 0 -25px;
+    -webkit-border-image: -webkit-linear-gradient(#ffffff, #e7e7e7 15%, #e7e7e7 85%, #ffffff);
+    border-image: linear-gradient(#ffffff, #e7e7e7 15%, #e7e7e7 85%, #ffffff);
+    box-shadow: inset 15px 0 5px -16px #e7e7e7;
+    background-image: -webkit-radial-gradient(right, #f2f2f2, #ffffff 80%);
+    background-image: radial-gradient(right, #f2f2f2, #ffffff 80%);
+}

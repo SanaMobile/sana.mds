@@ -14,8 +14,10 @@ from django.conf import settings
 
 from .models import SavedProcedure, Client, BinaryResource, ClientEventLog
 from mds.api.contrib import openmrslib
+from mds.api.contrib import smtplib
 from mds.api.encoders.ffmpeg import FFmpeg
 from mds.api.v1.util import flush
+from mds.api.v1 import v2compatlib
 
 # api.py -- interface-agnostic API methods
 
@@ -269,25 +271,26 @@ def maybe_upload_procedure(saved_procedure):
         patient_gender = 'F'
     
     # Begin upload to the emr
-    omrs = openmrslib.OpenMRS16(saved_procedure.upload_username,
-                          saved_procedure.upload_password,
-                          settings.OPENMRS_SERVER_URL)
+    #omrs = openmrslib.OpenMRS16(saved_procedure.upload_username,
+    #                      saved_procedure.upload_password,
+    #                      settings.OPENMRS_SERVER_URL)
       
     # creates the patient upstream if it does not exist
     new_patient = True if enrolled == "No" else False
     logging.debug("patient enrolled: %s" % new_patient)
     if new_patient:
         logging.debug("Creating new patient: patient_id -> %s" % patient_id)
-    omrs.create_patient(patient_id,
-                        patient_first,
-                        patient_last,
-                        patient_gender,
-                        patient_birthdate)
+    #omrs.create_patient(patient_id,
+    #                    patient_first,
+    #                    patient_last,
+    #                    patient_gender,
+    #                    patient_birthdate)
         
     # execute upload
-    logging.debug("Uploading to OpenMRS: %s %s %s %s %s "
-                  % (patient_id, client_name,
-                     savedprocedure_guid, files, cleaned_responses))
+    #logging.debug("Uploading to OpenMRS: %s %s %s %s %s "
+    #              % (patient_id, client_name,
+    #                 savedprocedure_guid, files, cleaned_responses))
+    '''
     result, msg, _ = omrs.upload_procedure(patient_id,
                                             client_name,
                                             procedure_title,
@@ -304,7 +307,17 @@ def maybe_upload_procedure(saved_procedure):
             binary.uploaded = True
             binary.save()
             logging.debug("Uploaded = True %s" % binaries_to_upload)
-        flush(saved_procedure) 
+        flush(saved_procedure)
+        
+    encounter, obsDict =  v2compatlib.sp_to_encounter(saved_procedure,subject)
+    encounter.save()
+    observations = v2compatlib.responses_to_observations(encounter, observations, sort=True)
+    for obs in observations:
+	obs.save()
+        if obs.concept.is_complex:
+    	    b = BinaryResource.objects.get(sp=saved_procedure, id=obs.node)
+    	    smtplib.sender.send_review_notification(obs)
+     
     return result, message
 
 def register_binary(procedure_guid, element_id, data):

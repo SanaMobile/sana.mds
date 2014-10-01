@@ -19,5 +19,7 @@ class Location(models.Model):
     name = models.CharField(max_length=255)
     """A label for identifying the location"""
     
+    code = models.IntegerField(blank=True)
+    
     def __unicode__(self):
-        return self.name
+        return u'%s - %s' % (self.code,self.name)

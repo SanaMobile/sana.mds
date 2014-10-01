@@ -70,6 +70,10 @@ class SubjectAdmin(admin.ModelAdmin):
 class SubjectInline(admin.StackedInline):
     model = Subject
 
+class SurgicalSubjectAdmin(admin.ModelAdmin):
+    readonly_fields = ['uuid',]
+    list_display = ['system_id','given_name', 'family_name', 'uuid', "image"]
+
 class LocationAdmin(admin.ModelAdmin):
     model = Location
     list_display = ('name',)
@@ -89,4 +93,9 @@ admin.site.register(Notification)
 admin.site.register(Observer,ObserverAdmin)
 admin.site.register(Procedure,ProcedureAdmin)
 admin.site.register(Subject,SubjectAdmin)
-admin.site.register(Event, EventAdmin)
+admin.site.register(SurgicalSubject,SurgicalSubjectAdmin)
+admin.site.register(Event)
+admin.site.register(Surgeon)
+admin.site.register(SurgicalAdvocate)
+
+#admin.site.register(ClientEventLog, ClientEventLogAdmin)
