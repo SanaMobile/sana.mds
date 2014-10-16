@@ -10,24 +10,24 @@ from .resources import *
 
 # non-restful urls
 urlpatterns = patterns(    
-    'core',
-    url(r'^$',
-        'views.home',
-        name="home"),
+    '',
+    url(r'^$', 'mds.core.views.home', name="home"),
     
     # Web views of logs
-    url(r'^logs/$', 'views.log_index', name='log-index'),
-    url(r'^logs/list/$', 'views.log_list', name='log-list'),
-    url(r'^logs/detail/(?P<uuid>[^/]+)/$', 'views.log_detail', name='log-detail'),
-    url(r'^logs/report/$', 'views.log_report', name='log-report'),
+    url(r'^logs/$', 'mds.core.views.log_index', name='log-index'),
+    url(r'^logs/list/$', 'mds.core.views.log_list', name='log-list'),
+    url(r'^logs/detail/(?P<uuid>[^/]+)/$', 'mds.core.views.log_detail', name='log-detail'),
+    url(r'^logs/report/$', 'mds.core.views.log_report', name='log-report'),
                                           
     # docs
     url(r'^docs/$', rsrc_doc, name='core-docs'),
-    url(r'^login/$', 'django.contrib.auth.views.login'),
-    url(r'^mobile/authenticate/$', 'views.mobile_authenticate', name='mobile-authenticate'),
+    url(r'^mobile/authenticate/$', 'mds.core.views.mobile_authenticate', name='mobile-authenticate'),
 
 )
 
+urlpatterns += patterns('',
+    url(r'^login/$', 'django.contrib.auth.views.login'),
+)
 extra_patterns = patterns(
     '',
     # session auth

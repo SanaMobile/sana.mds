@@ -15,12 +15,12 @@ admin.autodiscover()
 
 urlpatterns = patterns(
     '',
-    url(r'^$', 'mds.core.views.home', name="home"),
+    url(r'^$', 'mds.views.home', name="home"),
     url(r'^login/', 'django.contrib.auth.views.login'),
-    url(r'^core/', include('mds.core.urls', namespace='core')),
-    url(r'^tasks/', include('mds.tasks.urls', namespace='tasks')),
-    url(r'^clients/', include('clients.urls', namespace='clients')),
-    url(r'^web/', include('web.urls', namespace='web')),
+    url(r'^core/', include('mds.core.urls')),#, namespace='mds.core')),
+    url(r'^tasks/', include('mds.tasks.urls')),#, namespace='tasks')),
+    url(r'^clients/', include('mds.clients.urls',namespace='clients')),
+    url(r'^web/', include('mds.web.urls', namespace='web')),#,app_name='mds')),
     # ADMIN
     (r'^admin/', include(admin.site.urls)),
     (r'^admin/doc/', include('django.contrib.admindocs.urls')),
