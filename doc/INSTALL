@@ -1,41 +1,40 @@
 This file contains intructions for installing a new instance.
 
-Requires Ubuntu 12.04 LTS
+Requires Ubuntu 14.04 LTS
 
 Upgrade instructions.
 Everything as root(sudo)
 1.  Install packages
-    a. Use tasksel for meta packages. This will install a number of required 
+    a. Use tasksel for meta packages. This will install a number of required
        packages and their dependiencies.
        tasksel
        (Select Lamp Stack and Tomcat and press Enter)
     b. Individual packages
-       apt-get install libapache2-mod-wsgi
-       apt-get install libapache2-mod-jk
-       apt-get install python-cjson
-       apt-get install python-django
-       apt-get install python-django-piston
-       apt-get install python-mysqldb
-       apt-get install python-libxml2
-       apt-get install python-lxml
-       apt-get install python-django-extensions
-       apt-get install python-imaging
+        apt-get install                     \
+            libapache2-mod-wsgi         \
+            libapache2-mod-jk           \
+            python-cjson                \
+            python-django               \
+            python-django-piston        \
+            python-mysqldb              \
+            python-libxml2              \
+            python-lxml                 \
+            python-django-extensions    \
+            python-imaging              \
+            sqlite3
+        If getting the mds code from source
+        apt-get install git
+
 
 2.  Create /var/local/www if it does not exist. This will be the document root
     where the mds urls and files get served from.
-    a. mkdir -p /var/local/www/mds
-    
-3.  Copy contents of ../src to /var/local/www/mds
+    a. mkdir -p /var/local/www/webapps/mds
+    b. mkdir -p /var/local/www/static
+    c. mkdir -p /var/local/www/media
+    d. mkdir -p /var/local/www/wsgi/scripts
+3.  Create the directory for the wsgi script file and copy it
 
-4.  Create the directory for the wsgi script file and copy it
-    a. mkdir -p /var/local/www/wsgi/scripts
-    b. cp ../include/mds/wsgi/scripts/mds.wsgi /var/local/www/wsgi/scripts/mds.wsgi
-
-5.  Update permissions for the document root.
-    a. chown -R www-data:www-data /var/local/www
-
-
-6.  Create the mds database and set up access.Use your own password instead 
+6.  Create the mds database and set up access.Use your own password instead
     of **** below.
     a.  Open a MySQL prompt.
         mysql -u root -p
@@ -43,94 +42,76 @@ Everything as root(sudo)
         CREATE USER 'mds'@'localhost' IDENTIFIED BY '****';
         GRANT ALL ON mds.* TO 'mds'@'localhost';
         exit;
-    b.  Update the settings in settings.py
-        DATABASE_PASSWORD = "****"
-        
-7.  Run the Django management functions
-    a.  Change into the mds directory.
-        cd /var/local/www/mds
-    b.  Intitialize the database tables
+
+3. Install and set up the mds code
+    a. From source:
+       mkdir  ~/git
+       cd ~/git
+       git clone https://github.com/SanaMobile/sana.mds.git
+    b. Download the package from:
+       // TODO
+    c. Copy the src/mds/settings.py.tmpl file to settings.py and adjust the
+       value of any values
+    d. intialize mds
+        chdir sana.mds/src
         ./manage.py syncdb
-    c.  Collectic the static files for the currently installed Django version
-        ./manage.py collectstatic
-        
-8.  Set up encryption. (https://help.ubuntu.com/12.04/serverguide/certificates-and-security.html)
+        ./manage.py collectic static
+    d. Copy or link the contents of src/mds to
+       /var/local/www/webapps/mds
+    e. cp include/mds/wsgi/scripts/mds.wsgi /var/local/www/wsgi/scripts/mds.wsgi
+
+4. Update permissions for the document root.
+    a. chown -R www-data:www-data /var/local/www
+
+5.  Set up encryption. (https://help.ubuntu.com/12.04/serverguide/certificates-and-security.html)
     a. Create your own certificate and key
        openssl genrsa -des3 -out server.key 1024
        openssl rsa -in server.key -out server.key.insecure
        openssl req -new -key server.key -out server.csr
        openssl x509 -req -days 365 -in server.csr -signkey server.key.insecure -out server.crt
-       (You will be prompted for some information. Type in country, state, city, 
+       (You will be prompted for some information. Type in country, state, city,
         org, common name. You can skip challenge password and company name)
     b. Copy the cert and key
        cp server.crt /etc/ssl/certs
        cp server.key /etc/ssl/private
-       
-9.  Apache configs:
+
+6.  Apache configs:
     a. Copy apache config and site files
        cp ../include/apache2/* /etc/apache2/
     b. Enable sites
-       a2ensite sana.default
-       a2ensite sana.default.ssl
-       
-10. Restart Apache and check connection:
+       a2ensite sana-default.conf
+       a2ensite sana-default-ssl.conf
+    c. Set mds environment variables
+       echo 'export MDS_DIR=/var/local/www' >> /etc/apache2/envvars
+
+7.  Restart Apache and check connection:
     a.  service apache2 restart
     b.  You should now be able to access:
-        http://<your-server>/mds
-        https://<your-server>/mds
+        http://<your-server>/mds/
+        https://<your-server>/mds/
 
-11. Configure Tomcat
-    a.  Just follow old manual install instructions ignoring any references to 
+Ignore the follwoing steps if running MDS in standalone mode.
+8.  Configure Tomcat
+    a.  Just follow old manual install instructions ignoring any references to
         the older OpenMRS version.
         http://sana.mit.edu/wiki/index.php?title=Setup_Servers#Setup_and_Configure_Tomcat
 
-12. OpenMRS Install-1.9.2 release
+9.  OpenMRS Install-1.9.7 release
     a.  Download
         http://openmrs.org/download/
     b. Follow installation instructions:
         https://wiki.openmrs.org/display/docs/Installing+OpenMRS
 
-13. Add Modules through browser(OpenMRS Administration --> Manage Modules) 
+10. Add Modules through browser(OpenMRS Administration --> Manage Modules)
     a. Webservices.REST
-       Go to the module settings page in the Admin and set the 
+       Go to the module settings page in the Admin and set the
        "Webservices REST Uri Prefix" to http://<ip-address>[:port]/openmrs/
     b. HTMLFormEntry
     c. LogManager
     d. Sana module - get the latest beta version
-        http://code.google.com/p/sana/downloads/list
+        http://demo.sana.csail.mit.edu/src/openmrs/
 
-12. Configure OpenMRS for Sana
+11. Configure OpenMRS for Sana
     Again, follow current release instructions and ignore any references to
     older versions of OpenMRS
     http://sana.mit.edu/wiki/index.php?title=OpenMRS_Configuration
-    
-The online wiki will be updated with the new instructions when the code is 
-officially "released".
-
-Warning. The documentation on this next bit is not complete!
-Making sure everything works:
-1. Update the settings.py.
-2. ./manage.py syncdb
-3. ./manage.py shell
-4. At the python prompt:
->>> from sana.mrs import openmrs
->>> tester = openmrs.tests(host="<your hostname or IP>", username="<username>, password="<password>")
->>> tester.run_all()
->>> tester.run_all()
->>> tester.run_all()Session open result:  5FD47B4DBC35FDEE4996653AD0080DFE
-Session closed:  
-Session open result:  A28E0DE715D263700F112E667AABEED7
-Creating Patient, ID:  11110021
-Patient ID: 11110021  UUID: 55ee377c-97dc-4095-9ac4-6422ab3f32d9
-Session closed:  
-Fetching  11110021
-Session open result:  789AEAE3E373787B7843BF98C31E95A3
-Patient Fetch by ID: {.....alot of info...}
-Session closed:  
-
-If you get any error messages then something went wrong which may be anything
-from a credential problem to a server timeout, etc. If the server responds you
-should at least see the HttpError message such as:
-
->>> HTTPError: HTTP Error 401: Unauthorized
-

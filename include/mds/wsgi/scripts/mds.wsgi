@@ -2,7 +2,7 @@
 import os
 import sys
 
-path = '/var/local/webapps'
+path = '/var/local/www/webapps'
 if path not in sys.path:
     sys.path.append(path)
 
