@@ -11,6 +11,8 @@ from django.conf import settings
 from django.contrib.auth import authenticate
 from django.contrib.auth.decorators import login_required
 from django.core.paginator import Paginator, InvalidPage, EmptyPage
+from django.core import serializers
+from django.http import HttpResponse
 from django.forms.models import modelformset_factory
 from .forms import *
 
@@ -22,6 +24,7 @@ from mds.api.responses import JSONResponse
 from mds.api.v1.v2compatlib import sort_by_node
 from .models import Event
 
+@login_required(login_url='/mds/login/')
 def home(request):
     """Top level url
     
@@ -31,9 +34,21 @@ def home(request):
          "version": mds.api.version, 
          "service": "REST"}
     """
+    data = {
+        'status':'SUCCESS',
+        'code':200,
+        'message': version()
+    }
+    accept = request.META.get('HTTP_ACCEPT',None)
+    if 'application/json' in request.META.get('HTTP_ACCEPT'):
+        return HttpResponse(cjson.encode(data))
+    else:
+        return render_to_response('index.html', RequestContext(request))
+    '''
     username = request.REQUEST.get('username', 'empty')
     password = request.REQUEST.get('password','empty')
     user = authenticate(username=username, password=password)
+    
     if user is not None:
         return HttpResponse(cjson.encode( {
                'status':'SUCCESS',
@@ -47,7 +62,7 @@ def home(request):
                 'status':'FAIL',
                 'code':401, 
                 'message': message}))
-    
+    '''
 
 def _list(request,*args,**kwargs):
     query = dict(request.GET.items())
@@ -56,13 +71,11 @@ def _list(request,*args,**kwargs):
     objects = Event.objects.all().filter().order_by('-created')
     paginator = Paginator(objects, limit, allow_empty_first_page=True)
     objs = []
-    for p in paginator.page(start).object_list.all():
-        obj = p.to_python()
-        m = obj.pop('message')
+    for obj in paginator.page(start).object_list.all():
         try:
-            obj['message'] = cjson.decode(m,True)
+            obj.message = cjson.decode(obj.message,True)
         except:
-            obj['message'] = m
+            pass
         objs.append(obj)
     data = {'objects': objs,
             'limit': limit,
