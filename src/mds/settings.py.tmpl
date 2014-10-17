@@ -1,13 +1,13 @@
 """Django Project configuration variables for Sana.
 
-Default values available in settings.py.tmpl should be copied to settings.py 
-prior to filling in local values. Once updated, enter the following from the 
+Default values available in settings.py.tmpl should be copied to settings.py
+prior to filling in local values. Once updated, enter the following from the
 mds installation directory:
-    
+
     $> ./manage.py syncdb
-    
-This will require root privileges. 
-    
+
+This will require root privileges.
+
 :Authors: Sana Development Team
 :Version: 2.0
 """
@@ -26,9 +26,10 @@ ADMINS = (
 MANAGERS = ADMINS
 
 ### Database settings
+# replace with mysql or other settings as necessary
 DATABASES = {
     'default': {
-        'NAME': '/tmp/sana/sqlite.db',
+        'NAME': '/var/local/www/databases/sqlite.db',
         'ENGINE': 'django.db.backends.sqlite3',
         'USER': '',
         'PASSWORD': '',
@@ -57,7 +58,7 @@ SITE_ID = 1
 
 
 USE_I18N = True
-"""If you set this to False, Django will make some optimizations so as not to 
+"""If you set this to False, Django will make some optimizations so as not to
 load the internationalization machinery."""
 
 
@@ -65,33 +66,28 @@ STATIC_URL = "/static/"
 """URL that handles the media served from STATIC_ROOT. Make sure to use a
 trailing slash if there is a path component (optional in other cases). """
 
-STATIC_ROOT = '/opt/sana/static/'
-"""Absolute path to the directory that holds static media. Default value: 
+STATIC_ROOT = '/var/local/www/static/'
+"""Absolute path to the directory that holds static media. Default value:
 "/opt/sana/static/"
 """
 
 ADMIN_MEDIA_PREFIX = '/static/'
 """URL prefix for admin media -- CSS, JavaScript and images. Make sure to use a
-trailing slash. Default value "/static/admin/".
+trailing slash.
 """
 
-MEDIA_ROOT = '/opt/sana/media/'
-"""Absolute path to the directory that holds media. Default value: 
-"/opt/sana/media/"
+MEDIA_ROOT = '/var/local/www/media/'
+"""Absolute path to the directory that holds media.
 """
 
-MEDIA_URL = '/mds/media/'
+MEDIA_URL = '/media/'
 """URL that handles the media served from MEDIA_ROOT. Make sure to use a
-trailing slash if there is a path component (optional in other cases). Default
-value: "/mds/media/". """
+trailing slash if there is a path component (optional in other cases).
+"""
 
 SECRET_KEY = 'b#%x46e0f=jx%_#-a9b5(4bvxlfz-obm*gs4iu3i6k!034j(mx'
 """Make this unique, and don't share it with anybody. Seriously."""
-# Older versions of django
-#TEMPLATE_LOADERS = (
-#    'django.template.loaders.filesystem.load_template_source',
-#    'django.template.loaders.app_directories.load_template_source',
-#)
+
 TEMPLATE_LOADERS = (
     ('django.template.loaders.cached.Loader', (
         'django.template.loaders.filesystem.Loader',
@@ -114,11 +110,11 @@ ROOT_URLCONF = 'mds.urls'
 """Don't touch this unless you know what you are doing."""
 
 TEMPLATE_DIRS = (
-    '/var/local/',
+    '/var/local/www/webapps/templates',
 )
-"""Put strings here, like "/home/html/django_templates" or 
-"C:/www/django/templates". Always use forward slashes, even on Windows. Don't 
-forget to use absolute paths, not relative paths.For a typical Sana 
+"""Put strings here, like "/home/html/django_templates" or
+"C:/www/django/templates". Always use forward slashes, even on Windows. Don't
+forget to use absolute paths, not relative paths.For a typical Sana
 deployment use: "/opt/sana/templates/"."""
 
 INSTALLED_APPS = (
