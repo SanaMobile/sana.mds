@@ -11,8 +11,7 @@ from django.forms.models import modelformset_factory
 
 from django.shortcuts import render_to_response,redirect
 from django.template import RequestContext 
-from django.views.generic import list_detail
-
+from django.views.generic import DetailView, ListView
 
 from mds.api import version
 from mds.api.responses import JSONResponse
@@ -95,7 +94,7 @@ class _metadata(object):
     def messages(self):
             return self.debug
 
-@login_required(login_url='/mds/login/')
+@login_required(login_url='/login/')
 def web_root(request, **kwargs):
     metadata = _metadata(request)
     return render_to_response("web/index.html", 
