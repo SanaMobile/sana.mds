@@ -39,7 +39,7 @@ function submitSubjectWeb(){
     var gender = $('#id_gender').val();
     var image = $('#id_image').val();
     var location = $('#id_location').val();
-    {% url 'core:surgical-subject-list' as posturl %}
+    {% url 'mds.core:surgical-subject-list' as posturl %}
     var posturl = '{{ posturl }}';
     var url = '/mds/core/surgicalsubject/';
     var data = {

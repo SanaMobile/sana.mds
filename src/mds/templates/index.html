@@ -1,0 +1,7 @@
+{% extends "base.html" %}
+{% load url from future %}
+
+{% block body %}
+    {% csrf_token %}
+    <p>Welcome, {{ user.get_username }}.</p>
+{% endblock %}
