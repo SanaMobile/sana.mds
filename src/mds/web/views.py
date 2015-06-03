@@ -7,19 +7,46 @@ from django.contrib.auth import authenticate
 from django.contrib.auth.decorators import login_required
 from django.core.paginator import Paginator, InvalidPage, EmptyPage
 from django import forms
-from django.forms.models import modelformset_factory
+from django.forms.models import modelformset_factory, modelform_factory
+from django.db.models import ForeignKey, FileField, ImageField, DateField, DateTimeField
 
 from django.shortcuts import render_to_response,redirect
-from django.template import RequestContext 
-from django.views.generic import DetailView, ListView
+from django.template import RequestContext
+from django.template.response import TemplateResponse 
+from django.views.generic import DetailView, ListView, CreateView, UpdateView
+from django.views.generic.detail import *
+from django.utils.translation import ugettext_lazy as _
+
+from extra_views import CreateWithInlinesView, UpdateWithInlinesView
+from django.contrib.auth.models import User
 
 from mds.api import version
 from mds.api.responses import JSONResponse
 from mds.core.models import *
 from .forms import *
+from mds.core.widgets import *
+from mds.web.generic.filtering import FilterMixin
+from .generic.sorting import SortMixin
 from mds.tasks.models import *
+from .portal import site as portal_site
 
 #__all__ = ['home', 'index','intake']
+
+def login(request,*args,**kwargs):
+    form = {}
+    username = request.POST['username']
+    password = request.POST['password']
+    user = authenticate(username=username, password=password)
+    if user is not None:
+        if user.is_active:
+            pass
+            #login(request, user)
+            # Redirect to a success page.
+        else:
+            pass
+            # Return a 'disabled account' error message
+    else:
+        return TemplateResponse(request,'web/login.html',form)
 
 def home(request):
     """Top level url
@@ -96,12 +123,14 @@ class _metadata(object):
 
 @login_required(login_url='/login/')
 def web_root(request, **kwargs):
+    from mds.core import models as objects
     metadata = _metadata(request)
     return render_to_response("web/index.html", 
                               context_instance=RequestContext(request,{
                               'flavor': metadata.flavor,
                               'errors': metadata.errors,
-                              'messages' : metadata.messages
+                              'messages' : metadata.messages,
+                              'models' : objects.__all__
                             }))
 
 def registration(request, **kwargs):
@@ -291,7 +320,7 @@ def task_list(request):
         tasks = paginator.page(page)
     except (EmptyPage, InvalidPage):
         tasks = paginator.page(paginator.num_pages)
-    prange = range(1,paginator.num_pages)
+    prange = range(1,paginator.num_pages + 1)
     return render_to_response("web/etask_list.html", 
                               context_instance=RequestContext( request, 
                                 {
@@ -386,3 +415,465 @@ def log(request,*args,**kwargs):
             'page': page,
             "rate": int(query.get('refresh', 5)) }
     return render_to_response('logging/index.html', RequestContext(request,data))
+
+
+########################################################################
+# Class based views
+########################################################################
+#class @ListView(ListView):
+#    model = @
+#    template_name = "web/@_list.html"
+#
+#class @CreateView(CreateView):
+#    model = @
+#    template_name = "web/@_edit.html"
+    
+
+_core = [
+    Concept,
+    Device,
+    Encounter,
+    Location,
+    Notification, 
+    Observation, 
+    Observer,
+    Procedure,
+    Subject,
+]
+
+_tasks = [
+    EncounterTask,
+]
+
+class ModelListMixin(SortMixin):
+    template_name = "web/form.html"
+    exclude = ()
+    _fields = []
+    default_sort_params = ('created', 'asc')
+    
+    def __init__(self, *args, **kwargs):
+        super(ModelListMixin,self)
+        self._fields = self.field_names()
+        if not hasattr(self,'form'):
+            self.form = modelform_factory(self.model)
+        if not hasattr(self,'exclude'):
+            self.exclude = ()
+
+    def field_names(self):
+        if not getattr(self,'fields',None):
+            return list(x.name for x in self.model._meta.fields)
+        else:
+            return self.fields
+
+    def get_object_dict(self, obj):
+        opts = obj._meta
+        from django.utils.datastructures import SortedDict
+        _obj = SortedDict()
+        fields = SortedDict()
+        for f in self._fields:
+            #field = getattr(obj._meta, f, None)
+            field = opts.get_field(f)
+            data = {
+                    'label_tag': f.replace("_"," "),
+                    'is_link': False,
+                    'value': getattr(obj, f),
+                    'url': None,
+                    'type': 'text',
+            }
+            if isinstance(field, ForeignKey):
+                field_obj = getattr(obj,f)
+                data['is_link'] = True
+                data['url'] = u'/mds/web/{model}/{uuid}/'.format(
+                    model=field_obj.__class__.__name__.lower(),
+                    uuid=unicode(field_obj.id))
+                data['type'] = 'object'
+            elif isinstance(field, FileField):
+                data['is_link'] = True
+                data['url'] = u'/mds/media/{path}'.format(
+                    path=unicode(getattr(obj, f)))
+                data['type'] = 'file'
+            elif isinstance(field, DateField):
+                data['type'] = 'date'
+            elif isinstance(field, DateTimeField):
+                data['type'] = 'date'
+            fields[f] = data
+        _obj['fields'] = fields
+        _obj['id'] = obj.id
+        _obj['repr'] = unicode(obj)
+        return _obj
+
+    def get_context_data(self, **kwargs):
+        context = super(ModelListMixin, self).get_context_data(**kwargs)
+        context['model'] = self.model.__name__.lower()
+        #context['form'] = self.form(self.object)
+        context['fields'] = self._fields
+        if context.has_key('object'):
+            context['object_list'] = [context['object'],]
+        context['objects'] = list(self.get_object_dict(x) for x in context['object_list'])
+        #sort_by, order = self.get_sort_params()
+        #context.update({'sort_by': sort_by, 'order': order})
+        context['portal'] = portal_site
+        return context
+
+class ModelMixin(object):
+    template_name = "web/form.html"
+    
+    def __init__(self, *args, **kwargs):
+        super(ModelMixin,self)
+    #    if not hasattr(self,'fields'):
+    #        self.fields = self.get_default_model_fields()
+    #    if not hasattr(self,'form'):
+    #        self.form =  modelform_factory(self.model, fields=self.fields)
+
+    def get_context_data(self, **kwargs):
+        context = super(ModelMixin, self).get_context_data(**kwargs)
+        context['model'] = self.model.__name__.lower()
+        return context
+        
+class ModelFormMixin(object):
+    template_name = "web/form.html"
+    default_sort_params = ('created', 'asc')
+    exclude = ()
+    _fields = []
+    success_url_format = "/{app}/{model}/%(id)s/"
+    app = 'mds.web'
+    
+    def __init__(self, *args, **kwargs):
+        super(ModelFormMixin,self)
+        #if not hasattr(self,'fields'):
+        #    self.fields = self.get_default_model_fields()
+        self._fields = self.field_names()
+        if not hasattr(self,'form'):
+            self.form = modelform_factory(self.model)
+        if not hasattr(self,'exclude'):
+            self.exclude = ()
+        _model = getattr(self,"model").__name__.lower()
+        _app = getattr(self,'app').replace(".","/")
+        setattr(self,'success_url', 
+                self.success_url_format.format(app=_app,model=_model))
+
+    def field_names(self):
+        if not getattr(self,'fields',None):
+            return list(x.name for x in self.model._meta.fields)
+        else:
+            return self.fields
+
+    def get_field_list(self, obj):
+        from django.utils.datastructures import SortedDict
+        form = self.form(instance=obj)
+        opts = obj._meta
+        fields = SortedDict()
+        objs = SortedDict()
+        for field in self._fields:
+            _obj = {}
+            if not field.name in self.exclude:
+                data = {
+                    'name': field.name,
+                    'is_link': False,
+                    'value': getattr(obj,field.name),
+                    'link': None,
+                }
+                if isinstance(field, ForeignKey):
+                    data['is_link'] = True
+                    data['link'] = u'/mds/web/{model}/{uuid}/'.format(
+                        model=field.model,
+                        uuid=unicode(getattr(obj,field.name)
+                        ))
+                elif isinstance(field, FileField):
+                    data['is_link'] = True
+                    data['link'] = u'/mds/media/{path}'.format(
+                        path=unicode(getattr(obj,field.name)
+                        ))
+                _obj[field.name] = data
+                objs.append(_obj)
+        return tuple(fields)
+
+    def get_object_dict(self, obj):
+        opts = obj._meta
+        from django.utils.datastructures import SortedDict
+        _obj = SortedDict()
+        fields = SortedDict()
+        for f in self._fields:
+            #_field = field.name 
+            #for _field  in self._fields:
+            #if field.name in self._fields:
+            field = getattr(obj._meta, f, None)
+            _field = getattr(obj, f, None)
+            data = {
+                    'label_tag': f.replace("_"," "),
+                    'is_link': False,
+                    'value': getattr(obj, f),
+                    'url': None,
+                    'type': _field,
+            }
+            _field = getattr(obj, f, None)
+            if isinstance(_field, ForeignKey):
+                data['is_link'] = True
+                data['url'] = u'/mds/web/{model}/{uuid}/'.format(
+                    model=field.model.__class__.__name__.lower(),
+                    uuid=unicode(getattr(obj, _field).id))
+                data['type'] = 'ref'
+            elif isinstance(_field, FileField):
+                data['is_link'] = True
+                data['url'] = u'/mds/media/{path}'.format(
+                    path=unicode(getattr(obj, _field)))
+                data['type'] = 'file'
+            elif isinstance(_field, DateField):
+                data['type'] = 'date'
+            elif isinstance(_field, DateTimeField):
+                data['type'] = 'date'
+            fields[f] = data
+        _obj['fields'] = fields
+        _obj['id'] = obj.id
+        _obj['repr'] = unicode(obj)
+        return _obj
+
+    def get_context_data(self, **kwargs):
+        context = super(ModelFormMixin, self).get_context_data(**kwargs)
+        context['model'] = self.model.__name__.lower()
+        #context['form'] = self.form(self.object)
+        context['fields'] = self._fields
+        if context.has_key('object'):
+            context['objects'] = [self.get_object_dict(context['object']),]
+        if context.has_key('object_list'):
+            context['objects'] = list(self.get_object_dict(x) for x in context['object_list'])
+        context['portal'] = portal_site
+        return context
+
+# Concepts
+class UserListView(ModelListMixin, ListView):
+    model = User
+    template_name = "web/list.html"
+    fields = ('username',)
+    paginate_by=10
+
+class UserCreateView(ModelFormMixin,CreateView):
+    model = User
+    template_name = "web/form_new.html"
+    form_class = UserForm
+
+class UserUpdateView(ModelFormMixin, UpdateView):
+    model = User
+    template_name = 'web/form.html'
+
+class UserDetailView(ModelFormMixin,DetailView):
+    model = User
+    template_name = 'web/detail.html'
+    context_object_name = 'concept'
+    slug_field = 'uuid'
+
+
+# Concepts
+class ConceptListView(ModelListMixin, ListView):
+    model = Concept
+    template_name = "web/list.html"
+    fields = ('created', 'name', 'description', 'voided')
+    paginate_by=10
+
+class ConceptCreateView(ModelFormMixin,CreateView):
+    model = Concept
+    template_name = "web/form_new.html"
+
+class ConceptUpdateView(ModelFormMixin, UpdateView):
+    model = Concept
+    template_name = 'web/form.html'
+
+class ConceptDetailView(ModelFormMixin,DetailView):
+    model = Concept
+    template_name = 'web/detail.html'
+    context_object_name = 'concept'
+    slug_field = 'uuid'
+
+# Devices
+class DeviceListView(ModelListMixin, ListView):
+    model = Device
+    template_name = "web/list.html"
+    fields = ('created','name','voided',)
+    paginate_by=10
+
+class DeviceCreateView(ModelFormMixin,CreateView):
+    model = Device
+    template_name = "web/form_new.html"
+
+class DeviceUpdateView(ModelFormMixin, UpdateView):
+    model = Device
+    template_name = 'web/form.html'
+
+class DeviceDetailView(ModelFormMixin,DetailView):
+    model = Device
+    template_name = 'web/detail.html'
+    context_object_name = 'device'
+    slug_field = 'uuid'
+
+# Encounters
+class EncounterListView(ModelListMixin,ListView):
+    model = Encounter
+    template_name = "web/list.html"
+    fields = ('created', 'procedure', 'subject')#,'uuid')
+    paginate_by=10
+    
+class EncounterCreateView(ModelFormMixin,CreateView):
+    model = Encounter
+    template_name = "web/form_new.html"
+
+class EncounterUpdateView(ModelFormMixin, UpdateView):
+    model = Encounter
+    template_name = "web/form.html"
+
+class EncounterDetailView(ModelFormMixin,DetailView):
+    model = Encounter
+    template_name = 'web/detail.html'
+    context_object_name = 'encounter'
+    slug_field = 'uuid'
+
+# Locations
+class LocationListView(ModelListMixin, ListView):
+    model = Location
+    template_name = "web/list.html"
+    paginate_by=10
+    default_sort_params = ('name', 'asc')
+    fields = ('name','code',)
+    
+class LocationCreateView(ModelFormMixin,CreateView):
+    model = Location
+    template_name = "web/form_new.html"
+    #success_url="/mds/web/location/%(id)s/"
+    
+class LocationUpdateView(ModelFormMixin, UpdateView):
+    model = Location
+    template_name = 'web/form.html'
+    #success_url='/mds/web/location/%(id)s/'
+    
+class LocationDetailView(ModelFormMixin,DetailView):
+    model = Location
+    template_name = 'web/detail.html'
+    context_object_name = 'location'
+    slug_field = 'uuid'
+
+# Observations
+class ObservationListView(ModelListMixin, ListView):
+    model = Observation
+    template_name = "web/list.html"
+    paginate_by=10
+
+class ObservationCreateView(ModelFormMixin,CreateView):
+    model = Observation
+    template_name = "web/observation_create.html"
+
+class ObservationUpdateView(ModelFormMixin, UpdateView):
+    model = Observation
+    template_name = 'web/form.html'
+
+class ObservationDetailView(ModelFormMixin,DetailView):
+    model = Observation
+    template_name = 'web/detail.html'
+    context_object_name = 'observation'
+    slug_field = 'uuid'
+
+# Observers
+class ObserverListView(ModelListMixin, ListView):
+    model = Observer
+    template_name = "web/list.html"
+    paginate_by=10
+
+class ObserverCreateView(ModelFormMixin,CreateView):
+    model = Observer
+    template_name = "web/form_new.html"
+    
+class ObserverUpdateView(ModelFormMixin, UpdateView):
+    model = Observer
+    template_name = 'web/form.html'
+
+class ObserverDetailView(ModelFormMixin,DetailView):
+    model = Observer
+    template_name = 'web/detail.html'
+    context_object_name = 'observer'
+    slug_field = 'uuid'
+
+# Procedures
+class ProcedureListView(ModelListMixin, ListView):
+    template_name = 'web/list.html'
+    model = Procedure
+    default_sort_params = ('title', 'asc')
+    fields = ('title', 'version', 'author', 'src')#,'uuid')
+    paginate_by=3
+
+        
+class ProcedureDetailView(ModelFormMixin,DetailView):
+    model = Procedure
+    template_name = 'web/detail.html'
+    context_object_name = 'procedure'
+    slug_field = 'uuid'
+    
+class ProcedureCreateView(ModelFormMixin,CreateView):
+    model = Procedure
+    template_name = "web/form_new.html"
+
+class ProcedureUpdateView(ModelFormMixin, UpdateView):
+    model = Procedure
+    template_name = 'web/form.html'
+
+class SubjectListView(ModelListMixin, ListView):
+    model = Subject
+    default_sort_params = ('system_id', 'asc')
+    fields = ('created', 'system_id', 'family_name', 'given_name', 'gender', 'dob','voided')
+    template_name = "web/list.html"
+    paginate_by=10
+
+class SubjectCreateView(ModelFormMixin,CreateView):
+    model = Subject
+    template_name = "web/form_new.html"
+
+class SubjectUpdateView(ModelFormMixin, UpdateView):
+    model = Subject
+    template_name = 'web/form.html'
+
+class SubjectDetailView(ModelFormMixin,DetailView):
+    model = Subject
+    template_name = 'web/detail.html'
+    context_object_name = 'subject'
+    slug_field = 'uuid'
+
+class EncounterTaskListView(ModelListMixin, ListView):
+    model = EncounterTask
+    default_sort_params = ('due_on', 'asc')
+    fields = ('due_on', 'subject')
+    template_name = "web/list.html"
+    paginate_by=10
+
+class EncounterTaskCreateView(ModelFormMixin,CreateView):
+    model = EncounterTask
+    template_name = "web/form_new.html"
+    form_class = EncounterTaskForm
+
+class EncounterTaskUpdateView(ModelFormMixin, UpdateView):
+    model = EncounterTask
+    template_name = 'web/form.html'
+    form_class = EncounterTaskForm
+
+class EncounterTaskDetailView(ModelFormMixin,DetailView):
+    model = EncounterTask
+    template_name = 'web/detail.html'
+    context_object_name = 'encountertask'
+    slug_field = 'uuid'
+
+# class @ListView(ListView):
+#     model = @
+#     template_name = "web/@_list.html"
+
+
+def portal(request):
+    from mds.core import models as objects
+    metadata = _metadata(request)
+    context = {
+        'flavor': metadata.flavor,
+        'errors': metadata.errors,
+        'messages' : metadata.messages,
+        'models' : objects.__all__
+    }
+    
+    context['portal'] = portal_site
+    return TemplateResponse(request,
+        'web/index.html',
+        context,
+    )
