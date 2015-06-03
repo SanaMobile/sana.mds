@@ -333,8 +333,9 @@ tr.oddrow:hover{
     background-color: lightblue;
 }
 .content-list{
-    width:100%;
+    /* width:100%; */
     color:ffffff;
+    margin: 0 auto;
 }
 
 .listsort{
