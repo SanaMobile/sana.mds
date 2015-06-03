@@ -1,7 +1,11 @@
 {% extends "web/base.html" %}
 {% load url from future %}
+{% load static %}
 {% load i18n %}
 {% block title %}{{ model|title }} List{% endblock title%}
+{% block extrastyle %}
+<link rel="stylesheet" href="{{ STATIC_PREFIX }}web/css/liststyle.css">
+{% endblock %}
 {% block extrascript %}
     ordering = "asc";
     function spew(){
@@ -32,8 +36,10 @@
         {% for label in  fields %}
         <th class="left" id="{{ label }}-sort">
             <span ><strong>{{ label|title }}</strong>
-            <button id="{{ label }}-sort-asc">&#9650;</button>
-            <button id="{{ label }}-sort-desc" >&#9660;</button>
+            <ul>
+                <li><button id="{{ label }}-sort-asc" title="{% trans 'Filter Ascending' %}">&#9650;</button></li>
+                <li><button id="{{ label }}-sort-desc" title="{% trans 'Filter Descending' %}">&#9660;</button></li>
+            <ul>
             </span>
             <script>
                 $('#{{ label }}-sort-all').on('click', function(){

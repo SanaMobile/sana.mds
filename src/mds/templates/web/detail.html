@@ -4,8 +4,18 @@
 {% block title %}{{ model|title|add:' Detail' }}{% endblock %}
 {% block content %}
 {% for object in objects %}
-<h2>{{ object.repr }} </h2>
 <table class="content-list" >
+    <thead>
+        <tr class="headerrow">
+            <td colspan="2"><h2>{{ object.repr }} </h2></td>
+        </tr>
+    </thead>
+    <tfoot>
+        <tr class="headerrow">
+        <td class="alignleft"><a href="{% url 'web:'|add:model|add:'-list' %}">{% trans 'Back' %}</a></td>
+        <td class="alignright"><a href="{% url 'web:'|add:model|add:'-edit'  pk=object.id%}">{% trans 'Edit' %}</a>
+        </tr>
+    </tfoot>
     <tbody>
     {% for label,field in object.fields.items %}
         {% if label != 'id' %}
@@ -28,10 +38,4 @@
     </tbody>
 </table> 
 {% endfor %}
-<hr>
-<a href="{% url 'web:'|add:model|add:'-edit'  pk=object.id%}">Edit</a>
 {% endblock content %}
-{% block footer %}
-{{ super }}
-<a href="{% url 'web:'|add:model|add:'-list' %}">Back</a>
-{% endblock %}
