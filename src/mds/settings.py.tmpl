@@ -11,6 +11,8 @@ This will require root privileges.
 :Authors: Sana Development Team
 :Version: 2.0
 """
+SITE_ROOT = '/opt/sana/sana.mds/'
+CACHE_ROOT = SITE_ROOT + 'cache/'
 
 DEBUG = True
 ''' Global debug level. Should be set to False in production environments. '''
@@ -56,34 +58,34 @@ LANGUAGE_CODE = 'en-us'
 SITE_ID = 1
 """Don't touch this unless you know what you are doing."""
 
-
 USE_I18N = True
 """If you set this to False, Django will make some optimizations so as not to
 load the internationalization machinery."""
 
-
-STATIC_URL = "/static/"
+STATIC_URL = "/mds/static/"
 """URL that handles the media served from STATIC_ROOT. Make sure to use a
 trailing slash if there is a path component (optional in other cases). """
 
-STATIC_ROOT = '/var/local/www/static/'
-"""Absolute path to the directory that holds static media. Default value:
-"/opt/sana/static/"
+STATIC_ROOT = CACHE_ROOT + 'static/'
+"""Absolute path to the directory that holds static media. Default value: 
+"/opt/sana/sana.mds/cache/static/"
 """
 
-ADMIN_MEDIA_PREFIX = '/static/'
+ADMIN_MEDIA_PREFIX = '/mds/static/'
 """URL prefix for admin media -- CSS, JavaScript and images. Make sure to use a
-trailing slash.
+trailing slash. Default value "/static/admin/".
 """
 
-MEDIA_ROOT = '/var/local/www/media/'
-"""Absolute path to the directory that holds media.
+MEDIA_ROOT = CACHE_ROOT+'media/'
+"""Absolute path to the directory that holds media. Default value: 
+"/opt/sana/sana.mds/cache/media/"
 """
 
-MEDIA_URL = '/media/'
+MEDIA_URL = '/mds/media/'
 """URL that handles the media served from MEDIA_ROOT. Make sure to use a
-trailing slash if there is a path component (optional in other cases).
-"""
+trailing slash if there is a path component (optional in other cases). Default
+value: "/mds/media/". """
+
 
 SECRET_KEY = 'b#%x46e0f=jx%_#-a9b5(4bvxlfz-obm*gs4iu3i6k!034j(mx'
 """Make this unique, and don't share it with anybody. Seriously."""
@@ -110,7 +112,7 @@ ROOT_URLCONF = 'mds.urls'
 """Don't touch this unless you know what you are doing."""
 
 TEMPLATE_DIRS = (
-    '/var/local/www/webapps/templates',
+    SITE_ROOT+'mds/templates',
 )
 """Put strings here, like "/home/html/django_templates" or
 "C:/www/django/templates". Always use forward slashes, even on Windows. Don't
@@ -125,11 +127,19 @@ INSTALLED_APPS = (
     'django.contrib.sites',
     'django.contrib.admin',
     'django.contrib.staticfiles',
+    'django_extensions',
     'mds.mrs',
     'mds.core',
     'mds.tasks',
 )
 """Don't touch this unless you know what you are doing."""
+
+ALLOWED_INCLUDE_ROOTS = (
+    SITE_ROOT+'mds/templates/web/includes',
+    SITE_ROOT+'mds/templates',
+)
+
+LOGIN_URL = '/mds/login/'
 
 try:
     from local_settings import *
