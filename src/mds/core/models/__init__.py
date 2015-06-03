@@ -14,9 +14,10 @@ from .instruction import Instruction
 from .location import Location
 from .notification import Notification
 from .observation import Observation
-from .observer import Observer, Surgeon, SurgicalAdvocate
+from .observer import Observer
 from .procedure import Procedure
 from .subject import Subject, SurgicalSubject
+from mds.core.extensions.models import Surgeon, SurgicalAdvocate, SurgicalSubject
 
 __all__ = ['Concept', 'Relationship','RelationshipCategory',
            'Device', 
@@ -32,4 +33,3 @@ __all__ = ['Concept', 'Relationship','RelationshipCategory',
            'SurgicalSubject',
            'Surgeon',
            'SurgicalAdvocate']
-

@@ -93,18 +93,3 @@ class Subject(AbstractSubject):
 
     def __unicode__(self):
         return u'%s, %s - %s' % (self.family_name, self.given_name, self.system_id)
-
-class SurgicalSubject(Subject):
-    class Meta:
-        app_label = "core"
-
-    def __unicode__(self):
-        return u'%s, %s - %s' % (self.family_name, self.given_name, self.system_id)
-
-    house_number = models.CharField(max_length=64, blank=True)
-    family_number = models.IntegerField(max_length=5, null=True, blank=True)
-    national_id = models.IntegerField(max_length=7, null=True, blank=True)
-    contact_one =  models.CharField(max_length=64, blank=True)
-    contact_two =  models.CharField(max_length=64, blank=True)
-    contact_three =  models.CharField(max_length=64, blank=True)
-    contact_four =  models.CharField(max_length=64, blank=True)
