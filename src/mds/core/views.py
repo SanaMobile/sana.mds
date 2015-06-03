@@ -23,6 +23,22 @@ from mds.api import version
 from mds.api.responses import JSONResponse
 from mds.api.v1.v2compatlib import sort_by_node
 from .models import Event
+from mds.core.extensions import intake
+
+__all__ = [
+    'home',
+    'log_index',
+    'log_list',
+    'log_report',
+    'log_detail',
+    'log',
+    'encounter',
+    'subject',
+    'subject_create',
+    'index_page',
+    'mobile_authenticate',
+    'encounter_task',
+]
 
 @login_required(login_url='/mds/login/')
 def home(request):
@@ -188,51 +204,8 @@ def subject(request,**kwargs):
 def subject_create(request,**kwargs):
     return render_to_response('core/mobile/registration.html', 
                                context_instance=RequestContext(request,{}))
-                               
-@login_required(login_url='/mds/login')
-def intake(request,**kwargs):
-    method = request.META['REQUEST_METHOD']
-    if method == 'POST':
-        return intake_post(request,kwargs=kwargs)
-    else:
-        return intake_get(request,kwargskwargs=kwargs)
 
-def intake_post(request,**kwargs):    
-    user = request.user
-    observer = Observer.objects.get(user=request.user)
-    flavor = request.GET.get('flavor',None)
-    tmpl = 'core/intake.html'
-    if flavor:
-        if flavor == 'mobile':
-            tmpl = 'core/mobile/intake.html'
-        else:
-            tmpl = 'core/intake.html'
-        
-    return render_to_response(tmpl,
-                                context_instance=RequestContext(request, 
-                                                                {'subject_form':  SurgicalSubjectForm(),
-                                                                 'encounter_form': SurgicalIntakeForm(),
-                                                                 'sa_form' : SurgicalAdvocateFollowUpForm(),
-                                                                 'observer': observer}))
 
-def intake_get(request,**kwargs):
-    # Get the user
-    user = request.user
-    observer = Observer.objects.get(user=request.user)
-    flavor = request.GET.get('flavor',None)
-    tmpl = 'core/intake.html'
-    if flavor:
-        if flavor == 'mobile':
-            tmpl = 'core/mobile/intake.html'
-        else:
-            tmpl = 'core/intake.html'
-        
-    return render_to_response(tmpl,
-                                context_instance=RequestContext(request, 
-                                                                {'subject_form':  SurgicalSubjectForm(),
-                                                                 'encounter_form': SurgicalIntakeForm(),
-                                                                 'sa_form' : SurgicalAdvocateFollowUpForm(),
-                                                                 'observer': observer}))
 def index_page(request,**kwargs):
     flavor = request.GET.get('flavor',None)
     tmpl = 'core/index.html'
@@ -285,15 +258,3 @@ def encounter_task(request, **kwargs):
                                  'flavor': flavor
                                 })
                              )
-if __name__ == 'main':
-    data = {"data": [
-               {'line_number': 44, 
-                'level_number': 10, 
-                'delta': '0.000s', 
-                'timestamp': 1344815434.9979069, 
-                'level_name': 'DEBUG', 
-                'function_name': 'execute', 
-                'message': u'(0.002) SELECT \"core_concept\".\"id\", \"core_concept\".\"uuid\", \"core_concept\".\"created\", \"core_concept\".\"modified\", \"core_concept\".\"name\", \"core_concept\".\"display_name\", \"core_concept\".\"description\", \"core_concept\".\"conceptclass\", \"core_concept\".\"datatype\", \"core_concept\".\"mimetype\", \"core_concept\".\"constraint\" FROM \"core_concept\"; args=()', 
-                'module': 'util', 
-                'filename': 'util.py'}], 
-            "id": "2bbeb878-33f1-4590-9237-e41b151fa553"}
