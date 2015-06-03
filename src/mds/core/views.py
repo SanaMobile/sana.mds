@@ -23,7 +23,7 @@ from mds.api import version
 from mds.api.responses import JSONResponse
 from mds.api.v1.v2compatlib import sort_by_node
 from .models import Event
-from mds.core.extensions import intake
+from mds.core.extensions.views import intake
 
 __all__ = [
     'home',
@@ -38,6 +38,7 @@ __all__ = [
     'index_page',
     'mobile_authenticate',
     'encounter_task',
+    'intake',
 ]
 
 @login_required(login_url='/mds/login/')

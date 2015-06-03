@@ -16,7 +16,7 @@ from .notification import Notification
 from .observation import Observation
 from .observer import Observer
 from .procedure import Procedure
-from .subject import Subject, SurgicalSubject
+from .subject import Subject
 from mds.core.extensions.models import Surgeon, SurgicalAdvocate, SurgicalSubject
 
 __all__ = ['Concept', 'Relationship','RelationshipCategory',
