@@ -5,10 +5,11 @@ Created on Feb 29, 2012
 :Version: 2.0
 '''
 import logging
+import cjson
 
 from django.conf import settings
 from django.core.paginator import Paginator, InvalidPage, EmptyPage
-
+from django.db.models import ForeignKey
 from piston.handler import BaseHandler
 from piston.utils import rc
 
@@ -37,12 +38,45 @@ def get_start_limit(request):
     start = int(get.get('start', 1))
     return start, limit
 
-     
-class DispatchingHandler(BaseHandler):
+class HandlerMixin(object):
+    fks = None
+    m2m = None
+    
+    def __init__(self,*args,**kwargs):
+        super(HandlerMixin,self)
+        self.fks = self.get_foreign_keys()
+        self.m2m = self.get_m2m_keys()
+        self.model = getattr(self,'model',None)
+            
+    def get_foreign_keys(self):
+        foreign_keys = []
+        if hasattr(self,'model'):
+            _meta = getattr(self,'model')._meta
+        else:
+            return None
+        for field in _meta.fields:
+            logging.debug("fk: %s" % field.name)
+            if isinstance(_meta.get_field_by_name(field.name)[0], ForeignKey):
+                foreign_keys.append(field.name)
+        if not foreign_keys:
+            return ()
+        return foreign_keys
+        
+    def get_m2m_keys(self):
+        m2m = []
+        if hasattr(self,'model'):
+            _meta = getattr(self,'model')._meta
+        else:
+            return None
+        for field in _meta.many_to_many:
+            m2m.append(field.name)
+        return m2m
+
+class DispatchingHandler(BaseHandler,HandlerMixin):
     """Base HTTP handler for Sana api. Uses basic CRUD approach of the  
        django-piston api as a thin wrapper around class specific functions.
     """
-    exclude = ['id', 'created',]
+    exclude = ['id',]
     allowed_methods = ('GET','POST','PUT','DELETE')
 
     def queryset(self, request, uuid=None, **kwargs):
@@ -52,8 +86,7 @@ class DispatchingHandler(BaseHandler):
         if kwargs:
             qs.filter(**kwargs)
         return qs
-        #return self.model.objects.all()
-    
+
     @validate('POST')
     def create(self,request, uuid=None, *args, **kwargs):
         """ POST Request handler. Requires valid form defined by model of  
@@ -72,7 +105,7 @@ class DispatchingHandler(BaseHandler):
       
     def read(self,request, uuid=None, related=None,*args,**kwargs):
         """ GET Request handler. No validation is performed. """
-        logging.info("read: %s, %s" % (request.method,request.user))
+        logging.info("read: %s, %s, %s" % (self.model,request.method,request.user))
         try:
             if uuid and related:
                 response = self._read_by_uuid(request,uuid, related=related)
@@ -97,6 +130,8 @@ class DispatchingHandler(BaseHandler):
             if not uuid:
                 raise Exception("UUID required for update.")
             msg = self._update(request, uuid)
+            logging.info("Success updating {klazz}:{uuid}".format(
+                klazz=getattr(self,'model'), uuid=uuid))
             return succeed(msg)
         except Exception, e:
             return self.trace(request, e)
@@ -115,17 +150,30 @@ class DispatchingHandler(BaseHandler):
     def trace(self,request, ex=None):
         try:
             if settings.DEBUG:
-                logging.error(ex)
+                logging.error(unicode(ex))
             _,message,_ = logstack(self,ex)
             return error(message)
         except:
             return error(exception_value(ex))
     
     def _create(self,request, *args, **kwargs):
-        data = request.form.cleaned_data
+        if hasattr(request,'form'):
+            data = request.form.cleaned_data
+        else:
+            is_json = request.META.get('CONTENT_TYPE', False)
+            if is_json and is_json == 'application/json':
+                data = cjson.decode(request.body)
+            else:
+                data = self.flatten_dict(request.POST)
         klazz = getattr(self,'model')
+        uuid = data.get('uuid',None)
+        if uuid:
+            logging.info("Has uuid: %s" % uuid)
+            if klazz.objects.filter(uuid=uuid).count() == 1:
+                return self._update(request,uuid=uuid)
+            
         instance = klazz(**data)
-        instance.save()          
+        instance.save()
         return instance
     
     
@@ -160,14 +208,24 @@ class DispatchingHandler(BaseHandler):
         logging.info("_update() %s" % uuid)
         model = getattr(self,'model')
         if hasattr(request, 'form'):
+            data = request.form.cleaned_data
             request.form.save()
             msg = "Successfully updated  {0}: {1}".format(model.__class__.__name__,uuid)
         else:
             obj = model.objects.get(uuid=uuid)
-            data = self.flatten_dict(request.POST)
+            is_json = request.META.get('CONTENT_TYPE', False)
+            if is_json and is_json == 'application/json':
+                data = cjson.decode(request.body)
+            else:
+                data = self.flatten_dict(request.POST)
+            #fks = self.get_foreign_keys()
             if 'uuid' in data.keys():
                 data.pop('uuid')
             for k,v in data.items():
+                logging.info("%s : %s" % (k,v))
+                if k in self.fks:
+                    _obj = getattr(obj,k).__class__.objects.get(uuid=v)
+                    v = _obj
                 setattr(obj,k,v)
             obj.save()
             msg = obj
@@ -178,3 +236,4 @@ class DispatchingHandler(BaseHandler):
         model = getattr(self,'model')
         model.objects.delete(uuid=uuid)
         return "Successfully deleted {0}: {1}".format(model.__class__.__name__,uuid)
+
