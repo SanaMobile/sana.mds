@@ -1,0 +1,29 @@
+{% extends 'web/base.html' %}
+{% load i18n %}
+{% block header %}Update {{ model|title }}{% endblock %}
+{% block content %}
+<form action="{% url 'web:'|add:model|add:'-edit' pk=object.id %}" method="post">
+{{ csrftoken }}
+{% include "web/form_snippet.html" %}
+<div class="navbar">
+    <ul>
+    <li>
+        {% if object %}
+            <input type="submit" value="{% trans 'Update' %}" />
+        {% else %}
+            <input type="submit" value="{% trans 'Add' %}" />
+        {% endif %}
+    </li>
+    </ul>
+</div>
+<div id="wait">
+</div>
+{%endblock content %}
+{% block footer %}
+{{ super }}
+<div class="navbar">
+    <ul>
+        <li><a href="{% url 'web:'|add:model|add:'-list' %}">{% trans "Back" %}</a></li>
+    </ul>
+</div>
+{% endblock %} 

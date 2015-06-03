@@ -1,4 +1,6 @@
 {% load url from future %}
+{% load i18n %}
+{% load static %}
 <!DOCTYPE HTML>
 <html> 
   <head>
@@ -14,10 +16,13 @@
   {% block style %}
     <!-- <link href='http://fonts.googleapis.com/css?family=Source+Sans+Pro:200,300,400' rel='stylesheet' /> -->
     <link rel="stylesheet" href="{{ STATIC_PREFIX }}css/jquery-ui.css">
+    <link rel="stylesheet" href="{{ STATIC_PREFIX }}web/css/index.css">
     <link rel="stylesheet" href="{{ STATIC_PREFIX }}web/css/lib/fontello.css" />
     <link rel="stylesheet" href="{{ STATIC_PREFIX }}web/css/lib/normalize.css" />
-    <link rel="stylesheet" href="{{ STATIC_PREFIX }}web/css/index.css">
     <link rel="stylesheet" href="{{ STATIC_PREFIX }}web/css/sidebar.css" />
+    <link rel="stylesheet" href="{{ STATIC_PREFIX }}web/css/menu.css" />
+    <link rel="stylesheet" href="{{ STATIC_PREFIX }}web/css/loader.css" />
+    <link rel="stylesheet" href="{{ STATIC_PREFIX }}web/css/jquery-ui-timepicker-addon.css" />
   {% endblock style %}
 
   {% block script %}
@@ -28,6 +33,8 @@
   <script src="{{ STATIC_PREFIX }}web/js/jquery.cookie.js"></script>
   <script src="{{ STATIC_PREFIX }}web/js/console.js"></script>
   <script src="{{ STATIC_PREFIX }}web/js/functions.js" />
+  <script src="{{ STATIC_PREFIX }}web/js/jquery-ui-timepicker-addon.js"></script>
+  <script src="{{ STATIC_PREFIX }}web/js/jquery-ui-sliderAccess.js"></script>
   <script>
     var procedure = "303a113c-6345-413f-88cb-aa6c4be3a07d";
     var subject = null;
@@ -154,17 +161,25 @@
     function isNew(){
         return $.cookie("register");
     }
+
+{% block extrascript %}{% endblock extrascript %}
   </script>
 
   {% endblock script %}
+
   <script type="text/javascript">
     root="";
     {% block flavorscript %}
+      // Displays Date picker pop up
       $(function(){
-      //$( "input[type='date']" ).datepicker({ dateFormat: 'mm/dd/yy', changeYear: true });
-        $('input[type="date"]').datepicker({ dateFormat: 'yy-mm-dd', changeYear: true , yearRange : "c-100:c+05"}).prop('type','text');
+        $('input[type="date"]').datepicker({ 
+            dateFormat: 'yy-mm-dd', 
+            changeYear: true , 
+            yearRange : "c-100:c+05"
+            }).prop('type','text');
         $('input[type="date"]').prop('type','text');
-    });
+      });
+
     // Workaround for safari issues
     $(function() {
       $( "select[multiple='multiple']").selectable();
@@ -176,102 +191,49 @@
     {% endblock flavorscript %}
   </script>
   </head>
-<body class="jquery-ui page-template-default">
-<div class="wrapper jsc-sidebar-content jsc-sidebar-pushed">
+<body>
+<div class="wrapper">
   <section class="main-content">
-<!--
-  <nav>
-    <a href="#" class="icon-menu link-menu jsc-sidebar-trigger"></a>
-  </nav>
--->
   <div class="main-content-header">
-    {% block header %}{% endblock %}
+    <table >
+        <tr>
+            <td class="text-left"><a href="{% url 'web:portal' %}"><h3>{% trans "Home" %}</h3></a></td>
+            <td class="center"><h2><strong>{% block header %}{% endblock %}</strong></h2></td>
+            <td class="text-right"><a href="{% url 'web:logout' %}"><h3 class="text-right">{% trans "Logout" %}</h3></a></td>
+        </tr>
+    </table>
+    {% if portal %}
+        {% include 'web/includes/menu.html' with menu=portal %}
+    {% endif %}
   </div>
   <div class="main-content-body">
     <div class="main-content-body-inner">
       {% block content %}{% endblock %}
     </div>
-  <div>
-  {% block footer %}
-  <div data-role="footer" data-position="fixed" class="jqm-footer">
-    {% block flavorfooter %}
-    {% include "web/messages.html" %}
-    {% include "web/errors.html" %}
-    {% endblock flavorfooter %}
   </div>
-{% endblock footer %}
+  <footer>
+  <div class="main-content-footer">
+    {% block footer %}
+    <div style="width:100%;">
+    <ul>
+        <li>copyright 2015</li>
+        <li><img src="{{ STATIC_PREFIX }}web/img/sana_small.png"/></li>
+    </ul>
+    </div>
+    {% endblock footer %}
+  </div>
+  </footer>
   </section>
 </div>
-<nav class="sidebar jsc-sidebar" id="jsi-nav" data-sidebar-options="">
-    <ul class="sidebar-list">
-        {% url 'web:portal' as webportal %}
-        <li><a href="{{ webportal }}">Home</a></li>
-    <li>
-    <h4>Patients</h4>
-    <ul class="sidebar-list">
-        {% url 'web:register-patient' as newpatient %}
-        <li><a href="{{ newpatient }}">Register Patient</a></li>
-        {% url 'web:encounter' as webencounter %}
-        <li><a href="{{ webencounter }}">Enter Intake</a></li>
-    </ul>
-    </li>
-    <li>
-    <h4>Tasks</h4>
-    <ul class="sidebar-list">
-        {% url 'web:encounter-task' as webtask %}
-        <li><a href="{{ webtask }}" id="id_task_nav" target="_blank">Assign Task</a></li>
-        {% url 'web:encounter-task-list' as webtasklist %}
-        <li><a href="{{ webtasklist }}">View Status</a></li>
-    </ul>
-    </li>
-    <li>
-    <h4>Admin</h4>
-    <ul class="sidebar-list">
-        {% url 'web:log-index' as weblogs %}
-        <li><a href="{{ weblogs }}">Logs</a></li>
-        {% url 'admin:index' as adminindex %}
-        <li><a href="javascript:window.open('{{ adminindex }}')">Default Admin</a></li>
-    </ul>
-    </li>
-    </ul>
-</nav>
-  <script src="{{ STATIC_PREFIX }}web/js/sidebar.min.js"></script>
-  <script>
-     var menuStatic = false;
-     var menuVisible = true;
-     function toggleSideBar(){
-         if(menuStatic){
-
-         } else {
-            if(menuVisible){
-                stdout('pull');
-            } else {
-                stdout('push');
-            }
-            menuVisible = !menuVisible;
-         }
-     }
-    $('#jsi-nav').sidebar({
-                trigger: '.jsc-sidebar-trigger',
-                scrollbarDisplay: true,
-                pullCb: toggleSideBar,
-                pushCb: toggleSideBar
-            });
-/*
-    $('#jsc-sidebar-trigger').on('click', function (e) {
-            e.preventDefault();
-            if(!menuStatic){
-                if(menuVisible){
-                    $('#jsi-nav').data('sidebar').pull();
-                }  else {
-                    $('#jsi-nav').data('sidebar').push();
-                }
-            }
-        });
-*/
-        $('#jsi-nav').data('sidebar').push();
-
-  </script>
-
-  </body>
+<div id="loader" class="loader"></div>
+<script>
+      $(document).ajaxStart(function() {
+        // show loader on start
+        $("#loader").css("display","block");
+      }).ajaxSuccess(function() {
+      // hide loader on success
+      $("#loader").css("display","none");
+    });
+</script>
+</body>
 </html>

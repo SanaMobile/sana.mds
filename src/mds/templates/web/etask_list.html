@@ -80,13 +80,11 @@ function goToPage(value){
 {% endfor %}
 </table>
 <div>
-  Jump To page:
   <select onchange="goToPage(value)"> 
     {% for p in range %}
       <option>{{ p }}</option>
     {% endfor %}
   </select>
-<button type="button">Edit</button>
 </div>
 <script>
 

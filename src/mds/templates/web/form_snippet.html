@@ -1,0 +1,16 @@
+{% for hidden in form.hidden_fields %}
+    {{ hidden }}
+{% endfor %}
+{# Include the visible fields #}
+<table class="content-list">
+{% for field in form.visible_fields %}
+<tr class="{% cycle 'evenrow' 'oddrow' %}" style="padding:3px">
+    <td class="text-left">
+             <div class="fieldWrapper">
+            {{ field.errors }}{{ field.label_tag }}
+            </div>
+    </td>
+    <td class="text-right">{{ field }}</td>
+</tr>
+{% endfor %}
+</table>

@@ -177,15 +177,14 @@ td.selectp
     
 </script>
 
-{% endblock %} 
+{% endblock script %} 
 
 {% block header %}
-  {{ block.super }}
-    <table class="header">
+    <table style="width:100%">
 	<tr>
-	    <td width="124px" align="left"><b>Last Updated:</b></td>
+	    <td align="left"><b>Last Updated:</b></td>
 	    <td  id="status" width="360px" align="center"></td>
-            <td>
+            <td>Level:
                 <select id="level" onChange="filterLevel(value)">
                     <option value="0">ALL</option>
                     <option value="2">INFO</option>
@@ -194,13 +193,9 @@ td.selectp
                     <option value="16">ERROR</option>
                 </select>
             </td>
-	    <td align="right">
-		<input id="refreshB" type="button" onclick="refreshBlock()" value="Click to Auto Refresh!" />
-	    </td>	
 	</tr>
     </table>
-
-{% endblock %}
+{% endblock header %}
 {% block content %}
     {{ block.super }}
     <div id="logs" class="log-list">
@@ -219,6 +214,9 @@ td.selectp
                 {% endfor %}
                 </select>
             </td>
+	    <td align="right">
+		<input id="refreshB" type="button" onclick="refreshBlock()" value="Click to Auto Refresh!" />
+	    </td>
         </tr>
     </tbody>
 </table>
