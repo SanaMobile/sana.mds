@@ -45,24 +45,38 @@ class SessionHandler(DispatchingHandler):
     """ Handles session auth requests. """
     allowed_methods = ('GET','POST',)
     signals = { LOGGER:( EventSignal(), EventSignalHandler(Event))}
-
+    form = SessionForm
+    #model = None
+    
     def create(self,request):
-        username = request.REQUEST.get('username', 'empty')
-        password = request.REQUEST.get('password','empty')
-        user = authenticate(username=username, password=password)
+        #data = self.flatten_dict(request.POST)
+        '''
+        is_json = request.META.get('CONTENT_TYPE', False)
+        if is_json and is_json == 'application/json':
+            #data = cjson.decode(request.body)
+            username = data.get('username', None)
+            password = data.get('password', None)
+        else:
+            username = request.REQUEST.get('username', 'empty')
+            password = request.REQUEST.get('password','empty')
+        '''
+        #data = self.flatten_dict(request.POST)
         try:
+            username = request.REQUEST.get('username', 'empty')
+            password = request.REQUEST.get('password','empty')
+            user = authenticate(username=username, password=password)
             success,msg = do_authenticate(request)
             #if success:
             #    return succeed(msg)
             if user is not None:
                 observer = Observer.objects.get(user=user)
-                return succeed(observer.uuid)
+                return succeed(observer)
             else:
                 logging.warn(msg)
                 return fail(msg)
-        except:
+        except Exception as e:
             msg = "Internal Server Error"
-            logging.error(msg)
+            logging.error(unicode(e))
             return error(msg)
         
     def read(self,request):
@@ -75,22 +89,22 @@ class SessionHandler(DispatchingHandler):
 @logged
 class ConceptHandler(DispatchingHandler):
     """ Handles concept requests. """
-    allowed_methods = ('GET', 'POST')
+    allowed_methods = ('GET', 'POST','PUT')
     model = Concept
     form = ConceptForm
-    fields = ("uuid", "name")
+    #fields = ("uuid", "name")
     signals = { LOGGER:( EventSignal(), EventSignalHandler(Event))}
 
 class RelationshipHandler(DispatchingHandler):
     """ Handles concept relationship requests. """
-    allowed_methods = ('GET', 'POST')
+    allowed_methods = ('GET', 'POST','PUT')
     model = Relationship
     form = RelationshipForm
     signals = { LOGGER:( EventSignal(), EventSignalHandler(Event))}
     
 class RelationshipCategoryHandler(DispatchingHandler):
     """ Handles concept relationship category requests. """
-    allowed_methods = ('GET', 'POST')
+    allowed_methods = ('GET', 'POST','PUT')
     model = RelationshipCategory
     form = RelationshipCategoryForm
     signals = { LOGGER:( EventSignal(), EventSignalHandler(Event))}
@@ -98,50 +112,51 @@ class RelationshipCategoryHandler(DispatchingHandler):
 @logged
 class DeviceHandler(DispatchingHandler):
     """ Handles device requests. """
-    allowed_methods = ('GET', 'POST')
+    allowed_methods = ('GET', 'POST','PUT')
     model = Device
     form = DeviceForm
-    fields = (
-        "uuid",
-        "name",
-    )
+    #fields = (
+    #    "uuid",
+    #    "name",
+    #)
     signals = { LOGGER:( EventSignal(), EventSignalHandler(Event))}
     
 @logged    
 class EncounterHandler(DispatchingHandler):
     """ Handles encounter requests. """
-    allowed_methods = ('GET', 'POST')
+    allowed_methods = ('GET', 'POST','PUT')
     model = Encounter
     form = EncounterForm
-    fields = ("uuid",
-        "concept", 
-        "observation",
-        ("subject",("uuid",)),
-        "created",
-        "modified",
-        ("procedure",("title","uuid")),
-    )
+    #fields = ("uuid",
+    #    "concept", 
+    #    "observation",
+    #    ("subject",("uuid",)),
+    #    "created",
+    #    "modified",
+    #    ("procedure",("title","uuid")),
+    #)
     signals = { LOGGER:( EventSignal(), EventSignalHandler(Event))}
 
 @logged
 class EventHandler(BaseHandler):
     """ Handles network request log requests. """
-    allowed_methods = ('GET', 'POST')
+    allowed_methods = ('GET', 'POST','PUT')
     model = Event
 
 @logged
 class NotificationHandler(DispatchingHandler):
     """ Handles notification requests. """
-    allowed_methods = ('GET', 'POST')
+    allowed_methods = ('GET', 'POST','PUT')
     model = Notification
     form = NotificationForm
     signals = { LOGGER:( EventSignal(), EventSignalHandler(Event))}
 
 @logged
 class ObservationHandler(DispatchingHandler):
-    allowed_methods = ('GET', 'POST')
+    allowed_methods = ('GET', 'POST','PUT')
     model = Observation
     form = ObservationForm
+    '''
     fields = (
         "uuid",
         ("encounter",("uuid")),
@@ -151,23 +166,27 @@ class ObservationHandler(DispatchingHandler):
         "value_complex",
         "value",
     )
+    '''
     signals = { LOGGER:( EventSignal(), EventSignalHandler(Event))}
     
 @logged        
 class ObserverHandler(DispatchingHandler):
     """ Handles observer requests. """
-    allowed_methods = ('GET', 'POST')
+    allowed_methods = ('GET', 'POST','PUT')
     model = Observer
     form = ObserverForm
+    '''
     fields = ("uuid",
               ("user",("username","is_superuser")),
              )
+    '''
     signals = { LOGGER:( EventSignal(), EventSignalHandler(Event))}
 
 @logged
 class ProcedureHandler(DispatchingHandler):
-    allowed_methods = ('GET', 'POST')
+    allowed_methods = ('GET', 'POST','PUT')
     model = Procedure
+    '''
     fields = ("uuid",
               "title",
               "description",
@@ -175,6 +194,7 @@ class ProcedureHandler(DispatchingHandler):
               "version",
               "author",
              )
+    '''
     signals = { LOGGER:( EventSignal(), EventSignalHandler(Event))}
 
     def _read_by_uuid(self,request,uuid):
@@ -188,7 +208,8 @@ class ProcedureHandler(DispatchingHandler):
 @logged
 class SubjectHandler(DispatchingHandler):
     """ Handles subject requests. """
-    allowed_methods = ('GET', 'POST')
+    allowed_methods = ('GET', 'POST','PUT')
+    '''
     fields = (
         "uuid",
         "family_name",
@@ -199,6 +220,7 @@ class SubjectHandler(DispatchingHandler):
         "system_id",
         ("location",("name","uuid")),
     )
+    '''
     model = Subject
     form = SubjectForm
     signals = { LOGGER:( EventSignal(), EventSignalHandler(Event))}
@@ -216,7 +238,7 @@ class DocHandler(BaseHandler):
 # new stuff
 class LocationHandler(DispatchingHandler):
     model = Location
-    fields = ("name","uuid","code")
+    #fields = ("name","uuid","code")
 
 class CompoundFormHandler(object):
     forms = {}
@@ -239,6 +261,7 @@ class SurgicalSubjectHandler(DispatchingHandler):
     allowed_methods = ('GET', 'POST')
     #fields = ['uuid']
     #exclude = ("location")
+    '''
     fields = ("uuid",
               "family_name",
               "given_name",
@@ -255,6 +278,7 @@ class SurgicalSubjectHandler(DispatchingHandler):
                 "contact_three",
                 "contact_four",
              )
+    '''
     model = SurgicalSubject
     form = SurgicalSubjectForm
     signals = { LOGGER:( EventSignal(), EventSignalHandler(Event))}
