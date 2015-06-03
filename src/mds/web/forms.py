@@ -6,16 +6,30 @@ import logging
 from datetime import datetime
 from django import forms
 from django.forms.extras.widgets import SelectDateWidget
+from  django.forms.widgets import PasswordInput
+
+from django.contrib.auth.models import User
+
+from extra_views import InlineFormSet
 
 from mds.core.models import *
 from mds.core.widgets import *
+from mds.tasks.models import *
 
 __all__ = [
+    "ProcedureForm",
     "EmptyEncounterForm",
     "EncounterTaskForm",
     "InitialTaskSetForm",
     "SurgicalSubjectForm",
     "IntakeForm",
+    "AllowReadonly",
+    "AllowReadonlyForm",
+    "AllowReadonlyModelForm",
+    "SpanField",
+    "UserInline",
+    "UserForm",
+    "ObserverForm",
     ]
 
 def subject_choice_list():
@@ -42,16 +56,24 @@ class EmptyEncounterForm(forms.ModelForm):
             "concept":forms.HiddenInput(),
         }
 
-class EncounterTaskForm(forms.Form):
+class EncounterTaskForm(forms.ModelForm):
     """ Visits assigned to surgical advocate post S/P
     """
+    class Meta:
+        model = EncounterTask
+    subject = forms.ChoiceField(subject_choice_list(), label="Patient")
+    procedure = forms.ChoiceField(((x.uuid,x.title) for x in Procedure.objects.exclude(uuid__iexact="303a113c-6345-413f-88cb-aa6c4be3a07d")))
+    assigned_to = forms.ModelChoiceField(queryset=Observer.objects.all())
+    concept = forms.ChoiceField(concept_choice_list(), label="Type")
+    due_on = forms.DateTimeField(widget=DateTimeSelectorInput(format='%Y-%m-%d %H:%M'))
+    started = forms.DateTimeField(widget=DateTimeSelectorInput(format='%Y-%m-%d %H:%M'))
+    completed = forms.DateTimeField(widget=DateTimeSelectorInput(format='%Y-%m-%d %H:%M'))
+    
+class InitialTaskSetForm(forms.Form):
     subject = forms.ChoiceField(subject_choice_list(), label="Patient")
     procedure = forms.ChoiceField(((x.uuid,x.title) for x in Procedure.objects.exclude(uuid__iexact="303a113c-6345-413f-88cb-aa6c4be3a07d")))
     assigned_to = forms.ModelChoiceField(queryset=SurgicalAdvocate.objects.all())
     concept = forms.ChoiceField(concept_choice_list(), label="Type")
-    #due_on = forms.DateTimeField(widget=DateSelectorInput())
-
-class InitialTaskSetForm(EncounterTaskForm):
     due_on = forms.DateTimeField(widget=DateSelectorInput(), label="Initial Visit")
     due_second = forms.DateTimeField(widget=DateSelectorInput(), label="Regular follow up")
     due_thirty = forms.DateTimeField(widget=DateSelectorInput(), label="30 day follow up")
@@ -146,3 +168,91 @@ class IntakeForm(forms.ModelForm):
     date_of_regular_follow_up = forms.DateField(
             widget=DateSelectorInput())
 
+class SpanField(forms.Field):
+    '''A field which renders a value wrapped in a <span> tag.
+    
+    Requires use of specific form support. (see ReadonlyForm 
+    or ReadonlyModelForm)
+    '''
+    
+    def __init__(self, *args, **kwargs):
+        kwargs['widget'] = kwargs.get('widget', SpanWidget)
+        super(SpanField, self).__init__(*args, **kwargs)
+
+class AllowReadonly(object):
+    '''Base class for ReadonlyForm and ReadonlyModelForm which provides
+    the meat of the features described in the docstings for those classes.
+    '''
+
+    class NewMeta:
+        readonly = tuple()
+
+    def __init__(self, *args, **kwargs):
+        super(AllowReadonly, self).__init__(*args, **kwargs)
+        readonly = self.NewMeta.readonly
+        if not readonly:
+            return
+        for name, field in self.fields.items():
+            if name in readonly:
+                field.widget = SpanWidget()
+            elif not isinstance(field, SpanField):
+                continue
+            field.widget.original_value = str(getattr(self.instance, name))
+
+class AllowReadonlyForm(AllowReadonly, forms.Form):
+    '''A form which provides the ability to specify certain fields as
+    readonly, meaning that they will display their value as text wrapped
+    with a <span> tag. The user is unable to edit them, and they are
+    protected from POST data insertion attacks.
+    
+    The recommended usage is to place a NewMeta inner class on the
+    form, with a readonly attribute which is a list or tuple of fields,
+    similar to the fields and exclude attributes on the Meta inner class.
+    
+        class MyForm(ReadonlyForm):
+            foo = forms.TextField()
+            class NewMeta:
+                readonly = ('foo',)
+    '''
+    pass
+
+class AllowReadonlyModelForm(AllowReadonly, forms.ModelForm):
+    '''A ModelForm which provides the ability to specify certain fields as
+    readonly, meaning that they will display their value as text wrapped
+    with a <span> tag. The user is unable to edit them, and they are
+    protected from POST data insertion attacks.
+    
+    The recommended usage is to place a NewMeta inner class on the
+    form, with a readonly attribute which is a list or tuple of fields,
+    similar to the fields and exclude attributes on the Meta inner class.
+    
+        class Foo(models.Model):
+            bar = models.CharField(max_length=24)
+
+        class MyForm(ReadonlyModelForm):
+            class Meta:
+                model = Foo
+            class NewMeta:
+                readonly = ('bar',)
+    '''
+    pass
+
+class ProcedureForm(AllowReadonlyModelForm):
+    class Meta:
+        model = Procedure
+    class NewMeta:
+        readonly = ['uuid','created',]
+
+class UserInline(InlineFormSet):
+    model = User
+
+class UserForm(forms.ModelForm):
+    class Meta:
+        model = User
+        fields = ('username','password',)
+        widgets = (
+            {'password': PasswordInput },
+        )
+class ObserverForm(forms.ModelForm):
+    class Meta:
+        model =User
