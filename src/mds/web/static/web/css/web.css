@@ -23,46 +23,34 @@ aside,
 details,
 figcaption,
 figure,
-footer,
-header,
 hgroup,
-nav,
 section,
 summary {
     display: block;
 }
 
-#sidebar,
-.sidebar-left,
-.sidebar-right {
-    padding: 20px;
-    width: 29%;
-}
-
-#sidebar,
-.sidebar-right {
-    float: right;
-    margin-right: -25px;
-    position: relative;
-    -webkit-border-image: -webkit-linear-gradient(#ffffff, #e7e7e7 15%, #e7e7e7 85%, #ffffff);
-    border-image: linear-gradient(#ffffff, #e7e7e7 15%, #e7e7e7 85%, #ffffff);
-    box-shadow: inset 15px 0 5px -16px #e7e7e7;
-    background-image: -webkit-radial-gradient(left, #f2f2f2, #ffffff 80%);
-    background-image: radial-gradient(left, #f2f2f2, #ffffff 80%);
-    border: 0;
-    border-left: 1px solid #efefef;
+body, html
+{
+    margin: 0px; 
+    padding: 0px;
 }
 
 
-.content-right #sidebar,
-.sidebar-left {
-    float: left;
-    border-left: 0;
-    border-right: 1px solid #e7e7e7;
-    margin: -20px 0 0 -25px;
-    -webkit-border-image: -webkit-linear-gradient(#ffffff, #e7e7e7 15%, #e7e7e7 85%, #ffffff);
-    border-image: linear-gradient(#ffffff, #e7e7e7 15%, #e7e7e7 85%, #ffffff);
-    box-shadow: inset 15px 0 5px -16px #e7e7e7;
-    background-image: -webkit-radial-gradient(right, #f2f2f2, #ffffff 80%);
-    background-image: radial-gradient(right, #f2f2f2, #ffffff 80%);
+#footer { 
+    position:absolute; 
+    width:100%; 
+    height:100px; 
+    background-color: #efefff;
+    display: block;
 }
+
+#header { 
+    position:absolute; 
+    width:100%; 
+    height:100px; 
+    background-color: #efefff;
+    display: block;
+    top: 0px;
+}
+
+
