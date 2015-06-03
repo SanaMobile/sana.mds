@@ -113,7 +113,7 @@ def validate(operation='POST'):
             form = v_form(request.POST,request.FILES) if request.FILES else v_form(request.POST)
             if not form.is_valid():
                 errs = form.errors.keys();
-                return fail(None, errors=errs)
+                return fail(None, errors=errs+('oops',))
         else:
             data = handler.flatten_dict(getattr(request, operation))
             form = v_form(data=data,empty_permitted=True)
