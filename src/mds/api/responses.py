@@ -6,6 +6,7 @@ Created on Aug 11, 2012
 '''
 from django.http import HttpResponse
 import sys,traceback
+import collections
 
 def render_json_response(data):
     return JSONResponse(data)
@@ -66,6 +67,17 @@ def fail(data, code=404, errors=[]):
 
 def succeed(data, code=200):
     ''' Success response as a python dict with data '''
+    '''
+    msg = []
+    try:
+        if msg.hasattr('__contains__'):
+            msg = data
+        else:
+            msg.append(data)
+    except:
+        msg.append(data)
+    '''
+    #msg = data if isinstance(data,collections.Iterable) else data
     response = {'status': 'SUCCESS',
                 'code' : code,
                 'message': data, }
