@@ -1,0 +1,37 @@
+table.content-list{
+    color:ffffff;
+    margin: 0 auto;
+}
+
+table.content-list > thead tr{
+    padding: 10px;
+}
+
+table.content-list > thead tr td{
+
+}
+table.content-list > thead tr td ul{
+
+}
+table.content-list > thead tr td ul li{
+
+}
+table.content-list > thead tr td ul li button{
+    font-size:50%;
+}
+table.content-list > tfoot td{
+    padding: 10px;
+    
+}
+
+.contentlist{
+
+}
+
+.contentlist ul{
+
+}
+
+.contentlist ul li{
+
+}
