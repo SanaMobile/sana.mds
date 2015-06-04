@@ -37,7 +37,7 @@ __all__ = ['ConceptHandler',
            'SessionHandler',
            'SubjectHandler',
            'SurgicalSubjectHandler',
-           'LocationHandler']
+           'LocationHandler',]
 
    
 @logged     
@@ -70,7 +70,7 @@ class SessionHandler(DispatchingHandler):
             #    return succeed(msg)
             if user is not None:
                 observer = Observer.objects.get(user=user)
-                return succeed(observer)
+                return succeed(observer.uuid)
             else:
                 logging.warn(msg)
                 return fail(msg)

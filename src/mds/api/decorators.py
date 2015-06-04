@@ -4,6 +4,8 @@ Created on Aug 9, 2012
 :author: Sana Development Team
 :version: 2.0
 '''
+import logging
+import cjson
 
 from . import LOGGING_ENABLED, LOG_SIGNAL, SIGNALS, LOGGER, CRUD, crud
 from .responses import error, fail
@@ -96,6 +98,7 @@ def validate(operation='POST'):
     @decorator
     def wrap(f, handler, request, *a, **kwa):
         # gets the form we will validate
+        logging.info("request from %s" % request.user)
         klass = handler.__class__
         if hasattr(klass, 'form'):
             # want to start encouraging use of form
@@ -109,11 +112,23 @@ def validate(operation='POST'):
         else:
             return error(u'Invalid object')
         # Create the dispatchable form and validate
-        if operation == 'POST':
-            form = v_form(request.POST,request.FILES) if request.FILES else v_form(request.POST)
+        logging.info("%s" % operation)
+        if operation == 'POST' or operation == "PUT":
+            content_type = request.META.get('CONTENT_TYPE', None)
+            is_json = 'json' in content_type
+            if is_json:
+                data = cjson.decode(request.read())
+            else:
+                data = handler.flatten_dict(getattr(request, operation))
+            form = v_form(data=data,files=request.FILES) if request.FILES else v_form(data=data)
+            # set raw_data here to work around django form validation
+            setattr(request,'raw_data', data)
             if not form.is_valid():
+                logging.error("Form invalid")
                 errs = form.errors.keys();
                 return fail(None, errors=errs+('oops',))
+            else:
+                logging.debug("FORM VALID")
         else:
             data = handler.flatten_dict(getattr(request, operation))
             form = v_form(data=data,empty_permitted=True)

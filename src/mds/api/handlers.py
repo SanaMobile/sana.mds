@@ -23,8 +23,8 @@ class UnsupportedCRUDException(Exception):
     def __init__(self, value):
         self.value = value
         
-    def __str__(self):
-        return self.value
+    def __unicode__(self):
+        return unicode(self.value)
 
 def get_root(request):
     host = request.get_host()
@@ -55,11 +55,10 @@ class HandlerMixin(object):
         else:
             return None
         for field in _meta.fields:
-            logging.debug("fk: %s" % field.name)
             if isinstance(_meta.get_field_by_name(field.name)[0], ForeignKey):
                 foreign_keys.append(field.name)
         if not foreign_keys:
-            return ()
+            return []
         return foreign_keys
         
     def get_m2m_keys(self):
@@ -77,7 +76,7 @@ class DispatchingHandler(BaseHandler,HandlerMixin):
        django-piston api as a thin wrapper around class specific functions.
     """
     exclude = ['id',]
-    allowed_methods = ('GET','POST','PUT','DELETE')
+    allowed_methods = ['GET','POST','PUT','DELETE']
 
     def queryset(self, request, uuid=None, **kwargs):
         qs = self.model.objects.all()
@@ -92,7 +91,7 @@ class DispatchingHandler(BaseHandler,HandlerMixin):
         """ POST Request handler. Requires valid form defined by model of  
             extending class.
         """
-        logging.info("create(): %s, %s" % (request.method,request.user))
+        logging.info("create(): %s" % (request.user))
         if uuid:
             return self.update(request,uuid=uuid)
         try:
@@ -122,7 +121,8 @@ class DispatchingHandler(BaseHandler,HandlerMixin):
             return succeed(response)
         except Exception, e:
             return self.trace(request, e)
-        
+            
+    @validate('PUT')
     def update(self, request, uuid=None):
         """ PUT Request handler. Allows single item updates only. """
         logging.info("update(): %s, %s" % (request.method,request.user))
@@ -157,16 +157,15 @@ class DispatchingHandler(BaseHandler,HandlerMixin):
             return error(exception_value(ex))
     
     def _create(self,request, *args, **kwargs):
-        if hasattr(request,'form'):
-            data = request.form.cleaned_data
-        else:
-            is_json = request.META.get('CONTENT_TYPE', False)
-            if is_json and is_json == 'application/json':
-                data = cjson.decode(request.body)
-            else:
-                data = self.flatten_dict(request.POST)
+        data = request.form.cleaned_data
+        raw_data = request.raw_data
         klazz = getattr(self,'model')
-        uuid = data.get('uuid',None)
+        uuid = raw_data.get('uuid',None)
+        logging.debug("uuid=%s" % uuid)
+        if raw_data.has_key('uuid'):
+            logging.info("RAW data has uuid: %s" % uuid)
+            data['uuid'] = raw_data.get('uuid')
+            #instance = klazz(**raw_data)
         if uuid:
             logging.info("Has uuid: %s" % uuid)
             if klazz.objects.filter(uuid=uuid).count() == 1:
@@ -207,29 +206,19 @@ class DispatchingHandler(BaseHandler,HandlerMixin):
     def _update(self,request, uuid):
         logging.info("_update() %s" % uuid)
         model = getattr(self,'model')
-        if hasattr(request, 'form'):
-            data = request.form.cleaned_data
-            request.form.save()
-            msg = "Successfully updated  {0}: {1}".format(model.__class__.__name__,uuid)
-        else:
-            obj = model.objects.get(uuid=uuid)
-            is_json = request.META.get('CONTENT_TYPE', False)
-            if is_json and is_json == 'application/json':
-                data = cjson.decode(request.body)
-            else:
-                data = self.flatten_dict(request.POST)
-            #fks = self.get_foreign_keys()
-            if 'uuid' in data.keys():
-                data.pop('uuid')
-            for k,v in data.items():
-                logging.info("%s : %s" % (k,v))
-                if k in self.fks:
-                    _obj = getattr(obj,k).__class__.objects.get(uuid=v)
-                    v = _obj
-                setattr(obj,k,v)
-            obj.save()
-            msg = obj
+        data = request.form.cleaned_data
+        raw_data = request.raw_data
         
+        obj = model.objects.get(uuid=uuid)
+        if 'uuid' in raw_data.keys():
+            raw_data.pop('uuid')
+        for k,v in data.items():
+            if k in self.fks:
+                _obj = getattr(obj,k).__class__.objects.get(uuid=v)
+                v = _obj
+                setattr(obj,k,v)
+        model.objects.filter(uuid=uuid).update(**raw_data)
+        msg = model.objects.filter(uuid=uuid)
         return msg
     
     def _delete(self,uuid):
