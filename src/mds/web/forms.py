@@ -249,10 +249,25 @@ class UserInline(InlineFormSet):
 class UserForm(forms.ModelForm):
     class Meta:
         model = User
-        fields = ('username','password',)
+        fields = ('username','password', "first_name", 'last_name',)
         widgets = (
-            {'password': PasswordInput },
+            {'password': forms.PasswordInput(attrs={
+                "autocomplete":"off",
+                "type":'password'}) },
+            {'username': forms.TextInput(attrs={"autocomplete":"off"}) },
         )
+        
+
+class BlankUserForm(UserForm):
+
+    def __init__(self,**kwargs):
+        if kwargs.get('instance',None):
+            kwargs['instance'] = None
+        if kwargs.get('data',None):
+            kwargs['data'] = None
+            kwargs['data'] = None
+        UserForm.__init__(self, **kwargs)
+
 class ObserverForm(forms.ModelForm):
     class Meta:
         model =User
