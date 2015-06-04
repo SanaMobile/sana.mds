@@ -179,11 +179,11 @@ site = {
                         'context_name':'user-create',
                     },
                     { 
-                        'label': 'View all Observers',
+                        'label': 'View all CHWs',
                         'context_name':'observer-list',
                     },
                     { 
-                        'label': 'New Observer',
+                        'label': 'New CHW',
                         'context_name':'observer-create',
                     }
                 ]
