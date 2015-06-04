@@ -1,37 +1,92 @@
-table.content-list{
-    color:ffffff;
+.content-list{
+    color:#efefef;
     margin: 0 auto;
 }
-
-table.content-list > thead tr{
-    padding: 10px;
+.content-list thead{
+    padding: 0px;
+}
+.content-list tr.headerrow {
+    padding:0px;
+    margin:0px;
+    background-color: darkgray;
+}
+.content-list tr.headerrow th{
+    padding: 3px;
+    margin: 3px;
+    border-left: 1px solid rgba(48, 46, 46, 0.18);
 }
 
-table.content-list > thead tr td{
+.content-list tr.headerrow table{
+    padding:0px;
+}
+.content-list tr.headerrow table tr{
+    padding:0px;
+}
+.content-list tr.headerrow table td{
+    min-width:0px;
+}
+.content-list tr.headerrow button{
+    font-size:0.1em;
+}
+
+.content-list tr.headerrow th{
 
 }
-table.content-list > thead tr td ul{
+.content-list thead tr.headerrow th ul{ 
 
 }
-table.content-list > thead tr td ul li{
+.content-list  thead tr.headerrow th td ul li{
 
 }
-table.content-list > thead tr td ul li button{
-    font-size:50%;
+.content-list  thead tr.headerrow th td ul li button{
+
 }
-table.content-list > tfoot td{
-    padding: 10px;
+.content-list  thead tr.headerrow td ul li ul{
+}
+.content-list tr.headerrow td ul li ul li{
     
 }
-
-.contentlist{
-
+.content-list tfoot td{
+    padding: 0px;
+    
 }
-
-.contentlist ul{
-
+.content-list tr.footerrow{
+    background-color: darkgray;
+    color: #ffffff;
+    width:100%;
+    padding: 10px;
+    margin: 10px;
 }
-
-.contentlist ul li{
-
+.content-list tr.footerrow td{
+    padding: 10px;
+    margin: 5px;
+}
+.content-list tr.footerrow a {
+    min-width:96px;
+    text-decoration:none;
+    background-color: #666666;
+    color: #ffffff;
+    border-radius:5px;
+    margin: 0px 5px;
+    padding: 5px;
+}
+.content-list tr.footerrow a:hover{
+    background-color: #e9e9e9;
+    color: #2a2a2a;
+}
+.content-list tr.evenrow{
+    background-color: #efefef; 
+    width:100%;
+    color: #6e6e6e;
+}
+.content-list tr.evenrow:hover{
+    background-color: lightblue;
+}
+.content-list tr.oddrow{
+    background-color: #ffffff; 
+    width:100%;
+    color: #6e6e6e;
+}
+.content-list tr.oddrow:hover{
+    background-color: lightblue;
 }

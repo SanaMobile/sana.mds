@@ -1,11 +1,12 @@
 <div id="id_messages">
 {% block messages %}
   {% if messages %}
-  <ul>
-    {% for x in messages %}
-      <li>{{ x }}</li>
+  <p>Messages:</p>
+  <ul class="messages">
+    {% for message in messages %}
+    <li{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</li>
     {% endfor %}
-   </ul>
+  </ul>
   {% endif %}
 {% endblock messages %}
 {% block debug %}

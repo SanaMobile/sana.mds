@@ -151,6 +151,12 @@ a.listfooter {
 .main-content > .main-content-header table{
     width: 100%;
 }
+.main-content > .main-content-header table ul{
+    display:block;
+}
+.main-content > .main-content-header table ul li{
+    max-height:16px;
+}
 .main-content > .main-content-header table a {
     display: block;  
     text-decoration: none;
@@ -313,58 +319,13 @@ th, td{
 td.text-top{
     vertical-align:top;
 }
-tr.headerrow{
-    background-color: darkgray;
-    color: #ffffff;
-    width:100%;
-}
-tr.headerrow a{
-    text-decoration:none;
-    display:inline-block;
-    padding-left:5px;
-}
-tr.headerrow a:hover{
-    color: #ffffff;
-}
-tr.footerrow{
-    background-color: darkgray;
-    color: #ffffff;
-    width:100%;
-    padding: 5px;
-    margin: 5px;
-}
-tr.footerrow td{
-    padding: 5px;
-    margin: 5px;
-}
-tr.footerrow a {
-    min-width:96px;
-    text-decoration:none;
-    background-color: #666666;
-    color: #ffffff;
-    border-radius:5px;
-    margin: 0px 5px;
-    padding: 5px;
-}
-tr.footerrow a:hover{
-    background-color: #e9e9e9;
-    color: #2a2a2a;
-}
-tr.evenrow{
-    background-color: #efefef; 
-    width:100%;
-}
-tr.evenrow:hover{
-    background-color: lightblue;
-}
-tr.oddrow{
-    background-color: #ffffff; 
-    width:100%;
-}
-tr.oddrow:hover{
-    background-color: lightblue;
-}
 .listsort{
     color: #ffffff;
     background-color: #6d767f;
+}
+.errorlist {
+    color:red;
+}
+.errorlist li{
+    color:red;
 }

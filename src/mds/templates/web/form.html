@@ -1,6 +1,10 @@
 {% extends 'web/base.html' %}
+{% load static %}
 {% load i18n %}
 {% block header %}Update {{ model|title }}{% endblock %}
+{% block extrastyle %}
+<link rel="stylesheet" href="{{ STATIC_PREFIX }}web/css/formstyle.css">
+{% endblock %}
 {% block content %}
 <form action="{% url 'web:'|add:model|add:'-edit' pk=object.id %}" method="post">
 {{ csrftoken }}
@@ -16,14 +20,4 @@
     </li>
     </ul>
 </div>
-<div id="wait">
-</div>
 {%endblock content %}
-{% block footer %}
-{{ super }}
-<div class="navbar">
-    <ul>
-        <li><a href="{% url 'web:'|add:model|add:'-list' %}">{% trans "Back" %}</a></li>
-    </ul>
-</div>
-{% endblock %} 

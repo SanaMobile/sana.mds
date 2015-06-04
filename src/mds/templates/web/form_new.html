@@ -1,6 +1,24 @@
 {% extends 'web/base.html' %}
+{% load static %}
 {% load i18n %}
 {% block header %}Create {{ model|title }}{% endblock %}
+{% block extrastyle %}
+<link rel="stylesheet" href="{{ STATIC_PREFIX }}web/css/formstyle.css">
+{% endblock %}
+{% block extrascript %}
+/*
+    $(document).ready(function(){
+        $("#id_password").attr("type","password");
+        $("#id_password").val("");
+        $("#id_username").val("");
+    });
+*/
+    $(document).ready(function(){
+        $( document ).on( 'focus', ':input', function(){
+            $( this ).attr( 'autocomplete', 'off' );
+        });
+    });
+{% endblock %}
 {% block content %}
 <form action="{% url 'web:'|add:model|add:'-create' %}" method="post">
     {{ csrftoken }}
@@ -29,11 +47,3 @@
 <div id="wait">
 </div>
 {%endblock content %}
-{% block footer %}
-{{ super }}
-<div class="navbar">
-    <ul>
-        <li><a href="{% url 'web:'|add:model|add:'-list' %}">{% trans "Back" %}</a></li>
-    </ul>
-</div>
-{% endblock %} 
