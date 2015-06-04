@@ -371,6 +371,7 @@ def _list(request,*args,**kwargs):
 
 def logs(request,*args,**kwargs):
     data = _list(request)
+    data['portal'] = portal_site
     return render_to_response('web/logs.html', RequestContext(request,data))
 
 def log_list(request):

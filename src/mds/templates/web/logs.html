@@ -1,17 +1,8 @@
 {% extends "web/base.html" %}
 
-{% block style %}
-{{ block.super }}
+{% block extrastyle %}
 <style>
 
-body
-{
-    background-color: #D2CAB5;
-}
-table.header
-{
-    width: 100%;
-}
 .pagelist
 {
     cssFloat: right;
@@ -180,47 +171,34 @@ td.selectp
 {% endblock script %} 
 
 {% block header %}
-    <table style="width:100%">
-	<tr>
-	    <td align="left"><b>Last Updated:</b></td>
-	    <td  id="status" width="360px" align="center"></td>
-            <td>Level:
-                <select id="level" onChange="filterLevel(value)">
-                    <option value="0">ALL</option>
-                    <option value="2">INFO</option>
-                    <option value="4">DEBUG</option>
-                    <option value="8">WARN</option>
-                    <option value="16">ERROR</option>
-                </select>
-            </td>
-	</tr>
-    </table>
+
 {% endblock header %}
 {% block content %}
     {{ block.super }}
+<div>
+    <table style="margin:0 auto;">
+    <tr>
+        <td align="left"><b>Last Updated:</b></td>
+        <td  id="status" width="360px" align="center"></td>
+        <td>Level:
+            <select id="level" onChange="filterLevel(value)">
+                <option value="0">ALL</option>
+                <option value="2">INFO</option>
+                <option value="4">DEBUG</option>
+                <option value="8">WARN</option>
+                <option value="16">ERROR</option>
+            </select>
+        </td>
+    </tr>
+    </table>
+</div>
     <div id="logs" class="log-list">
       {% include "web/log_list.html" with objects=objects %}
     </div>
+    {% with start as curpage %}
+    <div>
+    <input id="refreshB" type="button" onclick="refreshBlock()" value="Click to Auto Refresh!" />
+    {% endwith %}
+    </div>
 {% endblock content %}
-{% block footer %}
-{% with start as curpage %}
-<table width="100%">
-    <tbody>
-        <tr>
-            <td class="pagenav">Go To Page:
-                <select onchange="getLogPage(value)"> 
-                {% for p in range %}
-                    <option>{{ p }}</option>
-                {% endfor %}
-                </select>
-            </td>
-	    <td align="right">
-		<input id="refreshB" type="button" onclick="refreshBlock()" value="Click to Auto Refresh!" />
-	    </td>
-        </tr>
-    </tbody>
-</table>
-{% endwith %}
-{{ block.super }}
-{% endblock footer %}
 
