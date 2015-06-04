@@ -5,6 +5,7 @@ from django.http import HttpResponse
 from django.conf import settings
 from django.contrib.auth import authenticate
 from django.contrib.auth.decorators import login_required
+from django.contrib.messages.views import SuccessMessageMixin
 from django.core.paginator import Paginator, InvalidPage, EmptyPage
 from django import forms
 from django.forms.models import modelformset_factory, modelform_factory
@@ -572,7 +573,10 @@ class ModelFormMixin(object):
                     'is_link': False,
                     'value': getattr(obj,field.name),
                     'link': None,
+                    'secure': False,
                 }
+                if isinstance(field.widget, forms.PasswordInput):
+                    data['secure'] = True
                 if isinstance(field, ForeignKey):
                     data['is_link'] = True
                     data['link'] = u'/mds/web/{model}/{uuid}/'.format(
@@ -605,8 +609,12 @@ class ModelFormMixin(object):
                     'value': getattr(obj, f),
                     'url': None,
                     'type': _field,
+                    'secure': False,
+                    'input_type': 'text',
             }
             _field = getattr(obj, f, None)
+            #if isinstance(_field.widget, forms.PasswordInput):
+            #    data['secure'] = True
             if isinstance(_field, ForeignKey):
                 data['is_link'] = True
                 data['url'] = u'/mds/web/{model}/{uuid}/'.format(
@@ -644,24 +652,41 @@ class ModelFormMixin(object):
 class UserListView(ModelListMixin, ListView):
     model = User
     template_name = "web/list.html"
-    fields = ('username',)
+    fields = ('username','last_name','first_name',)
     paginate_by=10
+    default_sort_params = ('username','last_name',)
 
-class UserCreateView(ModelFormMixin,CreateView):
+class UserCreateView(SuccessMessageMixin,CreateView):
     model = User
-    template_name = "web/form_new.html"
+    template_name = "web/form_user_new.html"
+    form_class = UserForm
+    success_message = "User: %(username)s was created successfully"
+
+    def get_success_message(self, cleaned_data):
+        return self.success_message % dict(cleaned_data)
+        
+    def get_context_data(self, **kwargs):
+        context = super(UserCreateView, self).get_context_data(**kwargs)
+        context['model'] = self.model.__name__.lower()
+        context['portal'] = portal_site
+        return context
+
+class UserUpdateView(ModelFormMixin, SuccessMessageMixin, UpdateView):
+    model = User
+    template_name = 'web/form_user.html'
     form_class = UserForm
 
-class UserUpdateView(ModelFormMixin, UpdateView):
-    model = User
-    template_name = 'web/form.html'
+    success_message = "User: %(username)s was updated successfully"
+
+    def get_success_message(self, cleaned_data):
+        return self.success_message % dict(cleaned_data)
 
 class UserDetailView(ModelFormMixin,DetailView):
     model = User
     template_name = 'web/detail.html'
-    context_object_name = 'concept'
+    context_object_name = 'user'
     slug_field = 'uuid'
-
+    fields = ('username','last_name','first_name','email')
 
 # Concepts
 class ConceptListView(ModelListMixin, ListView):
