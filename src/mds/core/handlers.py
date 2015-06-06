@@ -62,12 +62,19 @@ class SessionHandler(DispatchingHandler):
         '''
         #data = self.flatten_dict(request.POST)
         try:
-            username = request.REQUEST.get('username', 'empty')
-            password = request.REQUEST.get('password','empty')
+            content_type = request.META.get('CONTENT_TYPE', None)
+            logging.debug(content_type)
+            is_json = 'json' in content_type
+            logging.debug("is_json: %s" % is_json)
+            if is_json:
+                logging.debug("is_json = True")
+                raw_data = request.read()
+                data = cjson.decode(raw_data)
+            else:
+                data = self.flatten_dict(request.POST)
+            username = data.get('username', 'empty')
+            password = data.get('password','empty')
             user = authenticate(username=username, password=password)
-            success,msg = do_authenticate(request)
-            #if success:
-            #    return succeed(msg)
             if user is not None:
                 observer = Observer.objects.get(user=user)
                 return succeed(observer.uuid)
@@ -77,6 +84,7 @@ class SessionHandler(DispatchingHandler):
         except Exception as e:
             msg = "Internal Server Error"
             logging.error(unicode(e))
+            raise e
             return error(msg)
         
     def read(self,request):
