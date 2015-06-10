@@ -30,6 +30,7 @@ __all__ = [
     "UserInline",
     "UserForm",
     "ObserverForm",
+    "LoginForm",
     ]
 
 def subject_choice_list():
@@ -257,6 +258,10 @@ class UserForm(forms.ModelForm):
             {'username': forms.TextInput(attrs={"autocomplete":"off"}) },
         )
         
+class LoginForm(forms.ModelForm):
+    class Meta:
+        model = User
+        fields = ('username','password')
 
 class BlankUserForm(UserForm):
 

@@ -1,12 +1,17 @@
 import cjson
 import logging
 
-from django.http import HttpResponse
+from django.http import HttpResponse, HttpResponseRedirect
 from django.conf import settings
 from django.contrib.auth import authenticate
+from django.contrib.auth import login as auth_login
+from django.contrib.auth import logout as auth_logout
 from django.contrib.auth.decorators import login_required
+from django.contrib.auth.models import User
 from django.contrib.messages.views import SuccessMessageMixin
 from django.core.paginator import Paginator, InvalidPage, EmptyPage
+from django.core.urlresolvers import reverse
+
 from django import forms
 from django.forms.models import modelformset_factory, modelform_factory
 from django.db.models import ForeignKey, FileField, ImageField, DateField, DateTimeField
@@ -31,23 +36,37 @@ from .generic.sorting import SortMixin
 from mds.tasks.models import *
 from .portal import site as portal_site
 
-#__all__ = ['home', 'index','intake']
-
 def login(request,*args,**kwargs):
-    form = {}
-    username = request.POST['username']
-    password = request.POST['password']
-    user = authenticate(username=username, password=password)
-    if user is not None:
-        if user.is_active:
-            pass
-            #login(request, user)
-            # Redirect to a success page.
+    if request.method == "POST":
+        form = {}
+        username = request.POST['username']
+        password = request.POST['password']
+        user = authenticate(username=username, password=password)
+        redirect_to = request.REQUEST.get("next", '')
+        next_page = redirect_to if redirect_to else reverse("web:portal")
+        if user is None:
+            return TemplateResponse(request,
+                'web/login.html',
+                {
+                    'form': LoginForm(),
+                    'next': next_page
+                })
+            
         else:
-            pass
-            # Return a 'disabled account' error message
+            auth_login(request, user)
+            return HttpResponseRedirect(next_page)
     else:
-        return TemplateResponse(request,'web/login.html',form)
+        form = modelform_factory(User)
+        return TemplateResponse(request,
+            'web/login.html',
+            {
+                'form': LoginForm(),
+            })
+
+def logout(request):
+    auth_logout(request)
+    url = reverse('web:login')
+    return redirect(url)
 
 def home(request):
     """Top level url
@@ -888,6 +907,7 @@ class EncounterTaskDetailView(ModelFormMixin,DetailView):
 #     template_name = "web/@_list.html"
 
 
+@login_required(login_url="/mds/web/login/")
 def portal(request):
     from mds.core import models as objects
     metadata = _metadata(request)
