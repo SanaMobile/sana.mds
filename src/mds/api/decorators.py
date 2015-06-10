@@ -123,10 +123,16 @@ def validate(operation='POST'):
             form = v_form(data=data,files=request.FILES) if request.FILES else v_form(data=data)
             # set raw_data here to work around django form validation
             setattr(request,'raw_data', data)
+            try:
+                form.full_clean()
+            except:
+                errs = form.errors.keys()
+                return fail(None, errors=errs)
+                
             if not form.is_valid():
                 logging.error("Form invalid")
                 errs = form.errors.keys();
-                return fail(None, errors=errs+('oops',))
+                return fail(None, errors=errs)
             else:
                 logging.debug("FORM VALID")
         else:
