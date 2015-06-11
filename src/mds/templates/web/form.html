@@ -6,7 +6,12 @@
 <link rel="stylesheet" href="{{ STATIC_PREFIX }}web/css/formstyle.css">
 {% endblock %}
 {% block content %}
-<form type="multipart/form-data" action="{% url 'web:'|add:model|add:'-edit' pk=object.id %}" method="post">
+<!-- "{% url 'web:'|add:model|add:'-edit' pk=object.id %}" -->
+<form 
+    enctype="multipart/form-data" 
+    action="."
+    method="POST">
 {{ csrftoken }}
 {% include "web/form_snippet.html" %}
+</form>
 {%endblock content %}

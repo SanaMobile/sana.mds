@@ -20,7 +20,7 @@
     });
 {% endblock %}
 {% block content %}
-<form type="multipart/form-data" action="{% url 'web:'|add:model|add:'-create' %}" method="post">
+<form enctype="multipart/form-data" action="{% url 'web:'|add:model|add:'-create' %}" method="post">
     {{ csrftoken }}
     {% include "web/form_snippet.html" %}
     <div id="inlines">
