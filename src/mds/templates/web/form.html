@@ -6,18 +6,7 @@
 <link rel="stylesheet" href="{{ STATIC_PREFIX }}web/css/formstyle.css">
 {% endblock %}
 {% block content %}
-<form action="{% url 'web:'|add:model|add:'-edit' pk=object.id %}" method="post">
+<form type="multipart/form-data" action="{% url 'web:'|add:model|add:'-edit' pk=object.id %}" method="post">
 {{ csrftoken }}
 {% include "web/form_snippet.html" %}
-<div class="navbar">
-    <ul>
-    <li>
-        {% if object %}
-            <input type="submit" value="{% trans 'Update' %}" />
-        {% else %}
-            <input type="submit" value="{% trans 'Add' %}" />
-        {% endif %}
-    </li>
-    </ul>
-</div>
 {%endblock content %}
