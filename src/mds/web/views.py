@@ -621,8 +621,12 @@ class ModelFormMixin(object):
             #_field = field.name 
             #for _field  in self._fields:
             #if field.name in self._fields:
-            field = getattr(obj._meta, f, None)
-            _field = getattr(obj, f, None)
+            field = getattr(opts, f, None)
+            _field = None
+            for x in obj._meta.fields:
+                if x.name == f:
+                    _field = x
+            #_field = type(f)
             data = {
                     'label_tag': f.replace("_"," "),
                     'is_link': False,
@@ -632,19 +636,16 @@ class ModelFormMixin(object):
                     'secure': False,
                     'input_type': 'text',
             }
-            _field = getattr(obj, f, None)
-            #if isinstance(_field.widget, forms.PasswordInput):
-            #    data['secure'] = True
             if isinstance(_field, ForeignKey):
                 data['is_link'] = True
                 data['url'] = u'/mds/web/{model}/{uuid}/'.format(
-                    model=field.model.__class__.__name__.lower(),
-                    uuid=unicode(getattr(obj, _field).id))
+                    model= f.lower(), 
+                    uuid=unicode(getattr(obj, f).id))
                 data['type'] = 'ref'
             elif isinstance(_field, FileField):
                 data['is_link'] = True
                 data['url'] = u'/mds/media/{path}'.format(
-                    path=unicode(getattr(obj, _field)))
+                    path=unicode(getattr(obj, f)))
                 data['type'] = 'file'
             elif isinstance(_field, DateField):
                 data['type'] = 'date'
@@ -667,6 +668,21 @@ class ModelFormMixin(object):
             context['objects'] = list(self.get_object_dict(x) for x in context['object_list'])
         context['portal'] = portal_site
         return context
+
+class ModelSuccessMixin(SuccessMessageMixin):
+    success_message = "%(model)s: %(uuid)s was updated successfully"
+
+    def get_success_message(self, cleaned_data):
+        klazz = getattr(self,'model',None)
+        if klazz:
+            klazz = klazz.__name__
+        else:
+            klazz = _('Object')
+        data = {
+            'model': klazz,
+            'uuid' : self.object.uuid
+            }
+        return self.success_message % (data)
 
 # Concepts
 class UserListView(ModelListMixin, ListView):
@@ -715,14 +731,18 @@ class ConceptListView(ModelListMixin, ListView):
     fields = ('created', 'name', 'description', 'voided')
     paginate_by=10
 
-class ConceptCreateView(ModelFormMixin,CreateView):
+class ConceptCreateView(ModelFormMixin,SuccessMessageMixin,CreateView):
     model = Concept
     template_name = "web/form_new.html"
 
-class ConceptUpdateView(ModelFormMixin, UpdateView):
+class ConceptUpdateView(ModelFormMixin, SuccessMessageMixin, UpdateView):
     model = Concept
     template_name = 'web/form.html'
-
+    success_message = _("Concept: %(name)s was updated successfully")
+    
+    def get_success_message(self, cleaned_data):
+        return self.success_message % dict(cleaned_data)
+        
 class ConceptDetailView(ModelFormMixin,DetailView):
     model = Concept
     template_name = 'web/detail.html'
@@ -767,7 +787,7 @@ class EncounterUpdateView(ModelFormMixin, UpdateView):
 
 class EncounterDetailView(ModelFormMixin,DetailView):
     model = Encounter
-    template_name = 'web/detail.html'
+    template_name = 'web/encounter_detail.html'
     context_object_name = 'encounter'
     slug_field = 'uuid'
 
@@ -800,12 +820,20 @@ class ObservationListView(ModelListMixin, ListView):
     model = Observation
     template_name = "web/list.html"
     paginate_by=10
+    fields = (
+        'created',
+        'encounter',
+        'node',
+        'concept',
+        'value_text',
+        'value_complex',
+    )
 
 class ObservationCreateView(ModelFormMixin,CreateView):
     model = Observation
     template_name = "web/form_new.html"
 
-class ObservationUpdateView(ModelFormMixin, UpdateView):
+class ObservationUpdateView(ModelFormMixin, ModelSuccessMixin, UpdateView):
     model = Observation
     template_name = 'web/form.html'
 
