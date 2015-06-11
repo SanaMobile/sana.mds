@@ -45,7 +45,7 @@ class Encounter(models.Model):
 
     @property
     def slug(self):
-	return self.uuid
+        return self.uuid
 
     #_uploaded = models.BooleanField(default=False)
     #""" Whether the saved procedure was uploaded to a remote queueing server. """
