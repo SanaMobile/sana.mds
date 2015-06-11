@@ -60,7 +60,7 @@ urlpatterns = patterns(
     url(r'^encounter/$', EncounterListView.as_view(),name='encounter-list'),
     url(r'^encounter/new/$', EncounterCreateView.as_view(), name='encounter-create'),
     url(r'^encounter/(?P<pk>\d+)/$', EncounterUpdateView.as_view(), name='encounter-edit'),
-    url(r'^/(?P<pk>\d+)/detail/$', EncounterDetailView.as_view(), name='encounter-detail'),
+    url(r'^encounter/(?P<pk>\d+)/detail/$', EncounterDetailView.as_view(), name='encounter-detail'),
 
     # Locations
     url(r'^location/$', LocationListView.as_view(), name='location-list'),
