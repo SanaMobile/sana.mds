@@ -7,6 +7,8 @@ Procedure.
 import mimetypes, os
 
 from django.db import models
+from django.utils.translation import ugettext as _
+
 from mds.api.utils import make_uuid, guess_fext
 
 _app = "core"
@@ -20,10 +22,10 @@ class Observation(models.Model):
         ordering = ["-created"]
 
     def __unicode__(self):
-        return "%s %s %s %s" % (self.subject.full_name, 
-                                               self.node,
-                                               self.concept.name,
-                                               unicode(self.value), )
+        return "%s %s" % ( 
+            self.concept.name,
+            unicode(self.value), 
+    )
     uuid = models.SlugField(max_length=36, unique=True, default=make_uuid, editable=False)
     """ A universally unique identifier """
     
@@ -158,3 +160,8 @@ class Observation(models.Model):
 
     def encounter_uuid(self):
         return self.encounter.uuid
+        
+    def save(self,*args,**kwargs):
+        if self.is_complex:
+            self.value_text = _('complex data')
+        super(Observation,self).save(*args, **kwargs)

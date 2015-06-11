@@ -76,7 +76,7 @@ class Concept(models.Model):
         return self.related_to.filter(        
             from_concept__category=category,         
             from_concept__to_concept=self)
-    
+
 class RelationshipCategory(models.Model):
     """ A type of relationship between two concepts 
     """
