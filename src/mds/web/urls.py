@@ -54,7 +54,7 @@ urlpatterns = patterns(
     url(r'^device/$', DeviceListView.as_view(), name='device-list'),
     url(r'^device/new/$', DeviceCreateView.as_view(), name='device-create'),
     url(r'^device/(?P<pk>[^/]+)/$', DeviceUpdateView.as_view(), name='device-edit'),
-    url(r'^device/(?P<pk>\d+)/detail/$', DetailView.as_view(), name='device-detail'),
+    url(r'^device/(?P<pk>\d+)/detail/$', DeviceDetailView.as_view(), name='device-detail'),
 
     # Encounters
     url(r'^encounter/$', EncounterListView.as_view(),name='encounter-list'),

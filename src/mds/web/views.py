@@ -764,7 +764,7 @@ class DeviceUpdateView(ModelFormMixin, UpdateView):
     model = Device
     template_name = 'web/form.html'
 
-class DeviceDetailView(ModelFormMixin,DetailView):
+class DeviceDetailView(ModelFormMixin, DetailView):
     model = Device
     template_name = 'web/detail.html'
     context_object_name = 'device'
@@ -774,7 +774,7 @@ class DeviceDetailView(ModelFormMixin,DetailView):
 class EncounterListView(ModelListMixin,ListView):
     model = Encounter
     template_name = "web/list.html"
-    fields = ('created', 'procedure', 'subject')#,'uuid')
+    fields = ('created', 'procedure', 'subject')
     paginate_by=10
     
 class EncounterCreateView(ModelFormMixin,CreateView):
