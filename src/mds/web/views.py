@@ -803,7 +803,7 @@ class ObservationListView(ModelListMixin, ListView):
 
 class ObservationCreateView(ModelFormMixin,CreateView):
     model = Observation
-    template_name = "web/observation_create.html"
+    template_name = "web/form_new.html"
 
 class ObservationUpdateView(ModelFormMixin, UpdateView):
     model = Observation
