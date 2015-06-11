@@ -27,24 +27,12 @@
 }
 .content-list tr.headerrow button{
     font-size:0.1em;
+    min-width: 16px;
+    min-height: 16px;
 }
 
 .content-list tr.headerrow th{
-
-}
-.content-list thead tr.headerrow th ul{ 
-
-}
-.content-list  thead tr.headerrow th td ul li{
-
-}
-.content-list  thead tr.headerrow th td ul li button{
-
-}
-.content-list  thead tr.headerrow td ul li ul{
-}
-.content-list tr.headerrow td ul li ul li{
-    
+    min-width: 64px;
 }
 .content-list tfoot td{
     padding: 0px;
@@ -89,4 +77,8 @@
 }
 .content-list tr.oddrow:hover{
     background-color: lightblue;
+}
+
+.content-list td{
+    min-width:64px;
 }
