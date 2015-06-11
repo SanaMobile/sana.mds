@@ -68,3 +68,8 @@ class Encounter(models.Model):
     @models.permalink
     def get_absolute_url(self):
     	return ( 'core:encounter', { self.uuid : self.uuid } )
+
+    def __unicode__(self):
+        return u'{procedure} - {subject}'.format(
+            procedure=self.procedure,
+            subject=self.subject)
