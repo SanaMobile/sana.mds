@@ -31,6 +31,18 @@ MANAGERS = ADMINS
 # replace with mysql or other settings as necessary
 DATABASES = {
     'default': {
+        'NAME': 'mds',
+        'ENGINE': 'django.db.backends.mysql',
+        'USER': 'mds',
+        'PASSWORD': '********',
+        'HOST': '',
+        'PORT': '',
+    },
+}
+'''
+# SQLite configuration
+DATABASES = {
+    'default': {
         'NAME': '/var/local/www/databases/sqlite.db',
         'ENGINE': 'django.db.backends.sqlite3',
         'USER': '',
@@ -39,6 +51,7 @@ DATABASES = {
         'PORT': '',
     },
 }
+'''
 TIME_ZONE = 'America/Chicago'
 """Local time zone for this installation. Choices can be found here:
 
@@ -123,7 +136,7 @@ INSTALLED_APPS = (
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
-    'django.contrib.messages,'
+    'django.contrib.messages',
     'django.contrib.sites',
     'django.contrib.admin',
     'django.contrib.staticfiles',
