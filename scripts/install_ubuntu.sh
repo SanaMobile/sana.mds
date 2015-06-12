@@ -17,3 +17,16 @@ apt-get install                 \
     libjs-jquery-ui             \
     libjs-jquery-timepicker
 echo 'export MDS_DIR=/opt/sana/sana.mds' >> /etc/apache2/envvars
+adduser django
+usermod -a -G django www-data
+mkdir -p /opt/sana/cache                \
+    /opt/sana/sana.mds/cache/media      \
+    /opt/sana/sana.mds/cache/static     \
+    /opt/sana/sana.mds/cache/db
+ln -s /home/django/git/sana.mds/src/mds /opt/sana/sana.mds/mds
+mysql -u root -p
+cp ../include/mds/apache2/conf-available/mds.conf /etc/apache2/conf-available/
+a2enconf mds
+../src/mds/settings.py.tmpl ../src/mds/settings.py
+../src/mds/local_settings.py.tmpl ../src/mds/local_settings.py
+
