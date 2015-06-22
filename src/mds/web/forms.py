@@ -57,18 +57,36 @@ class EmptyEncounterForm(forms.ModelForm):
             "concept":forms.HiddenInput(),
         }
 
+def task_concepts():
+    qs = Concept.objects.filter(id__in=[26,27,28,29])
+    return qs
+
+def task_subjects():
+    qs = Subject.objects.all().exclude(voided=True)
+    return qs
+    
+def task_procedures():
+    qs = Procedure.objects.exclude(uuid__iexact="303a113c-6345-413f-88cb-aa6c4be3a07d")
+    return qs
+    
 class EncounterTaskForm(forms.ModelForm):
     """ Visits assigned to surgical advocate post S/P
     """
     class Meta:
         model = EncounterTask
-    subject = forms.ChoiceField(subject_choice_list(), label="Patient")
-    procedure = forms.ChoiceField(((x.uuid,x.title) for x in Procedure.objects.exclude(uuid__iexact="303a113c-6345-413f-88cb-aa6c4be3a07d")))
-    assigned_to = forms.ModelChoiceField(queryset=Observer.objects.all())
-    concept = forms.ChoiceField(concept_choice_list(), label="Type")
+    subject = forms.ModelChoiceField(queryset=task_subjects(), 
+    label="Patient",
+    to_field_name='uuid')
+    procedure = forms.ModelChoiceField(queryset=task_procedures(),
+    to_field_name='uuid')
+    assigned_to = forms.ModelChoiceField(queryset=Observer.objects.all(),
+    to_field_name='uuid')
+    concept = forms.ModelChoiceField(queryset=task_concepts(), 
+    label="Type",
+    to_field_name='uuid')
     due_on = forms.DateTimeField(widget=DateTimeSelectorInput(format='%Y-%m-%d %H:%M'))
-    started = forms.DateTimeField(widget=DateTimeSelectorInput(format='%Y-%m-%d %H:%M'))
-    completed = forms.DateTimeField(widget=DateTimeSelectorInput(format='%Y-%m-%d %H:%M'))
+    started = forms.DateTimeField(widget=DateTimeSelectorInput(format='%Y-%m-%d %H:%M'),required=False)
+    completed = forms.DateTimeField(widget=DateTimeSelectorInput(format='%Y-%m-%d %H:%M'),required=False)
     
 class InitialTaskSetForm(forms.Form):
     subject = forms.ChoiceField(subject_choice_list(), label="Patient")
