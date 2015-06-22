@@ -504,9 +504,10 @@ class ModelListMixin(SortMixin):
             if isinstance(field, ForeignKey):
                 field_obj = getattr(obj,f)
                 data['is_link'] = True
-                data['url'] = u'/mds/web/{model}/{uuid}/'.format(
-                    model=field_obj.__class__.__name__.lower(),
-                    uuid=unicode(field_obj.id))
+                if field_obj:
+                    data['url'] = u'/mds/web/{model}/{uuid}/'.format(
+                        model=field_obj.__class__.__name__.lower(),
+                        uuid=unicode(field_obj.id))
                 data['type'] = 'object'
             elif isinstance(field, FileField):
                 data['is_link'] = True
@@ -599,10 +600,11 @@ class ModelFormMixin(object):
                     data['secure'] = True
                 if isinstance(field, ForeignKey):
                     data['is_link'] = True
-                    data['link'] = u'/mds/web/{model}/{uuid}/'.format(
-                        model=field.model,
-                        uuid=unicode(getattr(obj,field.name)
-                        ))
+                    related = getattr(obj,field.name)
+                    if related:
+                        data['link'] = u'/mds/web/{model}/{uuid}/'.format(
+                            model=field.model,
+                            uuid=unicode(related.id))
                 elif isinstance(field, FileField):
                     data['is_link'] = True
                     data['link'] = u'/mds/media/{path}'.format(
@@ -637,10 +639,12 @@ class ModelFormMixin(object):
                     'input_type': 'text',
             }
             if isinstance(_field, ForeignKey):
+                related = getattr(obj, f)
                 data['is_link'] = True
-                data['url'] = u'/mds/web/{model}/{uuid}/'.format(
-                    model= f.lower(), 
-                    uuid=unicode(getattr(obj, f).id))
+                if related:
+                    data['url'] = u'/mds/web/{model}/{uuid}/'.format(
+                        model= f.lower(), 
+                        uuid=unicode(related.id))
                 data['type'] = 'ref'
             elif isinstance(_field, FileField):
                 data['is_link'] = True
@@ -914,10 +918,21 @@ class EncounterTaskListView(ModelListMixin, ListView):
     template_name = "web/list.html"
     paginate_by=10
 
-class EncounterTaskCreateView(ModelFormMixin,CreateView):
+    #def get_queryset(self):
+    #    status = self.kwargs.get('status',None)
+    #    
+    #    return EncounterTask.objects.filter(
+        
+
+class EncounterTaskCreateView(ModelFormMixin,ModelSuccessMixin,CreateView):
     model = EncounterTask
     template_name = "web/form_new.html"
     form_class = EncounterTaskForm
+    
+    #def form_valid(self, form):
+    #    concept = Concept.objects.get(uuid=form.instance.concept.uuid)
+    #    form.instance.concept = concept
+    #    return super(EncounterTaskCreateView, self).form_valid(form)
 
 class EncounterTaskUpdateView(ModelFormMixin, UpdateView):
     model = EncounterTask
