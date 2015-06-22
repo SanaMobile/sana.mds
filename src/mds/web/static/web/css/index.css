@@ -147,9 +147,14 @@ a.listfooter {
 .main-content > .main-content-header {
     background-color:rgba(20, 20, 20, 0.8);
     background-color: lightgrey;
+    font-size: 1.1em;
 }
 .main-content > .main-content-header table{
     width: 100%;
+}
+.main-content > .main-content-header td.title{
+    color: #9090aa;
+    font-size: 1.15em;
 }
 .main-content > .main-content-header table ul{
     display:block;
@@ -299,7 +304,6 @@ a.listfooter {
 
 th, td{
     padding: 5px;
-    min-width:196px;
 }
 .text-left{
     text-align: left;

@@ -15,7 +15,8 @@
 
 .horizontal-menu nav ul {
     background: #4b545f; 
-    padding:  0px auto;
+    padding:  0 auto;
+    margin: 0 auto;
     border-radius: 5px;  
     list-style: none;
     position: relative;

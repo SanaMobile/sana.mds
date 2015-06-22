@@ -200,9 +200,9 @@
   <div class="main-content-header">
     <table >
         <tr>
-            <td class="text-left"><a href="{% url 'web:portal' %}"><h3>{% trans "Home" %}</h3></a></td>
-            <td class="center"><h2><strong>{% block header %}{% endblock %}</strong></h2></td>
-            <td class="text-right"><a href="{% url 'web:logout' %}"><h3 class="text-right">{% trans "Logout" %}</h3></a></td>
+            <td class="text-left"><a href="{% url 'web:portal' %}">{% trans "Home" %}</a></td>
+            <td class="title"><strong>{% block header %}{% endblock %}</strong></td>
+            <td class="text-right"><a href="{% url 'web:logout' %}">{% trans "Logout" %}</a></td>
         </tr>
     </table>
     {% if portal %}
