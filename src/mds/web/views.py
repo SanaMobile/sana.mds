@@ -150,7 +150,8 @@ def web_root(request, **kwargs):
                               'flavor': metadata.flavor,
                               'errors': metadata.errors,
                               'messages' : metadata.messages,
-                              'models' : objects.__all__
+                              'models' : objects.__all__,
+                              'portal': portal_site,
                             }))
 
 def registration(request, **kwargs):
@@ -160,7 +161,8 @@ def registration(request, **kwargs):
                               'form':  SurgicalSubjectForm(),
                               'flavor': metadata.flavor,
                               'errors': metadata.errors,
-                              'messages' : metadata.messages
+                              'messages' : metadata.messages,
+                              'portal': portal_site,
                                }))
 
 @login_required(login_url='/mds/login/')
@@ -198,7 +200,8 @@ def encounter_task(request, **kwargs):
                                  'form':form,
                                  'flavor': flavor,
                                  'errors': errors,
-                                 'debug' : debug
+                                 'debug' : debug,
+                                 'portal': portal_site,
                                 })
                              )
 # TODO make this better
@@ -240,7 +243,8 @@ def edit_encounter_task(request, uuid, **kwargs):
                                  'form':form,
                                  'flavor': flavor,
                                  'errors': errors,
-                                 'debug' : debug
+                                 'debug' : debug,
+                                 'portal': portal_site,
                                 })
                              )
 @login_required(login_url='/mds/login/')
@@ -318,7 +322,8 @@ def web_encounter(request, **kwargs):
                                  'flavor': flavor,
                                  'errors': errors,
                                  'messages' : debug,
-                                 'debug' : debug
+                                 'debug' : debug,
+                                 'portal': portal_site,
                                 })
                              )
 
@@ -664,7 +669,6 @@ class ModelFormMixin(object):
     def get_context_data(self, **kwargs):
         context = super(ModelFormMixin, self).get_context_data(**kwargs)
         context['model'] = self.model.__name__.lower()
-        #context['form'] = self.form(self.object)
         context['fields'] = self._fields
         if context.has_key('object'):
             context['objects'] = [self.get_object_dict(context['object']),]
@@ -918,11 +922,20 @@ class EncounterTaskListView(ModelListMixin, ListView):
     template_name = "web/list.html"
     paginate_by=10
 
-    #def get_queryset(self):
-    #    status = self.kwargs.get('status',None)
-    #    
-    #    return EncounterTask.objects.filter(
-        
+    def get_queryset(self):
+        qs = EncounterTask.objects.all()
+        status = self.request.GET.get('status',None)
+        if status:
+            setattr(self,'status',status)
+            return qs.filter(status__id=int(status))
+        else:
+            return qs
+
+    def get_context_data(self, **kwargs):
+        context = super(EncounterTaskListView,self).get_context_data(**kwargs)
+        if hasattr(self,'status'):
+            context['status'] = self.status
+        return context
 
 class EncounterTaskCreateView(ModelFormMixin,ModelSuccessMixin,CreateView):
     model = EncounterTask
