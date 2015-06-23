@@ -7,6 +7,7 @@ from datetime import datetime
 from django import forms
 from django.forms.extras.widgets import SelectDateWidget
 from  django.forms.widgets import PasswordInput
+from django.utils.translation import ugettext_lazy as _
 
 from django.contrib.auth.models import User
 
@@ -75,38 +76,57 @@ class EncounterTaskForm(forms.ModelForm):
     class Meta:
         model = EncounterTask
     subject = forms.ModelChoiceField(queryset=task_subjects(), 
-    label="Patient",
-    to_field_name='uuid')
+        label=_("Patient"),
+        to_field_name='uuid')
     procedure = forms.ModelChoiceField(queryset=task_procedures(),
-    to_field_name='uuid')
+        label = _('Procedure'),
+        to_field_name='uuid')
     assigned_to = forms.ModelChoiceField(queryset=Observer.objects.all(),
-    to_field_name='uuid')
+        label = _('Assigned To'),
+        to_field_name='uuid')
     concept = forms.ModelChoiceField(queryset=task_concepts(), 
-    label="Type",
-    to_field_name='uuid')
-    due_on = forms.DateTimeField(widget=DateTimeSelectorInput(format='%Y-%m-%d %H:%M'))
-    started = forms.DateTimeField(widget=DateTimeSelectorInput(format='%Y-%m-%d %H:%M'),required=False)
-    completed = forms.DateTimeField(widget=DateTimeSelectorInput(format='%Y-%m-%d %H:%M'),required=False)
+        label=_("Type"),
+        to_field_name='uuid')
+    due_on = forms.DateTimeField(
+        widget=DateTimeSelectorInput(format='%Y-%m-%d %H:%M'),
+        label=_("Due On"))
+    started = forms.DateTimeField(
+        widget=DateTimeSelectorInput(format='%Y-%m-%d %H:%M'),
+        required=False,
+        label=_("Started"))
+    completed = forms.DateTimeField(
+        widget=DateTimeSelectorInput(format='%Y-%m-%d %H:%M'),
+        required=False,
+        label=_("Completed"))
     
 class InitialTaskSetForm(forms.Form):
-    subject = forms.ChoiceField(subject_choice_list(), label="Patient")
+    subject = forms.ChoiceField(subject_choice_list(), label=_("Patient"))
     procedure = forms.ChoiceField(((x.uuid,x.title) for x in Procedure.objects.exclude(uuid__iexact="303a113c-6345-413f-88cb-aa6c4be3a07d")))
-    assigned_to = forms.ModelChoiceField(queryset=SurgicalAdvocate.objects.all())
-    concept = forms.ChoiceField(concept_choice_list(), label="Type")
-    due_on = forms.DateTimeField(widget=DateSelectorInput(), label="Initial Visit")
-    due_second = forms.DateTimeField(widget=DateSelectorInput(), label="Regular follow up")
-    due_thirty = forms.DateTimeField(widget=DateSelectorInput(), label="30 day follow up")
+    assigned_to = forms.ModelChoiceField(queryset=SurgicalAdvocate.objects.all(),
+        label=_('Assigned To'))
+    concept = forms.ChoiceField(concept_choice_list(), 
+        label=_("Type"))
+    due_on = forms.DateTimeField(widget=DateSelectorInput(), 
+        label=_("Initial Visit"))
+    due_second = forms.DateTimeField(widget=DateSelectorInput(), label=_("Regular follow up"))
+    due_thirty = forms.DateTimeField(widget=DateSelectorInput(), label=_("30 day follow up"))
+    
 class SurgicalSubjectForm(forms.ModelForm):
     """ A simple patient form
     """
     #use_age = forms.BooleanField()
     #age = forms.IntegerField(required=False,
     #    widget=AgeInput(),min_value=0)
-    system_id = forms.CharField(max_length=64,label="HAS Number")
-    contact_one = forms.CharField(required=False,label="Telephone number one")
-    contact_two = forms.CharField(required=False,label="Telephone number two")
-    contact_three = forms.CharField(required=False,label="Telephone number three")
-    contact_four = forms.CharField(required=False,label="Telephone number four")
+    system_id = forms.CharField(max_length=64,
+        label=_("HAS Number"))
+    contact_one = forms.CharField(required=False,
+        label=_("Telephone number one"))
+    contact_two = forms.CharField(required=False,
+        label=_("Telephone number two"))
+    contact_three = forms.CharField(required=False,
+        label=_("Telephone number three"))
+    contact_four = forms.CharField(required=False,
+        label=_("Telephone number four"))
     class Meta:
         model = SurgicalSubject
         fields = [
@@ -117,7 +137,6 @@ class SurgicalSubjectForm(forms.ModelForm):
             'gender',
             'image',
             'location',
-            #'national_id',
             'house_number',
             'family_number',
             'contact_one',
@@ -126,27 +145,30 @@ class SurgicalSubjectForm(forms.ModelForm):
             'contact_four',
         ]
         widgets = {
-            'dob': DateTimeSelectorInput()
+            'dob': DateTimeSelectorInput(),
+            'label': _('Date of Birth'),
         }
 
 def diagnosis_choices():
-    choice_list = ( "Inguinal Hernia",
-                    "Other Hernia",
-                    "Breat Mass", 
-                    "Other Mass", 
-                    "Other")
+    choice_list = ( _("Inguinal Hernia"),
+                    _("Other Hernia"),
+                    _("Breat Mass"), 
+                    _("Other Mass"), 
+                    _("Other"))
     return ((x,x) for x in choice_list )
 
 def operation_choices():
-    choice_list = ( "Inguinal Hernia Repair",
-                    "Other Hernia Repair",
-                    "Breat Biopsy",
-                    "Mastectomy",
-                    "Mastectomy+Axillary LN Dissection",
-                    "Mastectomy+Axillary LN Biospy",
-                    "Biopsy, other",
-                    "Excision of Mass other than breast",
-                    "Other Operation")
+    choice_list = ( 
+        _("Inguinal Hernia Repair"),
+        _("Other Hernia Repair"),
+        _("Breat Biopsy"),
+        _("Mastectomy"),
+        _("Mastectomy+Axillary LN Dissection"),
+        _("Mastectomy+Axillary LN Biospy"),
+        _("Biopsy, other"),
+        _("Excision of Mass other than breast"),
+        _("Other Operation"),
+    )
     return ( (x,x) for x in choice_list)
     
 def advocate_choices():
