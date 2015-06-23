@@ -237,6 +237,19 @@ site = {
                 ]
             },
             {
+                'label':'Forms',
+                'views':[
+                    { 
+                        'label': 'Intake Form',
+                        'context_name':'intake',
+                    },
+                    { 
+                        'label': 'Patient Registration',
+                        'context_name':'register-patient',
+                    }
+                ]
+            },
+            {
                 'label':'Reports',
                 'views':[]
             },
