@@ -1,7 +1,8 @@
 {% extends "web/base.html" %}
-{% block script %}
-{{ block.super }}
-<script>
+{% block extrastyle %}
+<link rel="stylesheet" href="{{ STATIC_PREFIX }}web/css/liststyle.css">
+{% endblock %}
+{% block extrascript %}
 function logTokens(){
     var sessionid = readCookie("sessionid");
     var csrftoken = readCookie("csrftoken");
@@ -58,15 +59,32 @@ function submitSubjectWeb(){
     postAjaxWithHeaders(url,data,headers,successCB,failCB);
     //submitSubjectSSI(system_id, given_name, family_name, dob, gender, location, image,successCB,failCB);
 }
-</script>
 {% endblock %}
 
 {% block content %}
-<div id="tabs-1" class="ui-content">
-    {{ form.as_p }}
-  <input type="hidden" name="subject" id="id_subject">
+<form>
+{% for hidden in form.hidden_fields %}
+    {{ hidden }}
+{% endfor %}
+{# Include the visible fields #}
+<table class="content-list">
+<tbody>
+{% for field in form.visible_fields %}
+<tr class="{% cycle 'evenrow' 'oddrow' %}" style="padding:3px">
+    <td class="text-left">
+            <div class="fieldWrapper">
+            {{ field.errors }}{{ field.label_tag }}
+            </div>
+    </td>
+    <td class="text-right">
+        {{ field }}
+    </td>
+</tr>
+{% endfor %}
+</tbody>
+</table>
   <p align="center" style="font-size:larger">
     <input type="button" id="id_submit_patient" class="show-page-loading-msg" value="Create Patient" onClick="submitSubjectWeb()">
   </p>
-</div>
+</form>
 {% endblock content %}

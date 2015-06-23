@@ -1,16 +1,10 @@
 {% extends "web/base.html" %}
-{% block meta %}
-  {{ block.super }}
-  <meta name="flavor" value="{{ flavor }}"/>
-{% endblock meta %}
+{% load static %}
+{% block extrastyle %}
+<link rel="stylesheet" href="{{ STATIC_PREFIX }}web/css/liststyle.css">
+{% endblock %}
 
-{% block script %}
-{% if flavor and flavor == "mobile" %}
-
-{% else %}
-  {{ block.super }}
-{% endif %}
-<script>
+{% block extrascript %}
     var pending = 0;
     function postSuccess(data){
         if(data){
@@ -115,10 +109,7 @@
         postObs(encounter, '5', 'd24cf683-4b51-46d8-a4c4-154c38e1dd38', value, postSuccessObs);
     }
     
-</script>
-{% endblock script %}
-    {% block flavorscript %}
-      $(function(){
+    $(function(){
       //$( "input[type='date']" ).datepicker({ dateFormat: 'mm/dd/yy', changeYear: true });
         $('input[type="date"]').datepicker({ dateFormat: 'yy-mm-dd', changeYear: true , yearRange : "c-100:c+05"}).prop('type','text');
         $('input[type="date"]').prop('type','text');
@@ -131,16 +122,34 @@
       });
     });
 
-    {% endblock flavorscript %}
+{% endblock extrascript %}
 
 {% block content %}
 <form name="intake" id="id_form" action="javascript:submitEncounterWeb()" method="post">
-  {% if flavor and flavor == "mobile" %}
-    {{ form }}
-  {% else %}
-    {{ form.as_p }}
-  {% endif %}
-    <input type="checkbox" name="new_tasks" id="id_new_tasks" value="true">Create default tasks</input>
+{% for hidden in form.hidden_fields %}
+    {{ hidden }}
+{% endfor %}
+{# Include the visible fields #}
+<table class="content-list">
+<tbody>
+    {% for field in form.visible_fields %}
+    <tr class="{% cycle 'evenrow' 'oddrow' %}" style="padding:3px">
+        <td class="text-left">
+            <div class="fieldWrapper">
+            {{ field.errors }}{{ field.label_tag }}
+            </div>
+        </td>
+        <td class="text-right">{{ field }}</td>
+    </tr>
+    {% endfor %}
+    <tr>
+        <td colspan="2">
+            <input type="checkbox" name="new_tasks" id="id_new_tasks" value="true">Create default tasks</input>
+        </td>
+    </tr>
+</tbody>
+</table>
+
   <p align="center" style="font-size:larger">
     <input type="button" id="id_submit" class="show-page-loading-msg" value="Submit" onClick="submitEncounterWeb()">
   </p>
