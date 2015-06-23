@@ -333,3 +333,36 @@ td.text-top{
 .errorlist li{
     color:red;
 }
+.content-form{
+    margin: 0 auto;
+    min-width: 420px;
+}
+.content-form  ul li..evenrow{
+    background-color: #efefef;
+}
+.content-form ul li.oddrow{
+    background-color: #ffffff;
+}
+.content-form ul{
+    min-width: 420px;
+}
+.content-form ul li{
+    width: 420px;
+    margin: 5px;
+}
+.content-form ul li div.fieldwrapper{
+    min-width: 420px;
+    margin: 5px;
+}
+.content-form ul li div label{
+    left: 0px;
+    position: relative;
+}
+.content-form ul li div input{
+    right: 0px;
+    position: relative;
+}
+.content-form ul li div input{
+    right: 0px;
+    position: relative;
+}
