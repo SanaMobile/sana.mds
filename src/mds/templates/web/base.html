@@ -28,7 +28,7 @@
     <link rel="stylesheet" href="{{ STATIC_PREFIX }}web/css/jquery-ui-timepicker-addon.css" />
   {% endblock style %}
   {% block extrastyle %}{% endblock %}
-  {% block script %}
+  {% block srcscript %}
   <script src="{{ STATIC_PREFIX }}js/jquery-1.10.1.js"></script>
   <script src="{{ STATIC_PREFIX }}js/jquery-ui.js"></script>
   <script src="{{ STATIC_PREFIX }}js/jquery.serializejson.js"></script>
@@ -38,6 +38,8 @@
   <script src="{{ STATIC_PREFIX }}web/js/functions.js" />
   <script src="{{ STATIC_PREFIX }}web/js/jquery-ui-timepicker-addon.js"></script>
   <script src="{{ STATIC_PREFIX }}web/js/jquery-ui-sliderAccess.js"></script>
+{% endblock srcscript %}
+{% block script %}
   <script>
     var procedure = "303a113c-6345-413f-88cb-aa6c4be3a07d";
     var subject = null;
@@ -165,35 +167,10 @@
         return $.cookie("register");
     }
 
-{% block extrascript %}{% endblock extrascript %}
-  </script>
-
-  {% endblock script %}
-
-  <script type="text/javascript">
-    root="";
-    {% block flavorscript %}
-      // Displays Date picker pop up
-      $(function(){
-        $('input[type="date"]').datepicker({ 
-            dateFormat: 'yy-mm-dd', 
-            changeYear: true , 
-            yearRange : "c-100:c+05"
-            }).prop('type','text');
-        $('input[type="date"]').prop('type','text');
-      });
-
-    // Workaround for safari issues
-    $(function() {
-      $( "select[multiple='multiple']").selectable();
-      $( "select[multiple='multiple']").on("selectablestart", function (event, ui) {
-        event.originalEvent.ctrlKey = true;
-      });
-    });
-
-    {% endblock flavorscript %}
-  </script>
-  </head>
+    {% block extrascript %}{% endblock extrascript %}
+    </script>
+{% endblock script %}
+</head>
 <body>
 <div class="wrapper">
   <section class="main-content">
