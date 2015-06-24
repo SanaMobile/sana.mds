@@ -1,0 +1,131 @@
+{% extends 'web/base.html' %}
+{% block content %}
+<div>
+<ul>
+    <li>
+        <label for="id_date">Date</label>
+        <input id="id_date" type="date" />
+    </li>
+    <li>
+        <label for="id_subject">Patient</label>
+        <input id="id_subject" type="text" />
+    </li>
+    <li>
+        <label for="id_visit_type">Type of clinic visit:</label>
+        <select>
+            <option>Routine post-op</option>
+            <option>Referral for symptoms</option>
+        </select>
+    </li>
+</ul>
+</div>
+<hr>
+<div>
+    <h4>Please use the following definition of surgical site infection (SSI):</h4>
+    <p>Infection occurs within 30 days after any operative procedure 
+    <strong>AND</strong> the patient has at least one of the following:
+    </p>
+    <ul>
+        <li>a. Purulent drainage from the incision.</li>
+        <li>b. Organisms isolated from a culture of fluid or tissue from the incision.</li>
+        <li>c. Incision that spontaneously dehisces or is deliberately opened by a surgeon.</li>
+        <li>d. Diagnosis of an SSI by the surgeon.</li>
+    </ul>
+    <p><strong>DO NOT</strong> report SSI if:</p>
+    <ul>
+        <li>Stitch abscess: minimal inflammation and discharge confined to the points of suture penetration.</li>
+        <li>Cellulits: erythema without swelling, fluctuance or drainage from the incision.</li>
+    </ul>
+</div>
+<hr>
+<form>
+<div>
+    <ul>
+        <li>
+            <label for="id_ssi_present">Is there an SSI?<label>
+            <select id="id_ssi_present">
+                <option value="true">Yes</option>
+                <option value="false">No</option>
+            </select>
+        </li>
+    </ul>
+</div>
+<div id="id_ssi_present_true">
+    <form>
+    <ul>
+    <li>
+        <label for="id_earlier_evaluation">Would an earlier evaluation have been beneficial?</label>
+        <select id="id_ssi_present">
+            <option value="true">Yes</option>
+            <option value="false">No</option>
+        </select>
+    </li>
+    <li>
+        <label>What is the treatment plan?(Check all that apply)</label>
+        <form id="id_tx_plan">
+            <ul>
+                <li><input id="" type="checkbox">Antibiotics</input></li>
+                <li><input id="" type="checkbox">Open the incision and pack at the bedside</input></li>
+                <li><input id="" type="checkbox">Drainage in the operating room - local anesthesia</input></li>
+                <li><input id="" type="checkbox">Drainage in the operating room -general or spinal anesthesia</input></li>
+                <li><input id="" type="checkbox">Readmission</input></li>
+            <ul>
+        </form>
+    </li>
+    </ul>
+    </form>
+</div>
+<div id="id_ssi_present_false">
+    <p>Stop here if this is a routine post-op visit. Continue if the patient was referred for symptoms.</p>
+    <hr>
+    <form>
+        <ul>
+            <li>
+                <label for="id_evaluation_necessary">Was the referral appropriate?</label>
+                <select id="id_evaluation_necessary">
+                    <option value="true">Yes, the symptoms warranted evaluation</option>
+                    <option value="false">No, evaluation was not necessary</option>
+                </select>
+            </li>
+            <li>
+                <label for="id_tx_necessary">Is any treatment necessary?</label>
+                <select id="id_tx_necessary">
+                    <option value="false">No</option>
+                    <option value="true">Yes</option>
+                </select>
+                <div id="id_describe_tx">
+                    <label for="id_describe_tx">If Yes (please describe):</label>
+                    <input type="text" id="id_describe_tx"/>
+                </div>
+            </li>
+            <li>
+                <label for="id_follow_up_necessary">Is another follow up necessary?</label>
+                <select id="id_follow_up_necessary">
+                    <option value="false">No</option>
+                    <option value="false">Yes, another visit is justified </option>
+                </select>
+            </li>
+        </ul>
+    </form>
+</div>
+<div id="output">
+</div>
+<script>
+
+    $('#id_ssi_present_true').slideUp("fast");
+    $('#id_ssi_present_false').slideUp("fast");
+    $('#id_ssi_present').change(function(){
+        val = $(this).val(); 
+
+        if (val == "true"){
+            $('#output').text(val);
+            $('#id_ssi_present_true').slideDown("fast");
+            $('#id_ssi_present_false').slideUp("fast");
+        } else if (val == "false"){
+            $('#output').text(val);
+            $('#id_ssi_present_true').slideUp("fast");
+            $('#id_ssi_present_false').slideDown("fast");
+        }
+    })
+</script>
+{% endblock content %}
