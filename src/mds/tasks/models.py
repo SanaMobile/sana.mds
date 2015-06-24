@@ -1,5 +1,6 @@
 import datetime
 from django.db import models
+from django.utils.translation import ugettext_lazy as _
 
 from mds.api.utils import make_uuid
 from mds.core.models import Encounter, Instruction, Subject, Observer, Procedure,Concept
@@ -33,6 +34,10 @@ class Status(models.Model):
         return self.current
 
 class Task(models.Model):
+
+    class Meta:
+        verbose_name = _('Task')
+        verbose_name_plural = _('Tasks')
 
     uuid = models.SlugField(max_length=36, unique=True, default=make_uuid, editable=False)
     """ A universally unique identifier """
@@ -79,21 +84,32 @@ class Task(models.Model):
 
 class EncounterTask(Task):
     """An encounter task that must be completed."""
-    subject = models.ForeignKey(Subject, to_field='uuid')
+    class Meta:
+        verbose_name = _('Encounter Task')
+        verbose_name_plural = _('Encounter Tasks')
+    subject = models.ForeignKey(Subject, to_field='uuid',)
     """Who the task will be executed on."""
 
-    procedure = models.ForeignKey(Procedure, to_field='uuid')
+    procedure = models.ForeignKey(Procedure, to_field='uuid',
+        verbose_name=_('procedure'))
     """What will be executed."""
 
-    encounter = models.ForeignKey(Encounter, to_field='uuid', null=True, blank=True)
+    encounter = models.ForeignKey(Encounter, to_field='uuid', null=True, blank=True,
+        verbose_name=_('encounter'))
     """The encounter that was collected when the task was executed"""
 
 class ObservationTask(Task):
     """A single instruction that must be executed for an encounter such as for
        follow up data collection related to the original encounter.
     """
-    encounter = models.ForeignKey(Encounter, to_field='uuid')
+    class Meta:
+        verbose_name = _('Observation Task')
+        verbose_name_plural = _('Observation Tasks')
+
+    encounter = models.ForeignKey(Encounter, to_field='uuid',
+        verbose_name=_('encounter'))
     """Who or what the instruction will be executed on"""
 
-    instruction = models.ForeignKey(Instruction, to_field='uuid')
+    instruction = models.ForeignKey(Instruction, to_field='uuid',
+        verbose_name=_('instruction'))
     """What will be executed."""
