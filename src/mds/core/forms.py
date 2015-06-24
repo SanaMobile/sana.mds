@@ -97,3 +97,6 @@ class SubjectForm(forms.ModelForm):
     """
     class Meta:
         model = Subject
+        widgets = {
+            'dob': DateSelectorInput(),
+        }
