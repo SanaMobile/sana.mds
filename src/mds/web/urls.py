@@ -18,11 +18,6 @@ urlpatterns = patterns(
     url(r'^accounts/login/$', auth_views.login),
     url(r'^login/$', 'mds.web.views.login', name='login'),
     url(r'^logout/$', 'mds.web.views.logout',name='logout'),
-    #url(r'^login/$', 'django.contrib.auth.views.login'),
-    #url(r'^mobile/authenticate/$', 'views.mobile_authenticate', name='mobile-authenticate'),
-    url(r'^etask/$', 'mds.web.views.encounter_task', name='encounter-task'),
-    url(r'^etask/list/$', 'mds.web.views.task_list', name='encounter-task-list'),
-    url(r'^etask/(?P<uuid>[^/]+)/$', 'mds.web.views.edit_encounter_task', name='edit-encounter-task'),
     url(r'^registration/$', 'mds.web.views.registration', name='register-patient'),
     url(r'^intake/$', 'mds.web.views.web_encounter', name='intake'),
 
@@ -96,5 +91,13 @@ urlpatterns = patterns(
     url(r'^encountertask/new/$', EncounterTaskCreateView.as_view(),name='encountertask-create'),
     url(r'^encountertask/(?P<pk>[^/]+)/$', EncounterTaskUpdateView.as_view(),name='encountertask-edit'),
     url(r'^encountertask/(?P<pk>\d+)/detail/$', EncounterTaskDetailView.as_view(), name='encountertask-detail'),
+
+    # Forms
+    #url(r'^encounterreview/$', EncounterReviewList.as_view(), name='encountertaskreview-list'),
+    #url(r'^encounterreview/new/$', EncounterReviewCreate.as_view(), name='encountertaskreview-create'),
+    #url(r'^encounterreview/(?P<pk>\d+)/$', EncounterReviewUpdate.as_view(), name='encountertaskreview-edit'),
+    #url(r'^encounterreview/(?P<pk>\d+)/detail/$', EncounterReviewDetail.as_view(), name='encountertaskreview-detail'),
+    
+    url(r'^forms/clinicform/$', 'mds.web.views.surgeon_clinic_form', name='clinic-form'),
 )
 
