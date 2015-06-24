@@ -6,18 +6,13 @@
 <link rel="stylesheet" href="{{ STATIC_PREFIX }}web/css/formstyle.css">
 {% endblock %}
 {% block extrascript %}
-/*
-    $(document).ready(function(){
-        $("#id_password").attr("type","password");
-        $("#id_password").val("");
-        $("#id_username").val("");
-    });
-*/
+    /*
     $(document).ready(function(){
         $( document ).on( 'focus', ':input', function(){
             $( this ).attr( 'autocomplete', 'off' );
         });
     });
+    */
 {% endblock %}
 {% block content %}
 <form enctype="multipart/form-data" action="{% url 'web:'|add:model|add:'-create' %}" method="post">
@@ -33,6 +28,23 @@
     {% endif %}
     </div>
 </form>
-<div id="wait">
-</div>
+<script type="text/javascript">
+    // Displays Date picker pop up
+    $(function(){
+        $('input[type="date"]').datepicker({ 
+            dateFormat: 'yy-mm-dd', 
+            changeYear: true , 
+            yearRange : "c-100:c+05"
+            }).prop('type','text');
+        $('input[type="date"]').prop('type','text');
+     });
+
+    // Workaround for safari issues
+    $(function() {
+      $( "select[multiple='multiple']").selectable();
+      $( "select[multiple='multiple']").on("selectablestart", function (event, ui) {
+        event.originalEvent.ctrlKey = true;
+      });
+    });
+</script>
 {%endblock content %}
