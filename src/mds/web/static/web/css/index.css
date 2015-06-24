@@ -1,14 +1,13 @@
 html, body{
   height:100%;
   margin:0px;
+  padding: 0px;
 }
 
 body {
+  font-family: sans-serif;
   min-height:100%;
-  font-size: 18px;
-  font-family: 'Source Sans Pro', helvetica, sans-serif;
-  font-weight: 200;
-  color: #6e6e6e; 
+  color: #3b3b3b; 
 }
 .listfooter{
     -webkit-column-count: 3; /* Chrome, Safari, Opera */
@@ -35,29 +34,33 @@ body {
 p {
   margin-top: 0;
   margin-bottom: 0;
-  padding-top: 10px;
-  padding-bottom: 10px; }
+  padding-top: 5px;
+  padding-bottom: 5px; }
 
 h1 {
-  padding-top: 20px;
-  padding-bottom: 20px;
-  margin: 0;
+  padding-top: 5px;
+  padding-bottom: 5px;
+  margin: 0 auto;
   font-weight: 200; }
 
 h2 {
-  padding-top: 10px;
-  padding-bottom: 10px;
+  padding-top: 5px;
+  padding-bottom: 5px;
   margin: 0;
-  font-weight: 200; }
+  font-weight: 200; 
+}
 
 h3 {
-  padding-top: 6px;
-  padding-bottom: 6px;
+  padding-top: 5px;
+  padding-bottom: 5px;
   margin: 0;
-  font-weight: 200; }
+  font-weight: 200; 
+}
 
 ul {
   list-style-type: none;
+  padding: 5px;
+  margin: 0 auto;
 }
 
 .main-content > footer {
@@ -173,7 +176,7 @@ a.listfooter {
     text-decoration: none;
     font-weight: bold;
     padding: 5px;
-    width: 192px;
+    min-width: 64px;
 }
 .main-content > .main-content-header table a:hover {
     color: #ffffff; 
@@ -182,8 +185,7 @@ a.listfooter {
     
 }
 .main-content > .main-content-body {
-    padding-top: 0px;
-    padding-bottom: 64px;
+    padding: 5px;
     text-align: left;
 }
 .main-content > .main-content-body a {
@@ -194,8 +196,6 @@ a.listfooter {
     
 }
 .main-content > .main-content-body > .main-content-body-inner {
-    padding-top: 10px;
-    padding-bottom: 20px; 
 }
 
 .main-content > .main-content-body > .main-content-body-inner > h2 {
@@ -211,7 +211,7 @@ a.listfooter {
     padding-right: 14px; 
 }
 .main-content > .main-content-body > .main-content-body-inner > h2 + ul > li + li {
-    padding-top: 10px; 
+    padding-top: 0px; 
 }
 .main-content > .main-content-body > .main-content-body-inner h3 {
     border-bottom: 1px solid #51648b; 
