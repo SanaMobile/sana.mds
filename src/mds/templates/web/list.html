@@ -34,7 +34,7 @@
         <th class="left" id="{{ label }}-sort">
             <table>
             <tr>
-                <td><strong>{{ label|title }}</strong>
+                <td>{{ label|title }}</td>
                 <td>
                     <ul>
                         <li><button id="{{ label }}-sort-asc" title="{% trans 'Filter Ascending' %}">&#9650;</button></li>
@@ -43,7 +43,6 @@
                 </td>
             </tr>
             </table>
-            </span>
             <script>
                 $('#{{ label }}-sort-all').on('click', function(){
                         url = "{% url 'web:'|add:model|add:'-list' %}";
