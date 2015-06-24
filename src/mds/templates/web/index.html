@@ -1,10 +1,4 @@
 {% extends "web/base.html" %}
-{% block script %}
-  {{ block.super }}
-  <script>
-    //setMode("verbose");
-  </script>
-{% endblock %}
 {% block title %}{{ portal.name|title }}{% endblock title %}
 {% load i18n %}
 {% block header %}{{ portal.name|title }}{% endblock header %}
