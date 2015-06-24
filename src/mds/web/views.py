@@ -962,6 +962,18 @@ class EncounterTaskDetailView(ModelFormMixin,DetailView):
 #     model = @
 #     template_name = "web/@_list.html"
 
+def surgeon_clinic_form(request, *args, **kwargs):
+    sas = SurgicalAdvocate.objects.filter(voided=False)
+    return render_to_response(
+        "web/surgical_clinic_form.html", 
+        context_instance=RequestContext(
+            request, 
+            {
+                
+                'portal':portal_site,
+            }
+        )
+    )
 
 @login_required(login_url="/mds/web/login/")
 def portal(request):
@@ -979,3 +991,5 @@ def portal(request):
         'web/index.html',
         context,
     )
+
+
