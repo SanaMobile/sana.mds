@@ -246,6 +246,10 @@ site = {
                     { 
                         'label': 'Patient Registration',
                         'context_name':'register-patient',
+                    },
+                    { 
+                        'label': 'Clinic Form',
+                        'context_name':'clinic-form',
                     }
                 ]
             },
