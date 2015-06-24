@@ -219,6 +219,15 @@
   </section>
 </div>
 <div id="loader" class="loader"></div>
+<script>
+    $(document).ajaxStart(function() {
+        // show loader on start
+        $("#loader").css("display","block");
+    }).ajaxSuccess(function() {
+        // hide loader on success
+        $("#loader").css("display","none");
+    });
+</script>
 <footer>
 <div>
 {% block footer %}
@@ -229,14 +238,5 @@
 {% endblock footer %}
 </div>
 </footer>
- <script>
-      $(document).ajaxStart(function() {
-        // show loader on start
-        $("#loader").css("display","block");
-      }).ajaxSuccess(function() {
-      // hide loader on success
-      $("#loader").css("display","none");
-    });
-</script>
 </body>
 </html>
