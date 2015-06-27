@@ -149,7 +149,6 @@ a.listfooter {
 }
 .main-content > .main-content-header {
     background-color:rgba(20, 20, 20, 0.8);
-    background-color: lightgrey;
     font-size: 1.1em;
 }
 .main-content > .main-content-header table{
@@ -170,6 +169,7 @@ a.listfooter {
     text-decoration: none;
     font-weight: bold;
     padding: 5px;
+    color: #ABB6BE;
 }
 .main-content > .main-content-header table a h3{
     display: block;

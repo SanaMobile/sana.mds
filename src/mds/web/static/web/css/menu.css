@@ -31,7 +31,7 @@
 
 .horizontal-menu nav ul li {
     float: left;
-    width: 192px;
+    width: 128px;
 }
 .horizontal-menu nav ul li:hover {
     background: #4b545f;
@@ -45,7 +45,7 @@
 .horizontal-menu nav ul li a {
     display: block; 
     padding: 0px 20px;
-    color: #848484; 
+    color: #ABB6BE; 
     text-decoration: none;
 }
             
