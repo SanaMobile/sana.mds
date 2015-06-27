@@ -5,11 +5,32 @@
 """
 
 from django.contrib import admin
+from django.http import HttpResponse
 from .models import * 
 
 def mark_voided(modeladmin,request,queryset):
     queryset.update(voided=True)
 mark_voided.short_description = "Mark selected voided"
+
+def download_csv(modeladmin,request,queryset):
+    import csv, codecs
+    from django.utils.encoding import smart_str
+    opts = queryset.model._meta
+    model = queryset.model
+    response = HttpResponse(mimetype='text/csv')
+    # force download.
+    response['Content-Disposition'] = 'attachment;filename=export.csv'
+    # the csv writer
+    writer = csv.writer(response)
+    field_names = [field.name for field in opts.fields]
+    # Write a first row with header information
+    #writer.writerow(codecs.BOM_UTF16_LE)
+    writer.writerow([unicode(name).encode("utf-8") for name in field_names])
+    # Write data rows
+    for obj in queryset:
+        writer.writerow([unicode(getattr(obj, field)).encode("utf-8") for field in field_names])
+    return response
+download_csv.short_description = "Download selected as csv"
 
 class DeviceAdmin(admin.ModelAdmin):
     readonly_fields = ['uuid']  
@@ -38,7 +59,7 @@ class ConceptAdmin(admin.ModelAdmin):
     readonly_fields = ['uuid']  
     list_display = ['name', 'uuid']
     list_filter = ['name',]
-    actions=[mark_voided,]
+    actions=[mark_voided,download_csv,]
 
 class ObservationAdmin(admin.ModelAdmin):
     exclude = ('_complex_progress',)
