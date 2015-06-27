@@ -29,7 +29,7 @@ class Observation(models.Model):
     uuid = models.SlugField(max_length=36, unique=True, default=make_uuid, editable=False)
     """ A universally unique identifier """
     
-    encounter = models.ForeignKey('Encounter', to_field='uuid')
+    encounter = models.ForeignKey('Encounter', to_field='uuid',related_name='observations')
     """ The instance of a procedure which this observation is associated with. """
     
     node = models.CharField(max_length=255)
