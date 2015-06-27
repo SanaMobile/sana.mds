@@ -29,15 +29,15 @@
   {% endblock style %}
   {% block extrastyle %}{% endblock %}
   {% block srcscript %}
-  <script src="{{ STATIC_PREFIX }}js/jquery-1.10.1.js"></script>
-  <script src="{{ STATIC_PREFIX }}js/jquery-ui.js"></script>
+  <script src="{{ STATIC_PREFIX }}web/js/jquery.js"></script>
+  <script src="{{ STATIC_PREFIX }}web/js/jquery-ui.custom.js"></script>
+  <script src="{{ STATIC_PREFIX }}web/js/jquery-ui-sliderAccess.js"></script>
+  <script src="{{ STATIC_PREFIX }}web/js/jquery-ui-timepicker-addon.js"></script>
+  <script src="{{ STATIC_PREFIX }}web/js/jquery.cookie.js"></script>
   <script src="{{ STATIC_PREFIX }}js/jquery.serializejson.js"></script>
   <script src="{{ STATIC_PREFIX }}js/core.js"></script>
-  <script src="{{ STATIC_PREFIX }}web/js/jquery.cookie.js"></script>
   <script src="{{ STATIC_PREFIX }}web/js/console.js"></script>
   <script src="{{ STATIC_PREFIX }}web/js/functions.js" />
-  <script src="{{ STATIC_PREFIX }}web/js/jquery-ui-timepicker-addon.js"></script>
-  <script src="{{ STATIC_PREFIX }}web/js/jquery-ui-sliderAccess.js"></script>
 {% endblock srcscript %}
 {% block script %}
   <script>

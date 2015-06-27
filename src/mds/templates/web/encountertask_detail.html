@@ -1,24 +1,80 @@
 {% extends "web/base.html" %}
-{% comment %}
-# Generic model detail template for use with classes extending 
-# DetailView and using ModelMixin
-{% endcomment %}
+{% load static %}
+{% load i18n %}
+{% comment %}{% endcomment %}
 {% block title %}{{ model|title|add:' Detail' }}{% endblock %}
+{% block extrastyle %}
+<link rel="stylesheet" href="{{ STATIC_PREFIX }}web/css/liststyle.css">
+{% endblock %}
+{% block extrascript %}
+    $(document).ready(function(){
+        $("#id_password").attr("type","password");
+        $( document ).on( 'focus', ':input', function(){
+            $( this ).attr( 'autocomplete', 'off' );
+        });
+    });
+{% endblock %}
+
 {% block content %}
+<div>
+{% for object in objects %}
+<table class="content-list" >
+    <thead>
+        <tr class="headerrow">
+            <td colspan="2"><h2>{{ object.repr }}</h2></td>
+        </tr>
+    </thead>
+    <tfoot>
+        <tr class="footerrow">
+        <td class="alignleft"><a href="{% url 'web:'|add:model|add:'-list' %}">{% trans 'Back' %}</a></td>
+        <td class="alignright"><a href="{% url 'web:'|add:model|add:'-edit'  pk=object.id%}">{% trans 'Edit' %}</a>
+    </tr>
+    </tfoot>
+    <tbody>
+    {% for label,field in object.fields.items %}
+        {% if label != 'id' %}
+        <tr class="{% cycle 'evenrow' 'oddrow' %}">
+            <td class="text-left"><strong>{{ field.label_tag|title }}</strong></td>
+            <td class="text-right">
+                {% if field.type == "date" %}
+                    {{ field.value|date:"d-F-Y" }}
+                {% elif field.type == "file" %}
+                    <a href="{{ field.url }}"><img src="{{ STATIC_PREFIX }}web/img/binary.png"</a>
+                {% elif field.type == "object" %}
+                        <a href="{{ field.url }}">{{ field.value }}</a>
+                {% else %}
+                        {{ field.value }}
+                {% endif %}
+            </td>
+        </tr>
+        {% endif %}
+    {% endfor %}
+    </tbody>
+</table>
+{% endfor %}
+</div>
 <hr>
+<div>
+{{ related_label|title }}
 <table class="content-list" >
     <tbody>
-    {# replace %row with evenrow or oddrow #} 
-    <tr class="%row">
-        <td class="text-left"><strong>field</strong></td>
-        <td class="text-right">{{ v }}</td>
-    </tr>
-    <tr class="%row">
-        <td class="text-left"><strong>field</strong></td>
-        <td class="text-right"><a href="/mds/media/{{ object.field }}">{{ MEDIA_URL }}{{ object.src }}</a></td>
-    </tr>
+    {% for rel in related %}
+        <tr class="{% cycle 'evenrow' 'oddrow' %}">
+            <td class="text-left">{{ rel.node }}: {{ rel.concept.display_name }}</td>
+            <td class="text-right">
+            {% if rel.concept.is_complex %}
+                {% if "image" in rel.concept.mimetype %}
+                <a href="{{ field.url }}"><img src="{{ rel.value_complex }}"/></a>
+                {% else %}
+                <a href="{{ field.url }}">{{ rel.value_complex }}</a>
+                {% endif %}
+            {% else %}
+                {{ rel.value }}
+            {% endif %}
+            </td>
+        </tr>
+    {% endfor %}
     </tbody>
-</table> 
-<hr>
-<a href="{% url 'web:'|add:model|add:'-list' %}">Back</a>
+</table>
+</div>
 {% endblock content %}
