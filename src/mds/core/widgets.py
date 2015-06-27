@@ -12,11 +12,10 @@ class NumberInput(widgets.TextInput):
 class AgeInput(NumberInput):
     input_max=120
     input_min=0
-    input_step=1    
-    
+    input_step=1
+
 class DateSelectorInput(widgets.DateInput):
     input_type="date"
-    
+
 class DateTimeSelectorInput(widgets.DateTimeInput):
-    input_type="date"
-    
+    input_type="datetime"
