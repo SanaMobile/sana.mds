@@ -28,6 +28,8 @@ from django.contrib.auth.models import User
 
 from mds.api import version
 from mds.api.responses import JSONResponse
+from mds.api.v1.v2compatlib import sort_by_node
+from mds.core.forms import *
 from mds.core.models import *
 from .forms import *
 from mds.core.widgets import *
@@ -785,11 +787,11 @@ class EncounterListView(ModelListMixin,ListView):
     fields = ('created', 'procedure', 'subject')
     paginate_by=10
     
-class EncounterCreateView(ModelFormMixin,CreateView):
+class EncounterCreateView(ModelFormMixin,ModelSuccessMixin, CreateView):
     model = Encounter
     template_name = "web/form_new.html"
 
-class EncounterUpdateView(ModelFormMixin, UpdateView):
+class EncounterUpdateView(ModelFormMixin, ModelSuccessMixin, UpdateView):
     model = Encounter
     template_name = "web/form.html"
 
@@ -807,17 +809,17 @@ class LocationListView(ModelListMixin, ListView):
     default_sort_params = ('name', 'asc')
     fields = ('name','code',)
     
-class LocationCreateView(ModelFormMixin,CreateView):
+class LocationCreateView(ModelFormMixin,ModelSuccessMixin,CreateView):
     model = Location
     template_name = "web/form_new.html"
     #success_url="/mds/web/location/%(id)s/"
     
-class LocationUpdateView(ModelFormMixin, UpdateView):
+class LocationUpdateView(ModelFormMixin, ModelSuccessMixin,UpdateView):
     model = Location
     template_name = 'web/form.html'
     #success_url='/mds/web/location/%(id)s/'
     
-class LocationDetailView(ModelFormMixin,DetailView):
+class LocationDetailView(ModelFormMixin,ModelSuccessMixin,DetailView):
     model = Location
     template_name = 'web/detail.html'
     context_object_name = 'location'
@@ -837,7 +839,7 @@ class ObservationListView(ModelListMixin, ListView):
         'value_complex',
     )
 
-class ObservationCreateView(ModelFormMixin,CreateView):
+class ObservationCreateView(ModelFormMixin,ModelSuccessMixin,CreateView):
     model = Observation
     template_name = "web/form_new.html"
 
@@ -857,15 +859,15 @@ class ObserverListView(ModelListMixin, ListView):
     template_name = "web/list.html"
     paginate_by=10
 
-class ObserverCreateView(ModelFormMixin,CreateView):
+class ObserverCreateView(ModelFormMixin,ModelSuccessMixin,CreateView):
     model = Observer
     template_name = "web/form_new.html"
     
-class ObserverUpdateView(ModelFormMixin, UpdateView):
+class ObserverUpdateView(ModelFormMixin, ModelSuccessMixin,UpdateView):
     model = Observer
     template_name = 'web/form.html'
 
-class ObserverDetailView(ModelFormMixin,DetailView):
+class ObserverDetailView(ModelFormMixin,ModelSuccessMixin,DetailView):
     model = Observer
     template_name = 'web/detail.html'
     context_object_name = 'observer'
@@ -886,27 +888,29 @@ class ProcedureDetailView(ModelFormMixin,DetailView):
     context_object_name = 'procedure'
     slug_field = 'uuid'
     
-class ProcedureCreateView(ModelFormMixin,CreateView):
+class ProcedureCreateView(ModelFormMixin,ModelSuccessMixin,CreateView):
     model = Procedure
     template_name = "web/form_new.html"
 
-class ProcedureUpdateView(ModelFormMixin, UpdateView):
+class ProcedureUpdateView(ModelFormMixin,ModelSuccessMixin, UpdateView):
     model = Procedure
     template_name = 'web/form.html'
 
 class SubjectListView(ModelListMixin, ListView):
     model = Subject
     default_sort_params = ('system_id', 'asc')
-    fields = ('created', 'system_id', 'family_name', 'given_name', 'gender', 'dob','voided')
+    fields = ('system_id', 'family_name', 'given_name', 'gender', 'dob','voided')
     template_name = "web/list.html"
     paginate_by=10
 
-class SubjectCreateView(ModelFormMixin,CreateView):
+class SubjectCreateView(ModelFormMixin,ModelSuccessMixin,CreateView):
     model = Subject
+    form_class = SubjectForm
     template_name = "web/form_new.html"
 
-class SubjectUpdateView(ModelFormMixin, UpdateView):
+class SubjectUpdateView(ModelFormMixin, ModelSuccessMixin,UpdateView):
     model = Subject
+    form_class = SubjectForm
     template_name = 'web/form.html'
 
 class SubjectDetailView(ModelFormMixin,DetailView):
@@ -947,16 +951,26 @@ class EncounterTaskCreateView(ModelFormMixin,ModelSuccessMixin,CreateView):
     #    form.instance.concept = concept
     #    return super(EncounterTaskCreateView, self).form_valid(form)
 
-class EncounterTaskUpdateView(ModelFormMixin, UpdateView):
+class EncounterTaskUpdateView(ModelFormMixin,ModelSuccessMixin, UpdateView):
     model = EncounterTask
     template_name = 'web/form.html'
     form_class = EncounterTaskForm
 
 class EncounterTaskDetailView(ModelFormMixin,DetailView):
     model = EncounterTask
-    template_name = 'web/detail.html'
+    template_name = 'web/encountertask_detail.html'
     context_object_name = 'encountertask'
     slug_field = 'uuid'
+
+    def get_context_data(self, **kwargs):
+        context = super(EncounterTaskDetailView, self).get_context_data(**kwargs)
+        encounter = context['object'].encounter
+        observations = None
+        if encounter:
+            observations = sort_by_node(encounter.observations.all())[::-1]
+        context['related'] = observations
+        context['related_label'] = 'Observations'
+        return context
 
 # class @ListView(ListView):
 #     model = @
@@ -969,7 +983,6 @@ def surgeon_clinic_form(request, *args, **kwargs):
         context_instance=RequestContext(
             request, 
             {
-                
                 'portal':portal_site,
             }
         )
