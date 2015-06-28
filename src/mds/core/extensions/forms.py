@@ -49,7 +49,7 @@ class SurgicalSubjectForm(forms.ModelForm):
             'contact_four',
         ]
         widgets = {
-            'dob': DateTimeSelectorInput()
+            'dob': DateSelectorInput()
         }
 '''
         def clean(self):
@@ -140,3 +140,7 @@ class SurgicalAdvocateFollowUpForm(forms.Form):
             widget=DateSelectorInput())
     date_of_final_sa_follow_up = forms.DateTimeField(
             widget=DateSelectorInput())
+
+class EncounterReviewForm(forms.ModelForm):
+    pass
+
