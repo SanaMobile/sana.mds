@@ -3,11 +3,24 @@
 {% load i18n %}
 {% block extrastyle %}
 <link rel="stylesheet" href="{{ STATIC_PREFIX }}web/css/liststyle.css">
+<link rel="stylesheet" href="{{ STATIC_PREFIX }}web/css/formstyle.css">
 {% endblock extrastyle %}
 {% block title %}{{ model|title|add:' Detail' }}{% endblock %}
 {% block content %}
 <div>
-<table class="content-list" >
+<table class="content-form" >
+    <thead>
+        <tr class="headerrow">
+            <td colspan="2"><h2>{{ object }}</h2></td>
+        </tr>
+    </thead>
+    <tfoot>
+        <tr class="footerrow">
+            <td class="alignleft"><a href="{% url 'web:'|add:model|add:'-list' %}">{% trans 'Back' %}</a></td>
+            <td class="alignright"><a href="{% url 'web:'|add:model|add:'-edit'  pk=object.id%}">{% trans 'Edit' %}</a>
+        </tr>
+    </tfoot>
+
     <tbody>
     <tr class="evenrow">
         <td class="text-left"><strong>UUID</strong></td>
@@ -30,10 +43,10 @@
 </div>
 <hr>
 <div>
-<table class="content-list" >
+<table class="content-form" >
     <thead>
         <tr class="headerrow">
-            <th colspan="2"><h2>Observations</h2></th>
+            <th colspan="2"><h2>{% trans 'Observations' %}</h2></th>
         </tr>
     <tbody>
     {% for observation in object.observation_set.all %}
