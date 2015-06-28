@@ -977,13 +977,21 @@ class EncounterTaskDetailView(ModelFormMixin,DetailView):
 #     template_name = "web/@_list.html"
 
 def surgeon_clinic_form(request, *args, **kwargs):
-    sas = SurgicalAdvocate.objects.filter(voided=False)
+    params = request.COOKIES
+    # Should use this to track IP's?
+    device = params.get('device', "2fc0a9f7-384b-4d97-8c1c-aa08f0e12105")
+    #if device:
+    #    device = Device.objects.get(uuid=device)
+    patients = Subject.objects.filter(voided=False)
     return render_to_response(
-        "web/surgical_clinic_form.html", 
+        "web/surgical_clinic_form.html",
         context_instance=RequestContext(
             request, 
             {
                 'portal':portal_site,
+                'patients': patients,
+                'device': device,
+                'procedure': None,
             }
         )
     )
