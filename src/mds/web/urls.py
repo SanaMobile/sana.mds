@@ -99,5 +99,8 @@ urlpatterns = patterns(
     #url(r'^encounterreview/(?P<pk>\d+)/detail/$', EncounterReviewDetail.as_view(), name='encountertaskreview-detail'),
     
     url(r'^forms/clinicform/$', 'mds.web.views.surgeon_clinic_form', name='clinic-form'),
+    
+    # Internationalization
+    url(r'^setlang/$', 'mds.web.views.setlang', name='setlang'),
 )
 

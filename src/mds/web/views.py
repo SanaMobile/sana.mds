@@ -997,6 +997,30 @@ def surgeon_clinic_form(request, *args, **kwargs):
     )
 
 @login_required(login_url="/mds/web/login/")
+def setlang(request, *args, **kwargs):
+    method = request.method
+    if method == 'GET':
+        path = request.REQUEST.get('next',None)
+        params = request.COOKIES
+        return render_to_response(
+            "web/setlang.html",
+            context_instance=RequestContext(
+            request, 
+            {
+                'available_languages': ['en','fr','ht'],
+                'portal':portal_site,
+                'next': path,
+            }))
+    elif method == 'POST':
+        lang = request.POST.get('language', None)
+        path = request.POST.get('next', '/mds/web/')
+        path = path if path else '/mds/web/'
+        # set the language cookie here
+        response = HttpResponseRedirect(path)
+        response.set_cookie('lang',lang)
+        return response
+        
+@login_required(login_url="/mds/web/login/")
 def portal(request):
     from mds.core import models as objects
     metadata = _metadata(request)
