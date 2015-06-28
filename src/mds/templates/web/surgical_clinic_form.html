@@ -1,131 +1,183 @@
 {% extends 'web/base.html' %}
+{% load i18n %}
+{% block extrastyle %}
+<link rel="stylesheet" href="{{ STATIC_PREFIX }}web/css/formstyle.css">
+{% endblock %}
+{% block extrascript %}
+    function submitClinicForm(){
+        var vals = $('#id_form").serialize();
+        console.info(vals);
+    }
+{% endblock extrascript %}
 {% block content %}
-<div>
-<ul>
-    <li>
-        <label for="id_date">Date</label>
-        <input id="id_date" type="date" />
-    </li>
-    <li>
-        <label for="id_subject">Patient</label>
-        <input id="id_subject" type="text" />
-    </li>
-    <li>
-        <label for="id_visit_type">Type of clinic visit:</label>
-        <select>
-            <option>Routine post-op</option>
-            <option>Referral for symptoms</option>
+<!-- encounter form -->
+<form name="encounter">
+<div class="form">
+    <input type="hidden" name="device" value="{{ device }}"/>
+    <input type="hidden" name="concept" value="{{ concept }}"/>
+    <input type="hidden" name="procedure" value="{{ procedure }}"/>
+    <div class="fieldWrapper">
+        <label for="id_date">{% trans 'Date' %}</label>
+        <input id="id_date" name="created" type="date" value="{{ date }}"/>
+    </div>
+    <div class="fieldWrapper">
+        <label for="id_subject">{% trans 'Patient' %}</label>
+        <select id="id_subject" name="subject">
+        {% for patient in patients %}
+            <option value="{{ patient.uuid }}">{{ patient }}</option>
+        {% endfor %}
         </select>
-    </li>
-</ul>
+    </div>
+    <div class="fieldWrapper">
+        <label for="id_visit_type">{% trans 'Type of clinic visit' %}:</label>
+        <select id="id_visit_type" name="visit_type">
+            <option value="e351548a-98e9-437b-ac4d-4816314b0e4d">{% trans 'Routine post-op' %}</option>
+            <option value="19ebb13b-ba76-4e0f-b1c8-2e5da16af260">{% trans 'Referral for symptoms' %}</option>
+        </select>
+    </div>
 </div>
-<hr>
-<div>
-    <h4>Please use the following definition of surgical site infection (SSI):</h4>
-    <p>Infection occurs within 30 days after any operative procedure 
-    <strong>AND</strong> the patient has at least one of the following:
+<!-- end encounter -->
+</form>
+<!-- SSI definition -->
+<div >
+    <div class="block-border-thin" id="id_ssi_definition">
+    <p><strong>{% trans 'Please use the following definition of surgical site infection (SSI)' %}:</strong></p>
+    <p>{% blocktrans %}Infection occurs within 30 days after any operative procedure 
+    <strong>AND</strong> the patient has at least one of the following{% endblocktrans %}:
     </p>
     <ul>
-        <li>a. Purulent drainage from the incision.</li>
-        <li>b. Organisms isolated from a culture of fluid or tissue from the incision.</li>
-        <li>c. Incision that spontaneously dehisces or is deliberately opened by a surgeon.</li>
-        <li>d. Diagnosis of an SSI by the surgeon.</li>
+        <li>{% trans 'a. Purulent drainage from the incision.' %}</li>
+        <li>{% trans 'b. Organisms isolated from a culture of fluid or tissue from the incision.' %}</li>
+        <li>{% trans 'c. Incision that spontaneously dehisces or is deliberately opened by a surgeon.' %}</li>
+        <li>{% trans 'd. Diagnosis of an SSI by the surgeon.' %}</li>
     </ul>
-    <p><strong>DO NOT</strong> report SSI if:</p>
+    <p>{% trans '<strong>DO NOT</strong> report SSI if:' %}</p>
     <ul>
-        <li>Stitch abscess: minimal inflammation and discharge confined to the points of suture penetration.</li>
-        <li>Cellulits: erythema without swelling, fluctuance or drainage from the incision.</li>
+        <li>{% trans 'Stitch abscess: minimal inflammation and discharge confined to the points of suture penetration.' %}</li>
+        <li>{% trans 'Cellulits: erythema without swelling, fluctuance or drainage from the incision.' %}</li>
     </ul>
+    </div>
 </div>
-<hr>
-<form>
+<!-- end definition -->
+<!-- begin observations -->
+<form name="observations" id="id_observations">
+<!-- is SSI present -->
+<div class="fieldWrapper">
+        <label for="id_ssi_present">{% trans 'Is there an SSI?' %}</label>
+        <select id="id_ssi_present" name="ssi_present">
+            <option disabled selected> -- {% trans Select %} --</option>
+            <option value="true">{% trans 'Yes' %}</option>
+            <option value="false">{% trans 'No' %}</option>
+        </select>
+</div>
+<!-- if SSI present show this block -->
+<section id="id_ssi_present_true">
+<div class="fieldWrapper">
+        <label for="id_earlier_evaluation">{% trans 'Would an earlier evaluation have been beneficial?' %}</label>
+        <select id="id_earlier_evaluation" name="earlier_evaluation">
+            <option disabled selected> -- {% trans Select %} --</option>
+            <option value="true">{% trans 'Yes' %}</option>
+            <option value="false">{% trans 'No' %}</option>
+        </select>
+</div>
+<div class="fieldWrapper">
+    <label>{% trans 'What is the treatment plan?(Check all that apply)' %}</label>
+    <input type="hidden"/>
+</div>
 <div>
     <ul>
         <li>
-            <label for="id_ssi_present">Is there an SSI?<label>
-            <select id="id_ssi_present">
-                <option value="true">Yes</option>
-                <option value="false">No</option>
-            </select>
+            <input id="id_antibiotics" name="antibiotics" type="checkbox">{% trans 'Antibiotics' %}</input>
         </li>
-    </ul>
-</div>
-<div id="id_ssi_present_true">
-    <form>
+        <li>
+            <input id="id_open_incision" name="open_incision" type="checkbox" value="true">{% trans 'Open the incision and pack at the bedside' %}</input>
+            <div id="id_drainage" class="hidden-initial">
+                <ul>
+                    <li><input id="id_drainage_local" name="drainage_local" type="checkbox" value="true">{% trans 'Drainage in the operating room - local anesthesia' %}</input></li>
+                    <li><input id="id_drainage_general_spinal" name="drainage_general_spinal" type="checkbox" value="true">{% trans 'Drainage in the operating room -general or spinal anesthesia' %}</input></li>
+                </ul>
+            </div>
+        </li>
+        <li>
+            <input id="id_readmission" name="readmission" type="checkbox">{% trans 'Readmission' %}</input>
+        </li>
     <ul>
-    <li>
-        <label for="id_earlier_evaluation">Would an earlier evaluation have been beneficial?</label>
-        <select id="id_ssi_present">
-            <option value="true">Yes</option>
-            <option value="false">No</option>
-        </select>
-    </li>
-    <li>
-        <label>What is the treatment plan?(Check all that apply)</label>
-        <form id="id_tx_plan">
-            <ul>
-                <li><input id="" type="checkbox">Antibiotics</input></li>
-                <li><input id="" type="checkbox">Open the incision and pack at the bedside</input></li>
-                <li><input id="" type="checkbox">Drainage in the operating room - local anesthesia</input></li>
-                <li><input id="" type="checkbox">Drainage in the operating room -general or spinal anesthesia</input></li>
-                <li><input id="" type="checkbox">Readmission</input></li>
-            <ul>
-        </form>
-    </li>
-    </ul>
-    </form>
 </div>
-<div id="id_ssi_present_false">
-    <p>Stop here if this is a routine post-op visit. Continue if the patient was referred for symptoms.</p>
+</section>
+<script> 
+</script>
+<p>{% trans 'Stop here if this is a routine post-op visit. Continue if the patient was referred for symptoms.' %}</p>
     <hr>
-    <form>
-        <ul>
-            <li>
-                <label for="id_evaluation_necessary">Was the referral appropriate?</label>
-                <select id="id_evaluation_necessary">
-                    <option value="true">Yes, the symptoms warranted evaluation</option>
-                    <option value="false">No, evaluation was not necessary</option>
-                </select>
-            </li>
-            <li>
-                <label for="id_tx_necessary">Is any treatment necessary?</label>
-                <select id="id_tx_necessary">
-                    <option value="false">No</option>
-                    <option value="true">Yes</option>
-                </select>
-                <div id="id_describe_tx">
-                    <label for="id_describe_tx">If Yes (please describe):</label>
-                    <input type="text" id="id_describe_tx"/>
-                </div>
-            </li>
-            <li>
-                <label for="id_follow_up_necessary">Is another follow up necessary?</label>
-                <select id="id_follow_up_necessary">
-                    <option value="false">No</option>
-                    <option value="false">Yes, another visit is justified </option>
-                </select>
-            </li>
-        </ul>
-    </form>
+    <div class="fieldWrapper">
+        <label for="id_evaluation_necessary">{% trans 'Was the referral appropriate?' %}</label>
+        <select id="id_evaluation_necessary" name="evaluation_necesary">
+            <option disabled selected> -- {% trans Select %} --</option>
+            <option value="true">{% trans 'Yes, the symptoms warranted evaluation' %}</option>
+            <option value="false">{% trans 'No, evaluation was not necessary' %}</option>
+        </select>
+    </div>
+    <div class="fieldWrapper">
+        <label for="id_tx_necessary">{% trans 'Is any treatment necessary?' %}</label>
+        <select id="id_tx_necessary" name="tx_necessary">
+            <option disabled selected> -- {% trans Select %} --</option>
+            <option value="false">{% trans 'No' %}</option>
+            <option value="true">{% trans 'Yes' %}</option>
+        </select>
+    </div>
+    <div class="fieldWrapper" id="id_tx_necessary_true">
+        <label for="id_describe_tx">{% trans 'If Yes (please describe)' %}:</label>
+        <input type="text" id="id_describe_tx" name="describe_tx"/>
+    </div>
+    <div class="fieldWrapper">
+        <label for="id_follow_up_necessary">{% trans 'Is another follow up necessary?' %}</label>
+        <select id="id_follow_up_necessary" name="follow_up_necessary">
+            <option disabled selected> -- {% trans Select %} --</option>
+            <option value="false">{% trans 'No' %}</option>
+            <option value="false">{% trans 'Yes, another visit is justified' %}</option>
+        </select>
+    </div>
+</form>
 </div>
-<div id="output">
-</div>
+<p align="center" style="font-size:larger">
+    <input type="button" id="id_submit" class="show-page-loading-msg" value="{% trans 'Submit' %}">
+</p>
 <script>
+    // Use the date picker
+    $(function(){
+        $('input[type="date"]').datepicker({ 
+            dateFormat: 'yy-mm-dd', 
+            changeYear: true , 
+            yearRange : "c-100:c+05"
+            }).prop('type','text');
+        $('input[type="date"]').prop('type','text');
+     });
 
-    $('#id_ssi_present_true').slideUp("fast");
-    $('#id_ssi_present_false').slideUp("fast");
+    // hides the block with questions necessary if ssi present
+    $('#id_ssi_present_true').hide();
     $('#id_ssi_present').change(function(){
         val = $(this).val(); 
-
         if (val == "true"){
-            $('#output').text(val);
             $('#id_ssi_present_true').slideDown("fast");
-            $('#id_ssi_present_false').slideUp("fast");
         } else if (val == "false"){
-            $('#output').text(val);
             $('#id_ssi_present_true').slideUp("fast");
-            $('#id_ssi_present_false').slideDown("fast");
         }
-    })
+    });
+    
+    // hides the incision questions if open incision is not checked
+    $('#id_drainage').hide();
+    $('#id_open_incision').change(function(){
+        val = $(this).val(); 
+        console.info("id_open_incision="+val)
+        if ($(this).is(":checked")){
+            $('#id_drainage').slideDown("fast");
+        } else if (val == "off"){
+            $('#id_drainage').slideDown("fast");
+        }
+    });
+    
+    $('#id_submit').click(function(){
+        console.log($("#id_form").serialize());
+        console.log($("#id_observations").serialize());
+    });
 </script>
 {% endblock content %}
