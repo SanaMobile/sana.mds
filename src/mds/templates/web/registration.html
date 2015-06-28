@@ -62,6 +62,7 @@ function submitSubjectWeb(){
 {% endblock %}
 
 {% block content %}
+<div>
 <form>
 {% for hidden in form.hidden_fields %}
     {{ hidden }}
@@ -87,4 +88,26 @@ function submitSubjectWeb(){
     <input type="button" id="id_submit_patient" class="show-page-loading-msg" value="Create Patient" onClick="submitSubjectWeb()">
   </p>
 </form>
+</div>
+<script>
+    // Displays Date picker pop up
+    $(function(){
+        $('input[type="date"]').datepicker({ 
+            dateFormat: 'yy-mm-dd', 
+            changeYear: true , 
+            yearRange : "c-100:c+05"
+            }).prop('type','text');
+        $('input[type="date"]').prop('type','text');
+     });
+    // Displays DateTime picker pop up
+    $(function(){
+        $('input[type="datetime"]').datetimepicker({ 
+            dateFormat: 'yy-mm-dd', 
+            changeYear: true , 
+            yearRange : "c-100:c+05",
+            timeformat: "HH:mm",
+            }).prop('type','text');
+        $('input[type="datetime"]').prop('type','text');
+     });
+</script>
 {% endblock content %}
