@@ -922,7 +922,7 @@ class SubjectDetailView(ModelFormMixin,DetailView):
 class EncounterTaskListView(ModelListMixin, ListView):
     model = EncounterTask
     default_sort_params = ('due_on', 'asc')
-    fields = ('due_on', 'subject')
+    fields = ('due_on', 'status', 'subject', 'assigned_to')
     template_name = "web/list.html"
     paginate_by=10
 
