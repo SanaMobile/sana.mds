@@ -59,14 +59,14 @@
 <table class="content-list" >
     <tbody>
     {% for rel in related %}
-        <tr class="{% cycle 'evenrow' 'oddrow' %}">
+        <tr class="{% cycle 'evenrow' 'oddrow' %}" onclick="document.location='{% url 'web:observation-detail' pk=rel.id %}';">
             <td class="text-left">{{ rel.node }}: {{ rel.concept.display_name }}</td>
             <td class="text-right">
             {% if rel.concept.is_complex %}
                 {% if "image" in rel.concept.mimetype %}
-                <a href="{{ field.url }}"><img src="{{ rel.value_complex }}"/></a>
+                <a href="{{ MEDIA_URL }}{{ rel.value_complex }}"><img src="{{ MEDIA_URL }}{{ rel.value_complex }}"/></a>
                 {% else %}
-                <a href="{{ field.url }}">{{ rel.value_complex }}</a>
+                <a href="{{ MEDIA_URL }}{{rel.value_complex }}">{{ rel.value_complex }}</a>
                 {% endif %}
             {% else %}
                 {{ rel.value }}
