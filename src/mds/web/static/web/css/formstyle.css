@@ -8,12 +8,10 @@
 }
 .content-form tr.evenrow{
     background-color: #efefef; 
-    width:100%;
     color: #6e6e6e;
 }
 .content-form tr.oddrow{
     background-color: #ffffff; 
-    width:100%;
     color: #6e6e6e;
 }
 .content-form td{
@@ -21,12 +19,11 @@
     padding-bottom: 16px;
 }
 .content-form tfoot{
-    width:100%;
+
 }
 .content-form tfoot tr{
     background-color: darkgray;
     color: #ffffff;
-    width:100%;
     padding: 5px;
     margin: 0px;
 }
@@ -64,6 +61,7 @@
 .fieldWrapper {
     padding: 3px 10px 0 0;
     margin: 5px;
+    width: 0;
 }
 .fieldWrapper label{
     padding: 3px 10px 0 0;

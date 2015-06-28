@@ -3,6 +3,7 @@
     {{ hidden }}
 {% endfor %}
 {# Include the visible fields #}
+<div>
 <table class="content-form">
     <tfoot>
         <tr>
@@ -20,9 +21,9 @@
     </tfoot>
 <tbody>
 {% for field in form.visible_fields %}
-<tr class="{% cycle 'evenrow' 'oddrow' %}" style="padding:3px">
+<tr class="{% cycle 'evenrow' 'oddrow' %}">
     <td class="text-left">
-            <div class="fieldWrapper">
+            <div>
             {{ field.errors }}{{ field.label_tag }}
             </div>
     </td>
@@ -33,4 +34,4 @@
 {% endfor %}
 <tbody>
 </table>
-
+</div>
