@@ -108,6 +108,7 @@ a.listfooter {
     box-sizing: border-box;
     border-top: 2px solid #6c6c6c;
     background-color: #fefefe; 
+    padding-bottom:48px;
 }
 
 .link-menu {
@@ -333,6 +334,7 @@ td.text-top{
 .errorlist li{
     color:red;
 }
+/*
 .content-form{
     margin: 0 auto;
     min-width: 420px;
@@ -365,4 +367,10 @@ td.text-top{
 .content-form ul li div input{
     right: 0px;
     position: relative;
+}
+*/
+.block-border-thin{
+    border: 3px solid #000000;
+    padding: 10px;
+    margin: 10px;
 }

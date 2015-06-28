@@ -1,6 +1,11 @@
 .content-form {
     margin: 0 auto;
 }
+.content-form tr.headerrow {
+    padding:0px;
+    margin:0px;
+    background-color: darkgray;
+}
 .content-form tr.evenrow{
     background-color: #efefef; 
     width:100%;
@@ -55,4 +60,19 @@
 }
 .contentform > .errorlist {
     color: red;
+}
+.fieldWrapper {
+    padding: 3px 10px 0 0;
+    margin: 5px;
+}
+.fieldWrapper label{
+    padding: 3px 10px 0 0;
+    float: left;
+    width: 128em;
+    word-wrap: break-word;
+    font-weight: bold;
+}
+.fieldWrapper ul{
+    float: left;
+    padding: 40px;
 }
