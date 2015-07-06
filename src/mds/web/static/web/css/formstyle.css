@@ -61,7 +61,7 @@
 .fieldWrapper {
     padding: 3px 10px 0 0;
     margin: 5px;
-    width: 0;
+    width: 100%;
 }
 .fieldWrapper label{
     padding: 3px 10px 0 0;
