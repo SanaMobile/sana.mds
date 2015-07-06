@@ -9,6 +9,8 @@
         console.info(vals);
     }
 {% endblock extrascript %}
+{% block title %}{% trans 'Clinic Form' %}{% endblock %}
+{% block header %}{% trans 'Surgeon Clinic Form' %}{% endblock %}
 {% block content %}
 <!-- encounter form -->
 <form name="encounter">
@@ -31,6 +33,7 @@
     <div class="fieldWrapper">
         <label for="id_visit_type">{% trans 'Type of clinic visit' %}:</label>
         <select id="id_visit_type" name="visit_type">
+            <option disabled selected> -- {% trans 'Select' %} --</option>
             <option value="e351548a-98e9-437b-ac4d-4816314b0e4d">{% trans 'Routine post-op' %}</option>
             <option value="19ebb13b-ba76-4e0f-b1c8-2e5da16af260">{% trans 'Referral for symptoms' %}</option>
         </select>
@@ -65,7 +68,7 @@
 <div class="fieldWrapper">
         <label for="id_ssi_present">{% trans 'Is there an SSI?' %}</label>
         <select id="id_ssi_present" name="ssi_present">
-            <option disabled selected> -- {% trans Select %} --</option>
+            <option disabled selected> -- {% trans 'Select' %} --</option>
             <option value="true">{% trans 'Yes' %}</option>
             <option value="false">{% trans 'No' %}</option>
         </select>
@@ -75,7 +78,7 @@
 <div class="fieldWrapper">
         <label for="id_earlier_evaluation">{% trans 'Would an earlier evaluation have been beneficial?' %}</label>
         <select id="id_earlier_evaluation" name="earlier_evaluation">
-            <option disabled selected> -- {% trans Select %} --</option>
+            <option disabled selected> -- {% trans 'Select' %} --</option>
             <option value="true">{% trans 'Yes' %}</option>
             <option value="false">{% trans 'No' %}</option>
         </select>
@@ -106,12 +109,13 @@
 </section>
 <script> 
 </script>
+<section id="id_non_routine_postop">
 <p>{% trans 'Stop here if this is a routine post-op visit. Continue if the patient was referred for symptoms.' %}</p>
     <hr>
     <div class="fieldWrapper">
         <label for="id_evaluation_necessary">{% trans 'Was the referral appropriate?' %}</label>
         <select id="id_evaluation_necessary" name="evaluation_necesary">
-            <option disabled selected> -- {% trans Select %} --</option>
+            <option disabled selected> -- {% trans 'Select' %} --</option>
             <option value="true">{% trans 'Yes, the symptoms warranted evaluation' %}</option>
             <option value="false">{% trans 'No, evaluation was not necessary' %}</option>
         </select>
@@ -119,7 +123,7 @@
     <div class="fieldWrapper">
         <label for="id_tx_necessary">{% trans 'Is any treatment necessary?' %}</label>
         <select id="id_tx_necessary" name="tx_necessary">
-            <option disabled selected> -- {% trans Select %} --</option>
+            <option disabled selected> -- {% trans 'Select' %} --</option>
             <option value="false">{% trans 'No' %}</option>
             <option value="true">{% trans 'Yes' %}</option>
         </select>
@@ -131,11 +135,12 @@
     <div class="fieldWrapper">
         <label for="id_follow_up_necessary">{% trans 'Is another follow up necessary?' %}</label>
         <select id="id_follow_up_necessary" name="follow_up_necessary">
-            <option disabled selected> -- {% trans Select %} --</option>
+            <option disabled selected> -- {% trans 'Select' %} --</option>
             <option value="false">{% trans 'No' %}</option>
             <option value="false">{% trans 'Yes, another visit is justified' %}</option>
         </select>
     </div>
+</scetion>
 </form>
 </div>
 <p align="center" style="font-size:larger">
@@ -178,6 +183,17 @@
     $('#id_submit').click(function(){
         console.log($("#id_form").serialize());
         console.log($("#id_observations").serialize());
+    });
+    
+    // (un)hide the routine posto op visit questions
+    $('#id_non_routine_postop').hide();
+    $('#id_visit_type').change(function(){
+        var routine = "19ebb13b-ba76-4e0f-b1c8-2e5da16af260";
+        if($(this).val() == routine){
+            $('#id_non_routine_postop').slideDown("fast");
+        } else {
+            $('#id_non_routine_postop').slideUp("fast");
+        }
     });
 </script>
 {% endblock content %}
