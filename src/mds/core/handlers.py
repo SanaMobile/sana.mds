@@ -36,7 +36,6 @@ __all__ = ['ConceptHandler',
            'DocHandler' ,
            'SessionHandler',
            'SubjectHandler',
-           'SurgicalSubjectHandler',
            'LocationHandler',]
 
    
@@ -262,34 +261,6 @@ class CompoundFormHandler(object):
             
     def __call__(self):
         pass
-
-@logged
-class SurgicalSubjectHandler(DispatchingHandler):
-    """ Handles subject requests. """
-    allowed_methods = ('GET', 'POST')
-    #fields = ['uuid']
-    #exclude = ("location")
-    '''
-    fields = ("uuid",
-              "family_name",
-              "given_name",
-              "gender",
-              "dob",
-              "image",
-              "system_id",
-              ("location",("name","uuid")),
-                "house_number",
-                "family_number", 
-                "national_id",
-                "contact_one",
-                "contact_two",
-                "contact_three",
-                "contact_four",
-             )
-    '''
-    model = SurgicalSubject
-    form = SurgicalSubjectForm
-    signals = { LOGGER:( EventSignal(), EventSignalHandler(Event))}
 
 def intake_handler(request,*args,**kwargs):
     pass
