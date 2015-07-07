@@ -83,11 +83,7 @@ extra_patterns = patterns(
     url(r'^subject/(?P<uuid>[^/]+)/$', rsrc_subject, name='subject'),
     url(r'^subject/(?P<uuid>[^/]+)/encounter/$', rsrc_subject, name='subject-encounters', kwargs={'related':'procedure'}),
 
-    # surgical subjects
-    url(r'^surgicalsubject/$', rsrc_surgicalsubject, name='surgical-subject-list'),
-    url(r'^surgicalsubject/(?P<uuid>[^/]+)/$', rsrc_surgicalsubject, name='surgical-subject'),
-    url(r'^surgicalsubject/(?P<uuid>[^/]+)/encounter/$', rsrc_surgicalsubject, name='surgical-subject-encounters', kwargs={'related':'procedure'}),
-
+    #location
     url(r'^location/$', rsrc_location, name='location-list'),
 )
 
