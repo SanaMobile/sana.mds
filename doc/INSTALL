@@ -119,6 +119,7 @@ Including OpenMRS as the EHR backend.
         a2enmod jk
         a2enmod proxy
         a2enconf openmrs
+    Note: Step (b) will provide access to OpenMRS through http(s)://<your-server>/openmrs.
     
 2..  OpenMRS Install-1.9.7 release
     a.  Download
