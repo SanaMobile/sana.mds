@@ -52,9 +52,9 @@ Everything as root(sudo)
     c. git clone https://github.com/SanaMobile/sana.mds.git
     
 5. Link or copy the mds source into the sana directories
-    a. ln -s /home/<user>/git/sana.mds/src /opt/sana/sana.mds/mds
+    a. ln -s /home/<user>/git/sana.mds/src/mds /opt/sana/sana.mds/mds
     or
-    b. cp -r /home/<user>/git/sana.mds/src /opt/sana/sana.mds
+    b. cp -r /home/<user>/git/sana.mds/src/mds /opt/sana/sana.mds
     
 6. Install and set up the mds code
     a. cp /opt/sana/sana.mds/mds/settings.py.tmpl /opt/sana/sana.mds/mds/settings.py
