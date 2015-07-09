@@ -115,7 +115,11 @@ Including OpenMRS as the EHR backend.
     a.  Just follow old manual install instructions ignoring any references to
         the older OpenMRS version.
         http://sana.mit.edu/wiki/index.php?title=Setup_Servers#Setup_and_Configure_Tomcat
-
+    b. Enable apache modules and and openmrs conf
+        a2enmod jk
+        a2enmod proxy
+        a2enconf openmrs
+    
 2..  OpenMRS Install-1.9.7 release
     a.  Download
         http://openmrs.org/download/
