@@ -201,11 +201,6 @@ def encounter_task(request, **kwargs):
                                  'debug' : debug
                                 })
                              )
-# TODO make this better
-# Procedure UUid tp form mappings
-_procedure_forms = {
-    "303a113c-6345-413f-88cb-aa6c4be3a07d": IntakeForm,
-}
 
 @login_required(login_url='/mds/login/')
 def edit_encounter_task(request, uuid, **kwargs):
