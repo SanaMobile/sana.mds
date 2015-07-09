@@ -45,7 +45,8 @@ Everything as root(sudo)
         CREATE USER 'mds'@'localhost' IDENTIFIED BY '****';
         GRANT ALL ON mds.* TO 'mds'@'localhost';
         exit;
-        
+    Note: You should change the password value, '****', in the line beginning with "CREATE USER 'mds'...", 
+    to one of your choice.    
 4. Get the mds source code
     a. mkdir ~/git
     b. cd ~/git
