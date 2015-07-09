@@ -78,8 +78,8 @@ Everything as root(sudo)
        echo 'export MDS_DIR=/opt/sana/sana.mds' >> /etc/apache2/envvars
     b. Copy the mds.conf file from the source into the apache conf-available directory
        and enable
-        chdir /home/<user>/git/sana.mds/include/mds/apache2/conf-available/mds.conf \
-            /etc/apache2/conf-available/mds.conf
+        cp /home/<user>/git/sana.mds/include/mds/apache2/conf-available/* \
+            /etc/apache2/conf-available
     c. Enable mds conf
         a2enconf mds
     d. Verify wsgi module is running
