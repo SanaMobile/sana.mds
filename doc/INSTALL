@@ -81,6 +81,8 @@ Everything as root(sudo)
             /etc/apache2/conf-available/mds.conf
     c. Enable mds conf
         a2enconf mds
+    d. Verify wsgi module is running
+        a2enmod wsgi
     d. Restart apache
         service apache2 restart
         
