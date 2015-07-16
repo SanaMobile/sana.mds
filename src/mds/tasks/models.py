@@ -42,7 +42,7 @@ class Task(models.Model):
     uuid = models.SlugField(max_length=36, unique=True, default=make_uuid, editable=False)
     """ A universally unique identifier """
 
-    assigned_to = models.ForeignKey(Observer, to_field='uuid')
+    assigned_to = models.ForeignKey(Observer)
     """Who the task is assigned to"""
 
     status = models.ForeignKey(Status)
