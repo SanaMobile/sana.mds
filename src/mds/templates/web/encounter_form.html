@@ -109,11 +109,6 @@
         postObs(encounter, '5', 'd24cf683-4b51-46d8-a4c4-154c38e1dd38', value, postSuccessObs);
     }
     
-    $(function(){
-      //$( "input[type='date']" ).datepicker({ dateFormat: 'mm/dd/yy', changeYear: true });
-        $('input[type="date"]').datepicker({ dateFormat: 'yy-mm-dd', changeYear: true , yearRange : "c-100:c+05"}).prop('type','text');
-        $('input[type="date"]').prop('type','text');
-    });
     // Workaround for safari issues
     $(function() {
       $( "select[multiple='multiple']").selectable();
@@ -158,6 +153,18 @@
 <div id="id_messages">
 </div>
 <script>
+    $(function(){
+      //$( "input[type='date']" ).datepicker({ dateFormat: 'mm/dd/yy', changeYear: true });
+        $('input[type="date"]').datepicker({ dateFormat: 'yy-mm-dd', changeYear: true , yearRange : "c-100:c+05"}).prop('type','text');
+        $('input[type="date"]').prop('type','text');
+    });
+    // Workaround for safari issues
+    $(function() {
+      $( "select[multiple='multiple']").selectable();
+      $( "select[multiple='multiple']").on("selectablestart", function (event, ui) {
+        event.originalEvent.ctrlKey = true;
+      });
+    });
   var subject = null;
   $(function(){
     var subject = $.cookie("subject");
