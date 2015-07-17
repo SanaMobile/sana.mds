@@ -114,9 +114,16 @@
         {% endif %}
     </div>
     {% endfor %}
-<!--
-</ul>
--->
+    <div class="actionbar">
+        <p align="center" style="font-size:larger">
+            <input type="button" id="id_submit" class="show-page-loading-msg" value="Submit" onClick="submitEncounterWeb()">
+        </p>
+    </div>
+    <div>
+        <p align="center" style="font-size:larger">
+            <a id="id_call_observer" href="tel://{{ object.device.name }}">Call: {{ object.device.name }}</a>
+        </p>
+    </div>
 </div>
 </form>
 {% endblock %}
