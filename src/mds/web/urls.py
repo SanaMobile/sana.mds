@@ -97,8 +97,8 @@ urlpatterns = patterns(
     #url(r'^encounterreview/new/$', EncounterReviewCreate.as_view(), name='encountertaskreview-create'),
     #url(r'^encounterreview/(?P<pk>\d+)/$', EncounterReviewUpdate.as_view(), name='encountertaskreview-edit'),
     #url(r'^encounterreview/(?P<pk>\d+)/detail/$', EncounterReviewDetail.as_view(), name='encountertaskreview-detail'),
-    
-    url(r'^forms/clinicform/$', 'mds.web.views.surgeon_clinic_form', name='clinic-form'),
+    url(r'^forms/surgeon/review/(?P<uuid>[^/]+)/$', 'mds.web.views.encounter_review', name='surgeon-review'),
+    url(r'^forms/surgeon/clinic/$', 'mds.web.views.surgeon_clinic_form', name='clinic-form'),
     
     # Internationalization
     url(r'^setlang/$', 'mds.web.views.setlang', name='setlang'),

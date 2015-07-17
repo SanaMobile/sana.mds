@@ -1037,4 +1037,29 @@ def portal(request):
         context,
     )
 
+def encounter_review(request,**kwargs):
+    tmpl = 'web/surgical_encounter_review.html'
+    uuid = kwargs.get('uuid',None) if kwargs else None
+    messages = []
+    try:
+        encounter = Encounter.objects.get(uuid=uuid)
+        data = []
+        
+        encounters = [encounter,]
+        obsqs = Observation.objects.filter(encounter=encounter.uuid)
+        observations = sort_by_node(obsqs,descending=False)
+    except Exception, e:
+        encounter = None
+        observations = []
+        messages = [ unicode(e), ]
+    return render_to_response(
+        tmpl, 
+        context_instance=RequestContext(
+            request,
+            { 
+                'object': encounter,
+                "observations": observations , 
+                'portal': portal_site,
+                'messages': messages,
+            }))
 
