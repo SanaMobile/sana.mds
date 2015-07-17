@@ -202,7 +202,7 @@ def encounter_task(request, **kwargs):
                                  'form':form,
                                  'flavor': flavor,
                                  'errors': errors,
-                                 'debug' : debug,
+                                 #'debug' : debug,
                                  'portal': portal_site,
                                 })
                              )
@@ -245,7 +245,7 @@ def edit_encounter_task(request, uuid, **kwargs):
                                  'form':form,
                                  'flavor': flavor,
                                  'errors': errors,
-                                 'debug' : debug,
+                                 #'debug' : debug,
                                  'portal': portal_site,
                                 })
                              )
@@ -323,8 +323,8 @@ def web_encounter(request, **kwargs):
                                  'form': form,
                                  'flavor': flavor,
                                  'errors': errors,
-                                 'messages' : debug,
-                                 'debug' : debug,
+                                 #'messages' : debug,
+                                 #'debug' : debug,
                                  'portal': portal_site,
                                 })
                              )
