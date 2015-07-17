@@ -165,3 +165,18 @@ class Observation(models.Model):
         if self.is_complex:
             self.value_text = _('complex data')
         super(Observation,self).save(*args, **kwargs)
+        
+    def value_as_list(self):
+        remove = ['(', ')']
+        sc = set(remove)
+        replaced = ''.join([c for c in self.value if c not in sc])
+        vals = [x for x in replaced.split(",")]
+        self.value.replace('(','').replace(')','').split(','), 
+        return vals
+    
+    def value_as_floats(self):
+        remove = ['(', ')']
+        sc = set(remove)
+        replaced = ''.join([c for c in self.value if c not in sc])
+        vals = [float(x.strip()) for x in replaced.split(",")]
+        return vals
