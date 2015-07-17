@@ -40,7 +40,7 @@
                 {% elif field.type == "file" %}
                     <a href="{{ field.url }}"><img src="{{ STATIC_PREFIX }}web/img/binary.png"</a>
                 {% elif field.type == "object" %}
-                        <a href="{{ field.url }}">{{ field.value }}</a>
+                    <a href="{{ field.url }}">{{ field.value }}</a>
                 {% else %}
                         {{ field.value }}
                 {% endif %}

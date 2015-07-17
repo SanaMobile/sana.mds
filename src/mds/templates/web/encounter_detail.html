@@ -42,18 +42,20 @@
 </table> 
 </div>
 <hr>
+{% with observations=object.observations.all %}
 <div>
-<table class="content-form" >
+    <table class="content-form" >
     <thead>
         <tr class="headerrow">
             <th colspan="2"><h2>{% trans 'Observations' %}</h2></th>
         </tr>
+    </thead>
     <tbody>
-    {% for observation in object.observation_set.all %}
+    {% for observation in observations %}
     {% with obsurl='web:observation-detail' %}
     <tr class="{% cycle 'evenrow' 'oddrow'  %}"
-        onclick="document.location='{% url obsurl pk=observation.id %}'">
-        <td class="text-left"><strong>{{ observation.concept.name|title }}</strong></td>
+        onclick="document.location='{% url 'web:observation-detail' pk=observation.id %}'">
+        <td class="text-left"><strong>{{ observation.concept.description|title }}</strong></td>
         <td class="text-right">
             {% if observation.is_complex %}
                 <a href="{{ MEDIA_PREFIX }}{{ object.value_complex }}">
@@ -69,4 +71,5 @@
     </tbody>
 </table> 
 </div>
+{% endwith %}
 {% endblock content %}
