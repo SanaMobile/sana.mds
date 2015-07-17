@@ -27,6 +27,7 @@
 {% endblock %}
 {% block header %}<h3><strong>{{ model|title }} List</strong></h3>{% endblock %}
 {% block content %}
+<div>
 <table class="content-list" id="contentlist">
     <thead>
     <tr class="headerrow">
@@ -65,16 +66,18 @@
             </script>
         </th>
         {% endfor %}
-        <th></th>
+        <th class="edit"/>
     </tr>
     </thead>
     <tfoot>
         <tr class="footerrow">
             {% with cols=fields|length|add:"-1" %}
+            <!--
             <td class="footer-left"><a href="{% url 'web:portal' %}"><strong>Back</strong></a></td>
-            <td class="footer-center" colspan="{{ cols }}"><a href="{% url 'web:'|add:model|add:'-create' %}"><strong>New</strong></a></td>
-            <td class="footer-right"  style="text-align:right;">
-                <strong>Go to Page</strong>
+            -->
+            <td class="footer-left" colspan="{{ cols }}"><a href="{% url 'web:'|add:model|add:'-create' %}"><strong>New</strong></a></td>
+            <td class="footer-right"  colspan="2" style="text-align:right;">
+                <strong>{% trans 'Page' %}</strong>
                 <select onchange="location = this.options[this.selectedIndex].value;" >
                 {% for page in paginator.page_range %}
                     <option value="{% url 'web:'|add:model|add:'-list' %}?page={{ page}}&order={{ order }}&sort_by={{ sort_by }}" {% if page == page_obj.number %}selected="selected"{% endif %}>{{ page }}</option>
@@ -102,9 +105,13 @@
                 </td>
                 {% endif %}
             {% endfor %}
-            <td class="text-right"><a href="{% url 'web:'|add:model|add:'-edit' pk=obj.id %}">{% trans "Edit" %}</a></td>
+            <td class="edit text-right"><a href="{% url 'web:'|add:model|add:'-edit' pk=obj.id %}">{% trans "Edit" %}</a></td>
         </tr>
     {% endfor %}
     </tbody>
 </table>
+</div>
+<div class="backnav">
+    <a href="{% url 'web:portal' %}">Back</a>
+</div>
 {% endblock content %}
