@@ -390,3 +390,6 @@ td.text-top{
     padding: 10px 24px;
     font-weight: bold;
 }
+.hidden-initial{
+    display: none;
+}

@@ -76,6 +76,10 @@
     word-wrap: break-word;
     font-weight: bold;
 }
+.fieldWrapper span.value{
+    padding: 3px 16px 3px 0px;
+    width: 100%;
+}
 .fieldWrapper ul{
     float: left;
     padding: 10px;
@@ -121,4 +125,11 @@
 }
 .formrow > .fieldWrapper select{
     padding: 3px;
+}
+.form div.instruction{
+    border: 1px solid rgba(64,64,64,0.8);
+    border-radius: 3px;
+    font-weight: bold;
+    color: #6e6e6e;
+    padding: 10px;
 }
