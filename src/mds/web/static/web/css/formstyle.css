@@ -58,6 +58,12 @@
 .contentform > .errorlist {
     color: red;
 }
+.form{
+    float: center;
+    margin: 5px;
+    border: 1px solid #e6e6e6;
+    padding: 5px;
+}
 .fieldWrapper {
     padding: 3px 10px 0 0;
     margin: 5px;
@@ -66,11 +72,48 @@
 .fieldWrapper label{
     padding: 3px 10px 0 0;
     float: left;
-    width: 128em;
+    width: 100%;
     word-wrap: break-word;
     font-weight: bold;
 }
 .fieldWrapper ul{
     float: left;
-    padding: 40px;
+    padding: 10px;
+    width: 100%;
+}
+
+.fieldWrapper input{
+    padding: 3px;
+}
+.fieldWrapper select{
+    padding: 3px;
+}
+.formrow {
+    padding: 5px;
+}
+.formrow > .fieldWrapper {
+    padding: 3px 10px 0 0;
+    margin: 5px;
+    width: 100%;
+}
+.formrow > .fieldWrapper label{
+    padding: 3px 10px 0 0;
+    float: left;
+    width: 100%;
+    word-wrap: break-word;
+    font-weight: bold;
+}
+.form div.evenrow{
+    background-color: #efefef; 
+    color: #6e6e6e;
+}
+.form div.oddrow{
+    background-color: #ffffff; 
+    color: #6e6e6e;
+}
+.formrow > .fieldWrapper input{
+    padding: 3px;
+}
+.formrow > .fieldWrapper select{
+    padding: 3px;
 }
