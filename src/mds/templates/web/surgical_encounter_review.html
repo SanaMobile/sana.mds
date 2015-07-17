@@ -72,17 +72,18 @@
             </script>
             {% endwith %}
         {% elif obs.is_complex %}
-            <span id="id_{{ obs.uuid }}" class="ui-body-inherit value"><img src="{{ obs.url }}" width="96" onclick="window.open('{{ obs.url }}')"></img></span>
+            <span id="id_{{ obs.uuid }}" class="ui-body-inherit value"><img src="{{ MEDIA_URL }}{{ obs.value_complex }}" width="96" onclick="window.open('{{ MEDIA_URL }}{{ obs.value_complex }}')"></img></span>
             <div class="fieldWrapper ui-corner-all">
                 <label for="id_{{ obs.uuid }}_adequate">Is the photograph quality sufficient to allow assessment of infection?</label>
                 <select id="id_{{ obs.uuid }}_adequate" name="{{ obs.uuid }}">
-                    <option>{% trans 'Yes' %}</option>
-                    <option>{% trans 'No' %}</option>
+                    <option value="true">{% trans 'Yes' %}</option>
+                    <option value="false">{% trans 'No' %}</option>
                 </select>
             </div>
-            <section id="id_{{ obs.uuid }}_criteria" class="ihidden-initial">
+            <section id="id_{{ obs.uuid }}_criteria" class="hidden-initial">
                 <div class="fieldwrapper">
                     <ul>
+                        <li><h4>Select all that apply</h4></li>
                         <li>
                             <input type="checkbox" name="value">Body part is not identifiable.</input>
                         </li>
@@ -97,7 +98,16 @@
                 </div>
             </section>
             <script>
-                
+                // (un)hide the routine posto op visit questions
+                $('#id_{{ obs.uuid }}_criteria').hide();
+                $('#id_{{ obs.uuid }}_adequate').change(function(){
+                    if($(this).val() == "false"){
+                        $('#id_{{ obs.uuid }}_criteria').slideDown("fast");
+                    } else {
+                        $('#id_{{ obs.uuid }}_criteria').slideUp("fast");
+                    }
+                });
+
             </script>
          {% else %}
             <span id="id_{{ obs.uuid }}" class="ui-body-inherit value">{{ obs.value }}</span>
