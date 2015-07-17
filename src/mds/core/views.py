@@ -22,7 +22,7 @@ from django.template import RequestContext
 from mds.api import version
 from mds.api.responses import JSONResponse
 from mds.api.v1.v2compatlib import sort_by_node
-from .models import Event
+from .models import *
 from mds.core.extensions.views import intake
 
 __all__ = [
@@ -152,10 +152,11 @@ def log(request,*args,**kwargs):
 
 @login_required(login_url='/mds/login/')
 def encounter(request,**kwargs):
-    tmpl = 'core/mobile/encounter.html'
+    tmpl = 'core/mobile/suencounter.html'
     uuid = kwargs.get('uuid',None) if kwargs else None
     if kwargs:
-        tmpl = 'core/mobile/encounter.html'
+        if uuid:
+            tmpl = 'core/mobile/surgical_encounter_review.html'
         encounters = Encounter.objects.filter(**kwargs)
         num = encounters.count()
         data = []
@@ -169,7 +170,7 @@ def encounter(request,**kwargs):
             observations = []
             for obs in sort_by_node(obsqs,descending=False):
                 obsdata = { "node": obs.node,
-                        "concept": obs.concept.name}
+                        "concept": obs.concept.description }
                 if obs.concept.is_complex:
                     obsdata["url"] = obs.value_complex.url
                     obsdata["thumb"] = u''

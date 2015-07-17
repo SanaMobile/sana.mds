@@ -89,6 +89,7 @@ extra_patterns = patterns(
     url(r'^surgicalsubject/(?P<uuid>[^/]+)/encounter/$', rsrc_surgicalsubject, name='surgical-subject-encounters', kwargs={'related':'procedure'}),
 
     url(r'^location/$', rsrc_location, name='location-list'),
+    url(r'^mobile/encounter/(?P<uuid>[^/]+)/$', 'mds.core.views.encounter', name='surgeon-review'),
 )
 
 # add the non-RESTful urls
