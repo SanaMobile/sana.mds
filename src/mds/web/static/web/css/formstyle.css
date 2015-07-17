@@ -111,6 +111,11 @@
     background-color: #ffffff; 
     color: #6e6e6e;
 }
+.form div.actionbar{
+    background-color: #4b545f;
+    padding-top: 10px;
+    padding-bottom: 10px;
+}
 .formrow > .fieldWrapper input{
     padding: 3px;
 }
