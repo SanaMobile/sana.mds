@@ -63,6 +63,7 @@
 </div>
 <!-- end definition -->
 <!-- begin observations -->
+<div class="form">
 <form name="observations" id="id_observations">
 <!-- is SSI present -->
 <div class="fieldWrapper">
@@ -87,24 +88,30 @@
     <label>{% trans 'What is the treatment plan?(Check all that apply)' %}</label>
     <input type="hidden"/>
 </div>
-<div>
+<div class="formrow">
     <ul>
         <li>
-            <input id="id_antibiotics" name="antibiotics" type="checkbox">{% trans 'Antibiotics' %}</input>
-        </li>
-        <li>
-            <input id="id_open_incision" name="open_incision" type="checkbox" value="true">{% trans 'Open the incision and pack at the bedside' %}</input>
-            <div id="id_drainage" class="hidden-initial">
-                <ul>
-                    <li><input id="id_drainage_local" name="drainage_local" type="checkbox" value="true">{% trans 'Drainage in the operating room - local anesthesia' %}</input></li>
-                    <li><input id="id_drainage_general_spinal" name="drainage_general_spinal" type="checkbox" value="true">{% trans 'Drainage in the operating room -general or spinal anesthesia' %}</input></li>
-                </ul>
+            <div class="fieldWrapper">
+                <input id="id_antibiotics" name="antibiotics" type="checkbox">{% trans 'Antibiotics' %}</input>
             </div>
         </li>
         <li>
-            <input id="id_readmission" name="readmission" type="checkbox">{% trans 'Readmission' %}</input>
+            <div class="fieldWrapper">
+                <input id="id_open_incision" name="open_incision" type="checkbox" value="true"/>{% trans 'Open the incision and pack at the bedside' %}
+                <div id="id_drainage" class="hidden-initial">
+                    <ul>
+                    <li><input id="id_drainage_local" name="drainage_local" type="checkbox" value="true">{% trans 'Drainage in the operating room - local anesthesia' %}</input></li>
+                    <li><input id="id_drainage_general_spinal" name="drainage_general_spinal" type="checkbox" value="true">{% trans 'Drainage in the operating room -general or spinal anesthesia' %}</input></li>
+                    </ul>
+                </div>
+            </div>
         </li>
-    <ul>
+        <li>
+            <div class="fieldWrapper">
+            <input id="id_readmission" name="readmission" type="checkbox">{% trans 'Readmission' %}</input>
+            </div>
+        </li>
+    </ul>
 </div>
 </section>
 <script> 
@@ -140,12 +147,15 @@
             <option value="false">{% trans 'Yes, another visit is justified' %}</option>
         </select>
     </div>
-</scetion>
-</form>
-</div>
+</section>
+<div class="actionbar">
 <p align="center" style="font-size:larger">
     <input type="button" id="id_submit" class="show-page-loading-msg" value="{% trans 'Submit' %}">
 </p>
+</div>
+</div>
+</form>
+</div>
 <script>
     // Use the date picker
     $(function(){
@@ -175,8 +185,8 @@
         console.info("id_open_incision="+val)
         if ($(this).is(":checked")){
             $('#id_drainage').slideDown("fast");
-        } else if (val == "off"){
-            $('#id_drainage').slideDown("fast");
+        } else {
+            $('#id_drainage').slideUp("fast");
         }
     });
     

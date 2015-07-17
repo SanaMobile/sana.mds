@@ -2,6 +2,7 @@
 {% load static %}
 {% block extrastyle %}
 <link rel="stylesheet" href="{{ STATIC_PREFIX }}web/css/liststyle.css">
+<link rel="stylesheet" href="{{ STATIC_PREFIX }}web/css/formstyle.css">
 {% endblock %}
 
 {% block extrascript %}
@@ -121,38 +122,28 @@
 
 {% block content %}
 <form name="intake" id="id_form" action="javascript:submitEncounterWeb()" method="post">
+<div class="form">
 {% for hidden in form.hidden_fields %}
     {{ hidden }}
 {% endfor %}
 {# Include the visible fields #}
-<table class="content-list">
-<tbody>
     {% for field in form.visible_fields %}
-    <tr class="{% cycle 'evenrow' 'oddrow' %}" style="padding:3px">
-        <td class="text-left">
-            <div class="fieldWrapper">
+    <div class="formrow {% cycle 'evenrow' 'oddrow' %}">
+        <div class="fieldWrapper">
             {{ field.errors }}{{ field.label_tag }}
-            </div>
-        </td>
-        <td class="text-right">{{ field }}</td>
-    </tr>
+            {{ field }}
+        </div>
+    </div>
     {% endfor %}
-    <tr>
-        <td colspan="2">
-            <input type="checkbox" name="new_tasks" id="id_new_tasks" value="true">Create default tasks</input>
-        </td>
-    </tr>
-</tbody>
-</table>
-
-  <p align="center" style="font-size:larger">
-    <input type="button" id="id_submit" class="show-page-loading-msg" value="Submit" onClick="submitEncounterWeb()">
-  </p>
-
-</form>
-<div id="id_messages">
+    <div class="actionbar">
+        <p align="center" style="font-size:larger">
+            <input type="button" id="id_submit" class="show-page-loading-msg" value="Submit" onClick="submitEncounterWeb()">
+        </p>
+    </div>
 </div>
+</form>
 <script>
+    // Input handlers
     $(function(){
       //$( "input[type='date']" ).datepicker({ dateFormat: 'mm/dd/yy', changeYear: true });
         $('input[type="date"]').datepicker({ dateFormat: 'yy-mm-dd', changeYear: true , yearRange : "c-100:c+05"}).prop('type','text');
@@ -165,17 +156,18 @@
         event.originalEvent.ctrlKey = true;
       });
     });
-  var subject = null;
-  $(function(){
-    var subject = $.cookie("subject");
-    if(subject){
-        $('#id_subject').val(subject);
-    }
-    $('#id_new_tasks').bind('click',function() {
-        if($(this).is(':checked')) {
-            $('#id_messages').html($(this).val());
-         }
-   });
-  });
+    // Sets the current subject uuid as a cookie
+    var subject = null;
+    $(function(){
+        var subject = $.cookie("subject");
+        if(subject){
+            $('#id_subject').val(subject);
+        }
+        $('#id_new_tasks').bind('click',function() {
+            if($(this).is(':checked')) {
+                $('#id_messages').html($(this).val());
+            }
+        });
+    });
 </script>
 {% endblock content %}
