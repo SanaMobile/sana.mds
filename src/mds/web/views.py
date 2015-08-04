@@ -923,7 +923,7 @@ class EncounterTaskListView(ModelListMixin, ListView):
     model = EncounterTask
     default_sort_params = ('due_on', 'asc')
     fields = ('due_on', 'status', 'subject', 'assigned_to')
-    template_name = "web/list.html"
+    template_name = "web/task_list.html"
     paginate_by=10
 
     def get_queryset(self):
@@ -939,6 +939,15 @@ class EncounterTaskListView(ModelListMixin, ListView):
         context = super(EncounterTaskListView,self).get_context_data(**kwargs)
         if hasattr(self,'status'):
             context['status'] = self.status
+        
+        for obj in context['objects']:
+            due_on = obj['fields'].get('due_on')['value']
+            twindow = datetime.timedelta(days=1)
+            days = (datetime.datetime.today() - due_on).days
+            if (days >= 1):
+                obj['late'] = 'late'
+            elif (days < 1) and (days >= 0):
+                obj['late'] = 'today'
         return context
 
 class EncounterTaskCreateView(ModelFormMixin,ModelSuccessMixin,CreateView):

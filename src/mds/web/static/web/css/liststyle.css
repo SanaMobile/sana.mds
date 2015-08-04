@@ -89,3 +89,10 @@
     max-width: 32px;
     padding: 10px;
 }
+
+.content-list tr.late{
+    color: #E30101;
+}
+.content-list tr.today{
+    color: #FC6302;
+}
