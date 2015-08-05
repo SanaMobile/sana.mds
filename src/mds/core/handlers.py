@@ -217,7 +217,6 @@ class ProcedureHandler(DispatchingHandler):
 class SubjectHandler(DispatchingHandler):
     """ Handles subject requests. """
     allowed_methods = ('GET', 'POST','PUT')
-    '''
     fields = (
         "uuid",
         "family_name",
@@ -228,7 +227,6 @@ class SubjectHandler(DispatchingHandler):
         "system_id",
         ("location",("name","uuid")),
     )
-    '''
     model = Subject
     form = SubjectForm
     signals = { LOGGER:( EventSignal(), EventSignalHandler(Event))}
