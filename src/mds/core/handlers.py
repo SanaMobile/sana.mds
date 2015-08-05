@@ -164,7 +164,6 @@ class ObservationHandler(DispatchingHandler):
     allowed_methods = ('GET', 'POST','PUT')
     model = Observation
     form = ObservationForm
-    '''
     fields = (
         "uuid",
         ("encounter",("uuid")),
@@ -173,8 +172,10 @@ class ObservationHandler(DispatchingHandler):
         "value_text",
         "value_complex",
         "value",
+        'voided',
+        'created',
+        'modified',
     )
-    '''
     signals = { LOGGER:( EventSignal(), EventSignalHandler(Event))}
     
 @logged        
@@ -183,26 +184,30 @@ class ObserverHandler(DispatchingHandler):
     allowed_methods = ('GET', 'POST','PUT')
     model = Observer
     form = ObserverForm
-    '''
-    fields = ("uuid",
-              ("user",("username","is_superuser")),
-             )
-    '''
+    fields = (
+        "uuid",
+        ("user",("username","is_superuser")),
+        'voided',
+        'created',
+        'modified',
+    )
     signals = { LOGGER:( EventSignal(), EventSignalHandler(Event))}
 
 @logged
 class ProcedureHandler(DispatchingHandler):
     allowed_methods = ('GET', 'POST','PUT')
     model = Procedure
-    '''
-    fields = ("uuid",
-              "title",
-              "description",
-              "src",
-              "version",
-              "author",
-             )
-    '''
+    fields = (
+        "uuid",
+        "title",
+        "description",
+        "src",
+        "version",
+        "author",
+        'voided',
+        'created',
+        'modified',
+    )
     signals = { LOGGER:( EventSignal(), EventSignalHandler(Event))}
 
     def _read_by_uuid(self,request,uuid):
@@ -226,6 +231,9 @@ class SubjectHandler(DispatchingHandler):
         "image",
         "system_id",
         ("location",("name","uuid")),
+        'voided',
+        'created',
+        'modified',
     )
     model = Subject
     form = SubjectForm
@@ -244,7 +252,14 @@ class DocHandler(BaseHandler):
 # new stuff
 class LocationHandler(DispatchingHandler):
     model = Location
-    #fields = ("name","uuid","code")
+    fields = (
+        "name",
+        "uuid",
+        "code",
+        'voided',
+        'created',
+        'modified',
+    )
 
 class CompoundFormHandler(object):
     forms = {}
@@ -267,24 +282,27 @@ class SurgicalSubjectHandler(DispatchingHandler):
     allowed_methods = ('GET', 'POST')
     #fields = ['uuid']
     #exclude = ("location")
-    '''
-    fields = ("uuid",
-              "family_name",
-              "given_name",
-              "gender",
-              "dob",
-              "image",
-              "system_id",
-              ("location",("name","uuid")),
-                "house_number",
-                "family_number", 
-                "national_id",
-                "contact_one",
-                "contact_two",
-                "contact_three",
-                "contact_four",
-             )
-    '''
+    fields = (
+        "uuid",
+        "family_name",
+        "given_name",
+        "gender",
+        "dob",
+        "image",
+        "system_id",
+        ("location",("name","uuid")),
+        "house_number",
+        "family_number", 
+        "national_id",
+        "contact_one",
+        "contact_two",
+        "contact_three",
+        "contact_four",
+        'voided',
+        'created',
+        'modified',
+    )
+    
     model = SurgicalSubject
     form = SurgicalSubjectForm
     signals = { LOGGER:( EventSignal(), EventSignalHandler(Event))}

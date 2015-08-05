@@ -26,13 +26,17 @@ class EncounterTaskHandler(DispatchingHandler):
     form = EncounterTaskForm
     fields = (
         "uuid",
-        ("assigned_to",("uuid",)),
-        ("subject",("uuid")),
-        ("encounter",("uuid")),
+        ("assigned_to", ("uuid",)),
+        ("subject", ("uuid",)),
+        ("encounter", ("uuid",)),
         "status",
         "due_on",
         "completed",
-        "procedure")
+        "procedure",
+        'created',
+        'modified'
+        'voided',
+    )
     signals = { LOGGER:( EventSignal(), EventSignalHandler(Event))}
     
     def create(self,request,uuid=None):
