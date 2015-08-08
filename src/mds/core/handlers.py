@@ -123,10 +123,10 @@ class DeviceHandler(DispatchingHandler):
     allowed_methods = ('GET', 'POST','PUT')
     model = Device
     form = DeviceForm
-    #fields = (
-    #    "uuid",
-    #    "name",
-    #)
+    fields = (
+        "uuid",
+        "name",
+    )
     signals = { LOGGER:( EventSignal(), EventSignalHandler(Event))}
     
 @logged    
@@ -135,14 +135,17 @@ class EncounterHandler(DispatchingHandler):
     allowed_methods = ('GET', 'POST','PUT')
     model = Encounter
     form = EncounterForm
-    #fields = ("uuid",
-    #    "concept", 
-    #    "observation",
-    #    ("subject",("uuid",)),
-    #    "created",
-    #    "modified",
-    #    ("procedure",("title","uuid")),
-    #)
+    fields = (
+        "uuid",
+        "observer",
+        "device",
+        "concept", 
+        "observation",
+        ("subject",("uuid",)),
+        "created",
+        "modified",
+        ("procedure",("title","uuid")),
+    )
     signals = { LOGGER:( EventSignal(), EventSignalHandler(Event))}
 
 @logged
