@@ -70,6 +70,7 @@ class ObservationAdmin(admin.ModelAdmin):
     actions=[mark_voided,]
 
 class EncounterAdmin(admin.ModelAdmin):
+    readonly_fields = ['uuid',]
     exclude = ['concept',]
     list_display = ['subject','voided','procedure', 'created','uuid',"observer",]
     #actions = [mark_encounter_voided,]
@@ -86,7 +87,7 @@ class ObserverAdmin(admin.ModelAdmin):
 
 class SubjectAdmin(admin.ModelAdmin):
     readonly_fields = ['uuid',]
-    list_display = ['given_name', 'family_name', 'uuid', "image"]
+    list_display = ['given_name', 'family_name', 'system_id', 'uuid', "image"]
 
 class SubjectInline(admin.StackedInline):
     model = Subject
@@ -96,6 +97,7 @@ class SurgicalSubjectAdmin(admin.ModelAdmin):
     list_display = ['system_id','given_name', 'family_name', 'uuid', "image"]
 
 class LocationAdmin(admin.ModelAdmin):
+    readonly_fields = ['uuid',]
     model = Location
     list_display = ('name',)
     list_filter = ('name',)
