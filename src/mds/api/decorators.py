@@ -125,7 +125,9 @@ def validate(operation='POST'):
             setattr(request,'raw_data', data)
             try:
                 form.full_clean()
-            except:
+            except Exception, e:
+                logging.error("Form invalid: clean failed.")
+                logging.error("Exception: %s" % e)
                 errs = form.errors.keys()
                 return fail(None, errors=errs)
                 
