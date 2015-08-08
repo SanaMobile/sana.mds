@@ -170,11 +170,10 @@ class DispatchingHandler(BaseHandler,HandlerMixin):
             logging.info("Has uuid: %s" % uuid)
             if klazz.objects.filter(uuid=uuid).count() == 1:
                 return self._update(request,uuid=uuid)
-            
-        instance = klazz(**data)
-        instance.save()
-        return instance
-    
+        else:
+            instance = klazz(**data)
+            instance.save()
+            return self.model.objects.filter(uuid=instance.uuid)
     
     def _read_multiple(self, request, *args, **kwargs):
         """ Returns a zero or more length list of objects.
@@ -212,14 +211,8 @@ class DispatchingHandler(BaseHandler,HandlerMixin):
         obj = model.objects.get(uuid=uuid)
         if 'uuid' in raw_data.keys():
             raw_data.pop('uuid')
-        for k,v in data.items():
-            if k in self.fks:
-                _obj = getattr(obj,k).__class__.objects.get(uuid=v)
-                v = _obj
-                setattr(obj,k,v)
         model.objects.filter(uuid=uuid).update(**raw_data)
-        msg = model.objects.filter(uuid=uuid)
-        return msg
+        return model.objects.filter(uuid=uuid)
     
     def _delete(self,uuid):
         model = getattr(self,'model')
