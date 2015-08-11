@@ -16,7 +16,7 @@
 
 .horizontal-menu nav ul {
     background: #4b545f; 
-    padding:  0 auto;
+    padding:  0px;
     margin: 0 auto;
     border-radius: 5px;  
     list-style: none;
@@ -68,12 +68,10 @@
 }
 .horizontal-menu nav ul ul li a {
     padding: 15px 40px;
-    color: #fff;
-}   
+}
 .horizontal-menu nav ul ul li a:hover {
     background: #4b545f;
 }
-        
 .horizontal-menu nav ul ul ul {
     position: absolute; left: 100%; top:0;
 }
