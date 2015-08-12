@@ -10,5 +10,5 @@ urlpatterns = patterns(
     '',
     url(r'^$', 'clients.views.version', name="android"),
     url(r'^download/$', 'mds.clients.views.download_current', name="download-current"),
-    url(r'^download/(?P<version>\w+)/$', 'mds.clients.views.download_version', name="download-version"),
+    url(r'^download/(?P<version>.+)/$', 'mds.clients.views.download_version', name="download-version"),
     )
