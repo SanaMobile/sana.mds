@@ -39,8 +39,8 @@
   <script src="{{ STATIC_PREFIX }}web/js/console.js"></script>
   <script src="{{ STATIC_PREFIX }}web/js/functions.js" ></script>
   {% endblock srcscript %}
-  <script>
   {% block script %}
+  <script>
     var procedure = "303a113c-6345-413f-88cb-aa6c4be3a07d";
     var subject = null;
     var device = "2fc0a9f7-384b-4d97-8c1c-aa08f0e12105";
@@ -169,8 +169,8 @@
 
     {% block extrascript %}{% endblock extrascript %}
 
-{% endblock script %}
 </script>
+{% endblock script %}
 </head>
 <body>
 <div class="wrapper">
@@ -193,7 +193,6 @@
     </div>
     {% include 'web/messages.html' %}
   </div>
-
   </section>
 </div>
 <div id="loader" class="loader"></div>
