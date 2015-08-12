@@ -1,37 +1,34 @@
 {% extends "web/base.html" %}
+{% load i18n %}
 {% load url from future %}
 {% block extrastyle %}
-<link rel="stylesheet" href="{{ STATIC_PREFIX }}web/css/liststyle.css">
+<link rel="stylesheet" href="{{ STATIC_PREFIX }}web/css/login.css">
 {% endblock %}
 {% block extrascript %}
-    $(document).ready(function(){        
-        $("#id_password").attr("type","password");
-        $( document ).on( 'focus', ':input', function(){
-            $( this ).attr( 'autocomplete', 'off' );
-        });
-    });
 {% endblock %}
 {% block content %}
 {% if form.errors %}
 <p>Your username and password didn't match. Please try again.</p>
 {% endif %}
 <form method="post" action=".">
+<div class="ui-widget userform">
 {% csrf_token %}
-<table class="content-list" style="color:#696969">
-    <tr>
-        <td>{{ form.username.label_tag }}</td>
-        <td>{{ form.username }}</td>
-    </tr>
-    <tr>
-        <td>{{ form.password.label_tag }}</td>
-        <td>{{ form.password }}</td>
-    </tr>
-    <tr class="footerrow">
-        <td colspan="2" style="text-align:center">
-            <input type="submit" value="login" />
-        </td>
-    </tr>
-</table>
-<input type="hidden" name="next" value="{{ next }}" />
+{% for hidden in form.hidden_fields %}
+    {{ hidden }}
+{% endfor %}
+    <input type="hidden" name="next" value="{{ next }}" />
+    <div class="fieldWrapper">
+        <span>{{ form.username.errors }}{{ form.username.label_tag }}</span><br/>
+        {{ form.username }}
+    </div>
+    <div class="fieldWrapper">
+        <span>{{ form.password.errors }}{{ form.password.label_tag }}</span><br/>
+        {{ form.password }}
+    </div>
+    <div class="form-button">
+        <p><input type="submit" value="{% trans 'Login' %}" /></p>
+    </div>
+    <input type="hidden" name="next" value="{{ next }}" />
+</div>
 </form>
 {% endblock %}
