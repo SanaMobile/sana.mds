@@ -1,0 +1,22 @@
+{% extends 'web/base.html' %}
+{% load static %}
+{% load i18n %}
+{% block title %}{{ title }}{% endblock %}
+{% block header %}{{ title }}{% endblock %}
+{% block extrastyle %}
+<link rel="stylesheet" href="{{ STATIC_PREFIX }}web/css/formstyle.css">
+{% endblock %}
+{% block content %}
+<div class="ui-widget">
+    <h4><a href="/mds/clients/download/">{% trans 'Download latest' %}</a></h4>
+</div>
+<hr/>
+<div class="ui-widget">
+    <h4>{% trans 'Available versions:' %}</h4>
+    <ul>
+        {% for object in objects %}
+        <li><a href="/mds/clients/download/{{ object.version }}/">{{ object.version }}</a></li>
+        {% endfor %}
+    </ul>
+</div>
+{%endblock content %}

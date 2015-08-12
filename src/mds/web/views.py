@@ -19,7 +19,7 @@ from django.db.models import ForeignKey, FileField, ImageField, DateField, DateT
 from django.shortcuts import render_to_response,redirect
 from django.template import RequestContext
 from django.template.response import TemplateResponse 
-from django.views.generic import DetailView, ListView, CreateView, UpdateView
+from django.views.generic import *
 from django.views.generic.detail import *
 from django.utils.translation import ugettext_lazy as _
 
@@ -29,6 +29,7 @@ from django.contrib.auth.models import User
 from mds.api import version
 from mds.api.responses import JSONResponse
 from mds.api.v1.v2compatlib import sort_by_node
+from mds.clients import models as clients
 from mds.core.forms import *
 from mds.core.models import *
 from .forms import *
@@ -44,7 +45,7 @@ def login(request,*args,**kwargs):
         username = request.POST['username']
         password = request.POST['password']
         user = authenticate(username=username, password=password)
-        redirect_to = request.REQUEST.get("next", '')
+        redirect_to = request.REQUEST.get("next", None)
         next_page = redirect_to if redirect_to else reverse("web:portal")
         if user is None:
             return TemplateResponse(request,
@@ -678,7 +679,6 @@ class ModelFormMixin(object):
             context['objects'] = list(self.get_object_dict(x) for x in context['object_list'])
         context['portal'] = portal_site
         return context
-
 class ModelSuccessMixin(SuccessMessageMixin):
     success_message = "%(model)s: %(uuid)s was updated successfully"
 
@@ -900,7 +900,7 @@ class SubjectListView(ModelListMixin, ListView):
     model = Subject
     default_sort_params = ('system_id', 'asc')
     fields = ('system_id', 'family_name', 'given_name', 'gender', 'dob','voided')
-    template_name = "web/list.html"
+    template_name = "web/list_subjects.html"
     paginate_by=10
 
 class SubjectCreateView(ModelFormMixin,ModelSuccessMixin,CreateView):
@@ -1072,3 +1072,13 @@ def encounter_review(request,**kwargs):
                 'messages': messages,
             }))
 
+class ClientDownloadsView(TemplateView):
+
+    template_name = "web/download.html"
+
+    def get_context_data(self, **kwargs):
+        context = super(ClientDownloadsView, self).get_context_data(**kwargs)
+        context['title'] = _("Mobile Client Downloads")
+        context['objects'] = clients.Client.objects.order_by("-version")
+        context['portal'] = portal_site
+        return context

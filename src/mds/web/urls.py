@@ -102,5 +102,7 @@ urlpatterns = patterns(
     
     # Internationalization
     url(r'^setlang/$', 'mds.web.views.setlang', name='setlang'),
+    # Client downloads
+    url(r'^downloads/$', ClientDownloadsView.as_view(), name='download-client'),
 )
 

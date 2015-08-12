@@ -257,6 +257,15 @@ site = {
                 'label':'Reports',
                 'views':[]
             },
+            {
+                'label':'Downloads',
+                'views':[
+                    { 
+                        'label': 'Mobile Client',
+                        'context_name':'download-client',
+                    }
+                ]
+            },
         ]
     }
 
