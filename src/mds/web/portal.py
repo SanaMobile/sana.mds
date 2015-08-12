@@ -19,11 +19,74 @@ def build_urls(model_list):
     
 class Portal(object):
 
+    app = None
+    label = None
+    sites = {}
+    _sites = []
     _urlcache = None
 
     @property
     def urls(self):
         pass
+    
+    def __init__(self, app, name, sites=None):
+        self.app = app
+        self.name = name
+        if sites:
+            self.sites = sites
+    
+    def render(self, user):
+        _rendered = {
+            'app': self.app,
+            'name': self.name,
+            'sites': []
+        }
+        sites = []
+        groups = user.groups
+        for site in self._sites:
+            _site = self.sites.get(site)
+            requires = _site('requires', None)
+            if requires and not requires in groups:
+                continue
+            else:
+                views = []
+                _views = _site.get('views',[])
+                for _view in _views:
+                    requires = _view('requires', None)
+                    if requires and not requires in groups:
+                        continue
+                    else:
+                        views.append(_view)
+                sites.append(_site)
+        rendered['sites'] = sites
+        return rendered
+    
+    def _get_site(self, site):
+        return self.sites.get(site,{})
+    
+    def _get_views(self,site):
+        return self._get_site(site).values()
+
+    def register_site(self, site, requires=None, views=None):
+        _views = views if views else []
+        self.sites[site] = {
+            'label': site,
+            'requires': requires,
+            'views': _views,
+        }
+        _sites.append(site)
+        
+    def register_view(self, site, label, context_name, requires=None, url=None):
+        if not self.sites.has_key(site):
+            self.register_site(site,requires=requires)
+        _site = self._get_site(site)
+        _view = {
+            'label':label,
+            'context_name': context_name, 
+            'requires': requires,
+            'url': url
+        }
+        _site['views'].append(_view)
         
     def register_model(self,model, view=None, app=None,**kwargs):
         pass
@@ -164,15 +227,17 @@ class PortalSite(object):
         
 
 site = {
-        'name' : 'MDS2 Web Portal',
+        'name' : _('MDS2 Web Portal'),
         'app' : 'web',
         'sites' : [
            {
-                'label':'Users',
+                'label':_('Users'),
+                'requires': None,
                 'views': [
                     { 
                         'label': 'View all users',
                         'context_name':'user-list',
+                        'requires': None,
                     },
                     { 
                         'label': 'New User',
@@ -191,6 +256,7 @@ site = {
 
             {
                 'label':'Data',
+                'requires': None,
                 'views': [
                     { 
                         'label': 'concepts',
@@ -225,6 +291,7 @@ site = {
 
             {
                 'label':'Tasks',
+                'requires': None,
                 'views': [
                     { 
                         'label': 'Assigned Tasks',
@@ -238,6 +305,7 @@ site = {
             },
             {
                 'label':'Forms',
+                'requires': None,
                 'views':[
                     { 
                         'label': 'Intake Form',
@@ -255,14 +323,25 @@ site = {
             },
             {
                 'label':'Reports',
+                'requires': None,
                 'views':[]
             },
             {
-                'label':'Downloads',
+                'label':'Admin',
+                'requires': None,
                 'views':[
                     { 
-                        'label': 'Mobile Client',
+                        'label': 'Downloads',
                         'context_name':'download-client',
+                    },
+                    { 
+                        'label': 'Logs',
+                        'context_name':'log-index',
+                    },
+                    { 
+                        'label': 'Default Admin',
+                        'context_name': None,
+                        'url' : '/mds/admin/',
                     }
                 ]
             },
