@@ -261,8 +261,8 @@ def maybe_upload_procedure(saved_procedure):
             else:
                 attr['id'] = eid
                 cleaned_responses.append(attr)
-    patient_birthdate = '%s/%s/%s' % (months_dict[patient_month], patient_day,
-                                      patient_year)
+    #patient_birthdate = '%s/%s/%s' % (months_dict[patient_month], patient_day,
+    #                                  patient_year)
 
     if patient_id is None:
         patient_id = DEFAULT_PATIENT_ID

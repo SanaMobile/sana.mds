@@ -313,8 +313,8 @@ def spform_to_encounter(form):
     phone = form['phone']
     username = form['username']
     password = form['password']
-    patientId = form['subject']
-
+    patientId = form.get('subject',None)
+    logging.debug("username: " + username)
     procedure = get_v2(v2.Procedure,procedure_guid,"title")
     # check if they are an SA in which case we have a device
     # otherwise we fall back to the old behavior
@@ -333,7 +333,7 @@ def spform_to_encounter(form):
         device = get_or_create_v2(v2.Device, phone, "name")
 
     subject = get_v2(v2.Subject, patientId, "system_id")
-    concept = get_v2(v2.Concept,"ENCOUNTER","name")
+    concept = get_v2(v2.Concept,"ENCOUNTER", "name")
     
     encounter,created = v2.Encounter.objects.get_or_create(uuid=savedproc_guid,
 		    procedure=procedure,
