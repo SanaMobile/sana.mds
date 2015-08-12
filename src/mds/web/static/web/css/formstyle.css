@@ -55,8 +55,11 @@
 .content-form tfoot button{
     border-radius: 5px;
 }
-.contentform > .errorlist {
+.content-form > .errorlist {
     color: red;
+}
+.content-form img {
+    width: 128px;
 }
 .form{
     float: center;
