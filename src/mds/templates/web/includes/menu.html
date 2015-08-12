@@ -4,18 +4,28 @@
 <div class="horizontal-menu">
     <nav>
     <ul>
+    {% with roles=request.user.groups.all %}
     {% for site in menu.sites %}
         <li>
         <a href="#"><h4>{% trans site.label|title %}</h4></a>
         {% if site.views %}
             <ul>
                 {% for portal_view in site.views %}
-                <li><a href="{% url portal.app|add:':'|add:portal_view.context_name %}">{% trans portal_view.label|title %}</a></li>
+                    {% with label=portal_view.label %}
+                    <li>
+                        {% if portal_view.context_name %}
+                            <a href="{% url portal.app|add:':'|add:portal_view.context_name %}">{% trans label|title %}</a>
+                        {% else %}
+                            <a href="{{ portal_view.url }}">{% trans label|title %}</a>
+                        {% endif %}
+                    </li>
+                    {% endwith %}
                 {% endfor %}
             </ul>
         {% endif %}
         </li>
     {% endfor %}
+    {% endwith %}
     </ul>
 </nav>
 </div>
