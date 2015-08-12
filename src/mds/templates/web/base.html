@@ -15,8 +15,8 @@
     
   {% block style %}
     <!-- <link href='http://fonts.googleapis.com/css?family=Source+Sans+Pro:200,300,400' rel='stylesheet' /> -->
-    <link rel="stylesheet" href="{{ STATIC_PREFIX }}css/jquery-ui.css">
-    <link rel="stylesheet" href="{{ STATIC_PREFIX }}web/css/index.css">
+    <link rel="stylesheet" href="{{ STATIC_PREFIX }}css/jquery-ui.css" />
+    <link rel="stylesheet" href="{{ STATIC_PREFIX }}web/css/index.css" />
     <link rel="stylesheet" href="{{ STATIC_PREFIX }}web/css/lib/fontello.css" />
     <link rel="stylesheet" href="{{ STATIC_PREFIX }}web/css/lib/normalize.css" />
     <!--
@@ -37,10 +37,10 @@
   <script src="{{ STATIC_PREFIX }}js/jquery.serializejson.js"></script>
   <script src="{{ STATIC_PREFIX }}js/core.js"></script>
   <script src="{{ STATIC_PREFIX }}web/js/console.js"></script>
-  <script src="{{ STATIC_PREFIX }}web/js/functions.js" />
-{% endblock srcscript %}
-{% block script %}
+  <script src="{{ STATIC_PREFIX }}web/js/functions.js" ></script>
+  {% endblock srcscript %}
   <script>
+  {% block script %}
     var procedure = "303a113c-6345-413f-88cb-aa6c4be3a07d";
     var subject = null;
     var device = "2fc0a9f7-384b-4d97-8c1c-aa08f0e12105";
@@ -168,8 +168,9 @@
     }
 
     {% block extrascript %}{% endblock extrascript %}
-    </script>
+
 {% endblock script %}
+</script>
 </head>
 <body>
 <div class="wrapper">
