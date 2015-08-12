@@ -1,63 +1,7 @@
 {% extends "web/base.html" %}
 
 {% block extrastyle %}
-<style>
-
-.pagelist
-{
-    cssFloat: right;
-    width: 100%;
-    color: #fefefe;
-}
-td.selectp
-{
-    text-decoration:underline;
-}
-
-.err
-{
-    background-color: #ffaaaa;
-}
-.debug
-{
-    background-color: #dffddd;
-}
-#refresh{
-      cssFloat: right;
-}
-#logs
-{
-    background-color: #ffffff;
-    
-}
-.evenrow
-{
-    background-color: #ffffff;
-    
-}
-.oddrow
-{
-    background-color: #efefef;
-    
-}
-.logheader
-{
-    font-weight: bold;
-    width: inherit;
-    padding: 0;
-    border-spacing: 0px;
-    border-collapse: collapse;
-}
-.pagenav
-{
-    color: #1100ff;
-}
-.detail
-{
-    background-color: #ffffff;
-}
-
-</style>
+<link rel="stylesheet" href="{{ STATIC_PREFIX }}web/css/logs.css">
 {% endblock %}
 
 {% block script %}
