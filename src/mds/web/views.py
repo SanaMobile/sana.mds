@@ -144,7 +144,7 @@ class _metadata(object):
     def messages(self):
             return self.debug
 
-@login_required(login_url='/login/')
+@login_required(login_url='/mds/web/login/')
 def web_root(request, **kwargs):
     from mds.core import models as objects
     metadata = _metadata(request)
@@ -168,7 +168,7 @@ def registration(request, **kwargs):
                               'portal': portal_site,
                                }))
 
-@login_required(login_url='/mds/login/')
+@login_required(login_url='/mds/web/login/')
 def encounter_task(request, **kwargs):
     flavor = kwargs.get('flavor',None) if kwargs else None
     params = request.COOKIES
@@ -213,7 +213,7 @@ _procedure_forms = {
     "303a113c-6345-413f-88cb-aa6c4be3a07d": IntakeForm,
 }
 
-@login_required(login_url='/mds/login/')
+@login_required(login_url='/mds/web/login/')
 def edit_encounter_task(request, uuid, **kwargs):
     if(uuid):
         try:
@@ -250,7 +250,7 @@ def edit_encounter_task(request, uuid, **kwargs):
                                  'portal': portal_site,
                                 })
                              )
-@login_required(login_url='/mds/login/')
+@login_required(login_url='/mds/web/login/')
 def web_encounter(request, **kwargs):
     _cookies = request.COOKIES
     params = request.COOKIES
@@ -330,7 +330,7 @@ def web_encounter(request, **kwargs):
                                 })
                              )
 
-@login_required(login_url='/mds/login/')
+@login_required(login_url='/mds/web/login/')
 def task_list(request):
     query = dict(request.GET.items())
     page = int(query.get('page', 1))
@@ -474,7 +474,13 @@ _tasks = [
     EncounterTask,
 ]
 
-class ModelListMixin(SortMixin):
+class LoginRequiredMixin(object):
+    @classmethod
+    def as_view(cls, **initkwargs):
+        view = super(LoginRequiredMixin, cls).as_view(**initkwargs)
+        return login_required(view,login_url='/mds/web/login/')
+
+class ModelListMixin(LoginRequiredMixin, SortMixin):
     template_name = "web/form.html"
     exclude = ()
     _fields = []
@@ -560,7 +566,7 @@ class ModelMixin(object):
         context['model'] = self.model.__name__.lower()
         return context
         
-class ModelFormMixin(object):
+class ModelFormMixin(LoginRequiredMixin):
     template_name = "web/form.html"
     default_sort_params = ('created', 'asc')
     exclude = ()
@@ -679,6 +685,7 @@ class ModelFormMixin(object):
             context['objects'] = list(self.get_object_dict(x) for x in context['object_list'])
         context['portal'] = portal_site
         return context
+        
 class ModelSuccessMixin(SuccessMessageMixin):
     success_message = "%(model)s: %(uuid)s was updated successfully"
 
@@ -1072,7 +1079,7 @@ def encounter_review(request,**kwargs):
                 'messages': messages,
             }))
 
-class ClientDownloadsView(TemplateView):
+class ClientDownloadsView(LoginRequiredMixin,TemplateView):
 
     template_name = "web/download.html"
 
