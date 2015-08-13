@@ -19,7 +19,7 @@ from django.db.models import ForeignKey, FileField, ImageField, DateField, DateT
 from django.shortcuts import render_to_response,redirect
 from django.template import RequestContext
 from django.template.response import TemplateResponse 
-from django.views.generic import *
+from django.views.generic import DetailView, ListView, CreateView, UpdateView, TemplateView
 from django.views.generic.detail import *
 from django.utils.translation import ugettext_lazy as _
 
@@ -29,7 +29,7 @@ from django.contrib.auth.models import User
 from mds.api import version
 from mds.api.responses import JSONResponse
 from mds.api.v1.v2compatlib import sort_by_node
-from mds.clients import models as clients
+from mds.clients.models import Client
 from mds.core.forms import *
 from mds.core.models import *
 from .forms import *
@@ -45,7 +45,7 @@ def login(request,*args,**kwargs):
         username = request.POST['username']
         password = request.POST['password']
         user = authenticate(username=username, password=password)
-        redirect_to = request.REQUEST.get("next", None)
+        redirect_to = request.REQUEST.get("next", "")
         next_page = redirect_to if redirect_to else reverse("web:portal")
         if user is None:
             return TemplateResponse(request,
@@ -1079,13 +1079,13 @@ def encounter_review(request,**kwargs):
                 'messages': messages,
             }))
 
-class ClientDownloadsView(LoginRequiredMixin,TemplateView):
+class ClientDownloadsView(TemplateView):
 
     template_name = "web/download.html"
 
     def get_context_data(self, **kwargs):
         context = super(ClientDownloadsView, self).get_context_data(**kwargs)
         context['title'] = _("Mobile Client Downloads")
-        context['objects'] = clients.Client.objects.order_by("-version")
+        context['objects'] = Client.objects.order_by("-version")
         context['portal'] = portal_site
         return context
