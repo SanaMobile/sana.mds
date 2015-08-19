@@ -16,6 +16,7 @@ Everything as root(sudo)
             python-cjson                \
             python-django               \
             python-django-piston        \
+            python-django-extra-views   \
             python-mysqldb              \
             python-libxml2              \
             python-lxml                 \
