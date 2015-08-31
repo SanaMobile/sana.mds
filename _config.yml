@@ -1,0 +1,12 @@
+# Site settings
+title: "Sana"
+email: "questions@sanamobile.org"
+description: > # this means to ignore newlines until "baseurl:"
+  Sana platform user and technical documentation.
+baseurl: "/sana.mds" 
+url: "http://sanamobile.github.io" 
+# twitter_username: ""
+github_username:  "sanamobile"
+
+# Build settings
+markdown: kramdown
