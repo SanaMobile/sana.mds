@@ -29,5 +29,5 @@ cp ../include/mds/apache2/conf-available/mds.conf /etc/apache2/conf-available/
 cp ../include/mds/apache2/conf-available/openmrs.conf /etc/apache2/conf-available/
 a2enconf mds
 a2enconf openmrs
-../src/mds/settings.py.tmpl ../src/mds/settings.py
-../src/mds/local_settings.py.tmpl ../src/mds/local_settings.py
+cp ../src/mds/settings.py.tmpl ../src/mds/settings.py
+cp ../src/mds/local_settings.py.tmpl ../src/mds/local_settings.py
