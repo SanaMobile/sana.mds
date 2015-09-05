@@ -23,7 +23,7 @@ mkdir -p /opt/sana/cache                \
     /opt/sana/sana.mds/cache/media      \
     /opt/sana/sana.mds/cache/static     \
     /opt/sana/sana.mds/cache/db
-ln -s /home/django/git/sana.mds/src/mds /opt/sana/sana.mds/mds
+ln -s /home/django/git/sana.mds/src /opt/sana/sana.mds/mds
 mysql -u root -p
 cp ../include/mds/apache2/conf-available/mds.conf /etc/apache2/conf-available/
 cp ../include/mds/apache2/conf-available/openmrs.conf /etc/apache2/conf-available/
