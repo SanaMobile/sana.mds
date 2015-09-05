@@ -26,7 +26,8 @@ mkdir -p /opt/sana/cache                \
 ln -s /home/django/git/sana.mds/src/mds /opt/sana/sana.mds/mds
 mysql -u root -p
 cp ../include/mds/apache2/conf-available/mds.conf /etc/apache2/conf-available/
+cp ../include/mds/apache2/conf-available/openmrs.conf /etc/apache2/conf-available/
 a2enconf mds
+a2enconf openmrs
 ../src/mds/settings.py.tmpl ../src/mds/settings.py
 ../src/mds/local_settings.py.tmpl ../src/mds/local_settings.py
-
