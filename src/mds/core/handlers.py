@@ -83,7 +83,6 @@ class SessionHandler(DispatchingHandler):
         except Exception as e:
             msg = "Internal Server Error"
             logging.error(unicode(e))
-            raise e
             return error(msg)
         
     def read(self,request):
