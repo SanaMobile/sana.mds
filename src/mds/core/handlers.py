@@ -78,6 +78,7 @@ class SessionHandler(DispatchingHandler):
                 observer = Observer.objects.get(user=user)
                 return succeed(observer.uuid)
             else:
+                msg = "Invalid credentials"
                 logging.warn(msg)
                 return fail(msg)
         except Exception as e:
