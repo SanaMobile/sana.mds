@@ -66,12 +66,14 @@ Everything as root(sudo)
         cd /opt/sana/sana.mds
         ./manage.py syncdb
         ./manage.py collectstatic
-    d. Copy or link the contents of /opt/sana/sana.mds/mds/ to
-        /var/www/mds
+    d. Copy or link the contents of /opt/sana/sana.mds/mds/ to your apache document root. The default for 
+        Ubuntu is /var/www/html, e.g.
+        
+            ln -sf /var/www/html/mds /opt/sana/sana.mds/mds
         
    Update the apache configuration
 
-7. Update permissions for the document root.
+7. Update permissions for the .
     a. chown -R www-data:www-data /opt/sana/sana.mds
 
 8.  Apache configs:
@@ -81,11 +83,18 @@ Everything as root(sudo)
        and enable
         cp /home/<user>/git/sana.mds/include/mds/apache2/conf-available/* \
             /etc/apache2/conf-available
-    c. Enable mds conf
+    c. Add option to follow symlinks for the server root directive in your apache config, example:
+        
+        <Directory /var/www/html>
+            Options FollowSymLinks
+            Require all granted
+        </Directory>
+        
+    d. Enable mds conf
         a2enconf mds
-    d. Verify wsgi module is running
+    e. Verify wsgi module is running
         a2enmod wsgi
-    d. Restart apache
+    f. Restart apache
         service apache2 restart
         
 9.  Set up encryption. (https://help.ubuntu.com/14.04/serverguide/certificates-and-security.html)
