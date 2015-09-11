@@ -1,5 +1,6 @@
 from django.forms import widgets
 from django import forms
+from django.utils.translation import ugettext as _
 from django.utils.safestring import mark_safe
 
 __all__ = [
@@ -29,3 +30,14 @@ class SpanWidget(forms.Widget):
 
     def value_from_datadict(self, data, files, name):
         return self.original_value
+
+class ModelSelectOrNewWidget(forms.SelectWidget):
+
+    def render(self, name, value, attrs=None):
+        _url = None
+        output = []
+        output.append(super(ModelSelectOrNewWidget,self).render(name,value,attrs))
+        output.append("<a href='%s'><img src='/mds/static/admin/img/icon_addlink.gif'/></a>" % _url)
+        return mark_safe(u''.join(output))
+
+
