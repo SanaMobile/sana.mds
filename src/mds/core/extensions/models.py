@@ -64,3 +64,4 @@ class SurgicalSubject(Subject):
     contact_two =  models.CharField(max_length=64, blank=True)
     contact_three =  models.CharField(max_length=64, blank=True)
     contact_four =  models.CharField(max_length=64, blank=True)
+    confirmed = models.BooleanField(default=True)

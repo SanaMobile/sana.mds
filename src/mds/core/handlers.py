@@ -305,6 +305,7 @@ class SurgicalSubjectHandler(DispatchingHandler):
         'voided',
         'created',
         'modified',
+        'confirmed',
     )
     
     model = SurgicalSubject
