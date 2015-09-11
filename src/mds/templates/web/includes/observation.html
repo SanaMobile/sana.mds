@@ -1,0 +1,24 @@
+{% if observation.is_complex %}
+    <a href="{{ MEDIA_URL }}{{ observation.value_complex }}">
+        {% if "image/" in observation.concept.mimetype %}
+            <img src="{{ MEDIA_URL }}{{ observation.value }}"/>
+        {% else %}
+            <img src="{{ STATIC_PREFIX }}web/img/binary.png" />
+        {% endif %}
+    </a>
+{% else %}
+    {% if "GPS" in observation.concept.name %}
+        <span id="id_{{ observation.uuid }}" class="ui-body-inherit value">{{ obs.value }}</span>
+        <div id="map-canvas"></div>
+        {% with val=observation.value_as_floats %}
+        <script>
+            $(function(){
+                google.maps.event.addDomListener(window, 'load', initialize({{ val.0 }},{{ val.1 }}));
+            });
+        </script>
+        {% endwith %}
+            {{ observation.value }}
+    {% else %}
+        {{ observation.value }}
+    {% endif %}
+{% endif %}
