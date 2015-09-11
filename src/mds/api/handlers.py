@@ -56,7 +56,9 @@ class HandlerMixin(object):
             return None
         for field in _meta.fields:
             if isinstance(_meta.get_field_by_name(field.name)[0], ForeignKey):
-                foreign_keys.append(field.name)
+                # Exclude any abstract parents here
+                if not "_ptr" in field.name:
+                    foreign_keys.append(field.name)
         if not foreign_keys:
             return []
         return foreign_keys
@@ -170,10 +172,18 @@ class DispatchingHandler(BaseHandler,HandlerMixin):
             logging.info("Has uuid: %s" % uuid)
             if klazz.objects.filter(uuid=uuid).count() == 1:
                 return self._update(request,uuid=uuid)
+            else:
+                logging.info("object uuid(%s) does not exist" % uuid)
+                for field in self.fks:
+                    raw_data[field] = data[field]
+                raw_data['uuid'] = uuid
+                instance = klazz(**raw_data)
+                instance.save()
         else:
+            logging.info("uuid: %s" % uuid)
             instance = klazz(**data)
             instance.save()
-            return self.model.objects.filter(uuid=instance.uuid)
+        return self.model.objects.filter(uuid=instance.uuid)
     
     def _read_multiple(self, request, *args, **kwargs):
         """ Returns a zero or more length list of objects.
