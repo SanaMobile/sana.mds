@@ -12,10 +12,11 @@ from django.core.mail import send_mail
 __all__ = ["send_review_notification",]
 
 #TODO These should be saved as settings or a global config table
-link = "https://0.0.0.0/mds/admin/core/%s/%d/"
-mobile_link = "https://0.0.0.0/mds/core/mobile/%s/%s/"
+link = "https://%s/mds/web/form/surgeon/review/%s/"
+#mobile_link = "https://%s/mds/core/mobile/%s/%s/"
 
-def send_review_notification(instance,addresses,subject, 
+def send_review_notification(instance,addresses,subject,
+    review_host=settings.REVIEW_HOSTNAME, 
     replyTo=settings.SMTP_REPLYTO,
     template=settings.REVIEW_POST_TEMPLATE,
     auth_user=settings.EMAIL_HOST_USER,
@@ -24,14 +25,15 @@ def send_review_notification(instance,addresses,subject,
         an uploaded encounter.
     """
     try:
-        url = link % (instance.__class__.__name__.lower(), instance.id)
-        mobile_url = mobile_link % (instance.__class__.__name__.lower(), instance.uuid)
+        url = link % (
+            review_host,
+            instance.uuid
+        )
         logging.debug("review link %s" % url)
         #urlencodred = urllib.urlencode(url)
         #print urlencoded)
-        message = template % (url,mobile_url)
+        message = template % (url)
         logging.debug("Review message:\n %s" % message)
-        print message
         send_mail(subject, message, settings.SMTP_REPLYTO,addresses, 
                     fail_silently=False,
                     auth_user=auth_user, 
