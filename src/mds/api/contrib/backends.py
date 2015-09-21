@@ -4,6 +4,8 @@ Provides access to pluggable backend infrastructucture.
 Target backends must be configured in the settings by adding
 the desired backend to the value of the TARGET variable.
 '''
+import logging
+
 __all__ = [
     'AbstractHandler',
     'register_handler',
