@@ -16,15 +16,28 @@ from django.template import RequestContext
 
 from mds.api import version
 
-@login_required(login_url='/mds/login/')
+#@login_required(login_url='/mds/login/')
 def home(request):
-    """Top level url
-    
-    Displays ::
-        {"path": HttpRequest.path, 
-         "host": HttpRequest.get_host(), 
-         "version": mds.api.version, 
-         "service": "REST"}
+    """Top level url. Displays standard mds response containing following
+       information about the system :
+        
+        Django version
+        Host OS
+        MDS version
+        
+        Note: If Http "Accept" header is included and set to 
+        "application/json", the returned message will be a standard MDS
+        response as follows:
+        
+        {
+            'status':'SUCCESS',
+            'code':200,
+            'message': { 
+                'django': django_version(),
+                'platform': u' '.join(platform.uname()[0:3]),
+                'version': version(),
+            }
+        }
     """
     data = {
         'status':'SUCCESS',

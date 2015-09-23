@@ -2,6 +2,10 @@
 {% load url from future %}
 
 {% block body %}
-    {% csrf_token %}
-    <p>Welcome, {{ user.get_username }}.</p>
+<h3>MDS connection successful</h3>
+<ul>
+    <li>Django Version: {{ message.django }}</li>
+    <li>Platform: {{ message.platform }}</li>
+    <li>MDS version: {{ message.version }}</li>
+<ul>
 {% endblock %}
