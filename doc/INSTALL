@@ -126,15 +126,25 @@ Including OpenMRS as the EHR backend.
         the older OpenMRS version.
         http://sana.mit.edu/wiki/index.php?title=Setup_Servers#Setup_and_Configure_Tomcat
     b. Enable apache modules and and openmrs conf
+    
         a2enmod jk
         a2enmod proxy
         a2enmod proxy_http
         a2enmod proxy_ajp
         a2enconf openmrs
-    Note: Step (b) will provide access to OpenMRS through http(s)://<your-server>/openmrs.
+        
+       Note: Step (b) will provide access to OpenMRS through http(s)://<your-server>/openmrs.
     c. Verify that the following line is in your /etc/tomcat7/server.xml file, uncomment if necessary.
+    
            <Connector port="8009" URIEncoding="UTF-8" enableLookups="false" protocol="AJP/1.3" />
-       The restart tomcat.
+       
+       A sample server.xml is available in the includes directory.
+    d. Create OpenMRS installation directory
+    
+        mkdir /usr/share/tomcat7/.OpenMRS
+        chown tomcat7:tomcat7 /usr/share/tomcat7/.OpenMRS
+       
+    e. Restart tomcat.
            service tomcat7 restart
 
 2..  OpenMRS Install-1.9.7 release
