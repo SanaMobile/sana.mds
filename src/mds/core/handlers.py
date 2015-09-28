@@ -243,9 +243,14 @@ class DocHandler(BaseHandler):
         return [ handler_uri_templates(x) for x in _handled]
         
 # new stuff
+@logged
 class LocationHandler(DispatchingHandler):
     model = Location
-    #fields = ("name","uuid","code")
+    fields = (
+        "name",
+        "uuid",
+        "code"
+    )
 
 class CompoundFormHandler(object):
     forms = {}
