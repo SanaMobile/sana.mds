@@ -175,8 +175,16 @@ class Observation(models.Model):
         return vals
     
     def value_as_floats(self):
-        remove = ['(', ')']
-        sc = set(remove)
-        replaced = ''.join([c for c in self.value if c not in sc])
-        vals = [float(x.strip()) for x in replaced.split(",")]
+        # Default to 3-tuple of 0.0 ]
+        vals = [ 0.0,0.0,0.0 ]
+        # if no value
+        if not self.value or self.value.lower() == 'no response':
+            return vals
+        try:
+            remove = ['(', ')']
+            sc = set(remove)
+            replaced = ''.join([c for c in self.value if c not in sc])
+            vals = [float(x.strip()) for x in replaced.split(",")]
+        except:
+            pass
         return vals
