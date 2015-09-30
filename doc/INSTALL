@@ -70,7 +70,7 @@ Everything as root(sudo)
     d. Copy or link the contents of /opt/sana/sana.mds/mds/ to your apache document root. The default for 
         Ubuntu is /var/www/html, e.g.
         
-            ln -sf /var/www/html/mds /opt/sana/sana.mds/mds
+            ln -sf /opt/sana/sana.mds/mds /var/www/html/mds
         
    Update the apache configuration
 
