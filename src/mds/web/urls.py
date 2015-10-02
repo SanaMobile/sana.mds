@@ -5,17 +5,14 @@
 :Version: 2.0
 """
 from django.conf.urls import patterns, url, include
-from django.contrib.auth import views as auth_views
 
 from .views import *
 
 urlpatterns = patterns(    
     #'mds.web',
     '',
-    url(r'^$',
-        'mds.web.views.portal',
-        name="portal"),
-    url(r'^accounts/login/$', auth_views.login),
+    url(r'^$','mds.web.views.portal', name="portal"),
+
     url(r'^login/$', 'mds.web.views.login', name='login'),
     url(r'^logout/$', 'mds.web.views.logout',name='logout'),
     url(r'^registration/$', 'mds.web.views.registration', name='register-patient'),
@@ -23,7 +20,6 @@ urlpatterns = patterns(
 
     url(r'^logs/$', 'mds.web.views.logs', name='log-index'),
     url(r'^logs/list/$', 'mds.web.views.log_list', name='log-list'),
-
 
     # Replace @ with name of Model class
     #url(r'^@/$', @ListView.as_view(), name='@-list'),
@@ -93,16 +89,13 @@ urlpatterns = patterns(
     url(r'^encountertask/(?P<pk>\d+)/detail/$', EncounterTaskDetailView.as_view(), name='encountertask-detail'),
 
     # Forms
-    #url(r'^encounterreview/$', EncounterReviewList.as_view(), name='encountertaskreview-list'),
-    #url(r'^encounterreview/new/$', EncounterReviewCreate.as_view(), name='encountertaskreview-create'),
-    #url(r'^encounterreview/(?P<pk>\d+)/$', EncounterReviewUpdate.as_view(), name='encountertaskreview-edit'),
-    #url(r'^encounterreview/(?P<pk>\d+)/detail/$', EncounterReviewDetail.as_view(), name='encountertaskreview-detail'),
     url(r'^forms/surgeon/review/(?P<uuid>[^/]+)/$', 'mds.web.views.encounter_review', name='surgeon-review'),
     url(r'^forms/surgeon/clinic/$', 'mds.web.views.surgeon_clinic_form', name='clinic-form'),
-    
+
     # Internationalization
-    url(r'^setlang/$', 'mds.web.views.setlang', name='setlang'),
+    url(r'^lang/$', 'mds.web.views.setlang', name='setlang'),
     # Client downloads
     url(r'^downloads/$', ClientDownloadsView.as_view(), name='download-client'),
+
 )
 
