@@ -72,7 +72,8 @@ EMAIL_PORT = ''
 EMAIL_USE_TLS = True        
 """Check with mail host if encryption is supported"""
 
-REVIEW_POST_TEMPLATE = "Data requiring review has been uploaded:\n\nClick to view: %s"
+REVIEW_URL_TEMPLATE = 'https://{hostname}/mds/web/forms/surgeon/review/{uuid}/'
+REVIEW_POST_TEMPLATE = "Data requiring review has been uploaded:\n\nClick to view: {url}"
 REVIEW_SUBJECT="Review required"
 REVIEW_HOSTNAME = ''
 SMTP_REPLYTO = "admin@localhost.com"
