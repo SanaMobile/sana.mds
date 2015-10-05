@@ -17,6 +17,9 @@ from mds.core.models import *
 from mds.core.widgets import *
 from mds.tasks.models import *
 
+from .widgets import *
+
+
 __all__ = [
     "ProcedureForm",
     "EmptyEncounterForm",
@@ -33,6 +36,45 @@ __all__ = [
     "ObserverForm",
     "LoginForm",
     ]
+
+
+class SelectOrTextField(forms.MultiValueField):
+    other = None
+    
+    def __init__(self, other=None, *args, **kwargs):
+        fields = [
+            forms.MultiChoiceField(widget=SelectOrTextWidget, *args, **kwargs),
+            forms.CharField(required=False)
+        ]
+        self.other = other
+        widget = SelectOrTextWidget(choices=kwargs['choices'])
+        kwargs.pop('choices')
+        self._was_required = kwargs.pop('required', True)
+        kwargs['required'] = False
+        
+    def compress(self, data_list):
+        if data_list[0] == self.other:
+            return data_list[1]
+        else:
+            return data_list[0]
+        
+        
+class MultiSelectSelectWithTextField(forms.MultiValueField):
+    def __init__(self, *args, **kwargs):
+        fields = [
+            forms.SelectMultiple(widget=MultiSelectWithTextWidget(*args, **kwargs)),
+            forms.CharField(required=False)
+        ]
+        widget = SelectOrTextWidget(choices=kwargs['choices'])
+        kwargs.pop('choices')
+        self._was_required = kwargs.pop('required', True)
+        kwargs['required'] = False
+        
+    def compress(self, data_list):
+        if data_list:
+            return ','.join(data_list)
+        else:
+            return None
 
 def subject_choice_list():
     subject_list = (
@@ -100,17 +142,17 @@ class EncounterTaskForm(forms.ModelForm):
         label=_("Completed"))
     
 class InitialTaskSetForm(forms.Form):
-    subject = forms.ChoiceField(subject_choice_list(), label=_("Patient"))
-    procedure = forms.ChoiceField(((x.uuid,x.title) for x in Procedure.objects.exclude(uuid__iexact="303a113c-6345-413f-88cb-aa6c4be3a07d")))
-    assigned_to = forms.ModelChoiceField(queryset=SurgicalAdvocate.objects.all(),
-        label=_('Assigned To'))
-    concept = forms.ChoiceField(concept_choice_list(), 
-        label=_("Type"))
-    due_on = forms.DateTimeField(widget=DateSelectorInput(), 
+    #subject = forms.ChoiceField(subject_choice_list(), label=_("Patient"))
+    #procedure = forms.ChoiceField(((x.uuid,x.title) for x in Procedure.objects.exclude(uuid__iexact="303a113c-6345-413f-88cb-aa6c4be3a07d")))
+    #assigned_to = forms.ModelChoiceField(queryset=SurgicalAdvocate.objects.all(),
+    #    label=_('Assigned To'))
+    #concept = forms.ChoiceField(concept_choice_list(), 
+    #    label=_("Type"))
+    due_on = forms.DateTimeField(widget=DateTimeSelectorInput(),
         label=_("Initial Visit"))
-    due_second = forms.DateTimeField(widget=DateSelectorInput(), label=_("Regular follow up"))
-    due_thirty = forms.DateTimeField(widget=DateSelectorInput(), label=_("30 day follow up"))
-    
+    due_second = forms.DateTimeField(widget=DateTimeSelectorInput(), label=_("Regular follow up"))
+    due_thirty = forms.DateTimeField(widget=DateTimeSelectorInput(), label=_("30 day follow up"))
+
 class SurgicalSubjectForm(forms.ModelForm):
     """ A simple patient form
     """
@@ -159,6 +201,17 @@ def diagnosis_choices():
 
 def operation_choices():
     choice_list = ( 
+        "Inguinal Hernia Repair",
+        "Other Hernia Repair",
+        "Breat Biopsy",
+        "Mastectomy",
+        "Mastectomy+Axillary LN Dissection",
+        "Mastectomy+Axillary LN Biospy",
+        "Biopsy, other",
+        "Excision of Mass other than breast",
+        "Other Operation",
+    )
+    label_list = ( 
         _("Inguinal Hernia Repair"),
         _("Other Hernia Repair"),
         _("Breat Biopsy"),
@@ -169,7 +222,7 @@ def operation_choices():
         _("Excision of Mass other than breast"),
         _("Other Operation"),
     )
-    return ( (x,x) for x in choice_list)
+    return ((_(x),x) for x in choice_list)
     
 def advocate_choices():
     choice_list = None
@@ -196,18 +249,34 @@ class IntakeForm(forms.ModelForm):
     observer = forms.SlugField(widget=forms.HiddenInput())
     subject = forms.ChoiceField(subject_choice_list(), label="Patient")
     """
-    subject = forms.ChoiceField(subject_choice_list(), label="Patient")
+    subject = forms.ChoiceField(subject_choice_list(), 
+        label=_("subject"))
     # Observation data
-    diagnosis = forms.ChoiceField(choices=diagnosis_choices())
-    diagnosis_other = forms.CharField(required=False)
-    operation = forms.MultipleChoiceField(choices=operation_choices())
-    operation_other = forms.CharField(required=False)
+    diagnosis = forms.ChoiceField(label=_('diagnosis') ,
+            choices=diagnosis_choices(),
+            widget=forms.Select(attrs={'class': 'select-exclusive'}))
+    diagnosis_other = forms.CharField(label=_('other'),
+            required=False,
+            widget=forms.TextInput(attrs={'class': 'other-exclusive'}))
+    operation = forms.MultipleChoiceField(label=_('operation'),
+            choices=operation_choices(),
+            widget=forms.SelectMultiple(attrs={'class': 'select-multiple'}))
+    operation_other = forms.CharField(label=_('other'),
+            required=False,
+            widget=forms.TextInput(attrs={'class': 'other-multiple'}))
     date_of_operation = forms.DateField(
+            label=_('date of operation'),
             widget=DateSelectorInput())
     date_of_discharge = forms.DateField(
+            label=_('date of discharge'),
             widget=DateSelectorInput())
-    date_of_regular_follow_up = forms.DateField(
-            widget=DateSelectorInput())
+    #date_of_regular_follow_up = forms.DateTimeField(
+    #        label=_('initial follow up'),
+    #        widget=DateSelectorInput())
+
+
+
+
 
 class SpanField(forms.Field):
     '''A field which renders a value wrapped in a <span> tag.
@@ -319,3 +388,4 @@ class BlankUserForm(UserForm):
 class ObserverForm(forms.ModelForm):
     class Meta:
         model =User
+
