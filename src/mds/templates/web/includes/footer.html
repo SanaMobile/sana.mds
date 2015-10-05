@@ -6,12 +6,18 @@
             <select id="id_language" name="language">
             {% for language in available_languages %}
                 <option value="{{ language.code }}"{% ifequal lang language.code %}selected="selected"{% endifequal%}>
-                <div><img src="{{ STATIC_PREFIX }}web/img/i18n/{{ language.code }}.png"/>{{ language.name }}</div>
+                    <img src="{{ STATIC_PREFIX }}web/img/i18n/{{ language.code }}.png">{{ language.name }}</img>
                 </option>
             {% endfor %}
             </select>
             
             <script>
+                var language = $.cookie('language');
+                // Set the active language selected
+                $('#id_language').removeAttr('selected')
+                    .filter('[value="' + $.cookie('language') +'"]')
+                    .attr('selected', true);
+                // Set change listener to reload the page
                 $('#id_language').change(function() {
                     var lang = $(this).val();
                     $.cookie('language', lang);

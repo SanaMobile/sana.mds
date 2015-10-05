@@ -25,9 +25,8 @@
     }
     //window['filter'] = filter;
 {% endblock %}
-{% block header %}<h3><strong>{{ model|title }} List</strong></h3>{% endblock %}
+{% block header %}{% trans model|title|pluralize  %}{% endblock %}
 {% block content %}
-<div>
 <table class="content-list" id="contentlist">
     <thead>
     <tr class="headerrow">
@@ -35,7 +34,7 @@
         <th class="left" id="{{ label }}-sort">
             <table>
             <tr>
-                <td>{{ label|title }}</td>
+                <td>{% trans label|title %}</td>
                 <td>
                     <ul>
                         <li><button id="{{ label }}-sort-asc" title="{% trans 'Filter Ascending' %}">&#9650;</button></li>
@@ -75,9 +74,9 @@
             <!--
             <td class="footer-left"><a href="{% url 'web:portal' %}"><strong>Back</strong></a></td>
             -->
-            <td class="footer-left" colspan="{{ cols }}"><a href="{% url 'web:'|add:model|add:'-create' %}"><strong>New</strong></a></td>
+            <td class="footer-left" colspan="{{ cols }}"><a href="{% url 'web:'|add:model|add:'-create' %}"><strong>{% trans 'New' %}</strong></a></td>
             <td class="footer-right"  colspan="2" style="text-align:right;">
-                <strong>{% trans 'Page' %}</strong>
+                <label>{% trans 'Page' %}</label>
                 <select onchange="location = this.options[this.selectedIndex].value;" >
                 {% for page in paginator.page_range %}
                     <option value="{% url 'web:'|add:model|add:'-list' %}?page={{ page}}&order={{ order }}&sort_by={{ sort_by }}" {% if page == page_obj.number %}selected="selected"{% endif %}>{{ page }}</option>
@@ -110,8 +109,7 @@
     {% endfor %}
     </tbody>
 </table>
-</div>
 <div class="backnav">
-    <a href="{% url 'web:portal' %}">Back</a>
+    <a href="{% url 'web:portal' %}">{% trans 'Back' %}</a>
 </div>
 {% endblock content %}

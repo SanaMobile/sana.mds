@@ -1,4 +1,5 @@
 {% extends "web/base.html" %}
+{% load i18n %}
 {% load static %}
 {% block extrastyle %}
 <link rel="stylesheet" href="{{ STATIC_PREFIX }}web/css/liststyle.css">
@@ -130,18 +131,60 @@
     {% for field in form.visible_fields %}
     <div class="formrow {% cycle 'evenrow' 'oddrow' %}">
         <div class="fieldWrapper">
-            {{ field.errors }}{{ field.label_tag }}
+            {{ field.errors }}
+            {% with field.label_tag|title as label %}
+                {% trans label %}
+            {% endwith %}
             {{ field }}
         </div>
     </div>
     {% endfor %}
+    <script>
+        $(".other-exclusive").parent().hide();
+        $(".other-multiple").parent().hide();
+        $(".select-exclusive").change(function(i){
+            var length = $(this).children().length;
+            var selectedIndex = $(".select-exclusive option:selected").index();
+            if (selectedIndex == length - 1){
+                $(".other-exclusive").parent().show();
+            } else {
+                $(".other-exclusive").parent().hide();
+            }
+        });
+        $(".select-multiple").change(function(){
+            var length = $(this).children().length;
+            var selectedIndex = $(".select-multiple option:selected").index();
+            var doShow = $(this).children().eq(length-1).prop('selected');
+            if( doShow){
+                $(".other-multiple").parent().show();
+            } else {
+                $(".other-multiple").parent().hide();
+            }
+        
+        });
+    </script>
+    <hr/>
+    {% for exform in extra_forms %}
+    {% for hidden in exform.hidden_fields %}
+    {{ hidden }}
+    {% endfor %}
+    {# Include the visible fields #}
+    {% for field in exform.visible_fields %}
+    <div class="formrow {% cycle 'evenrow' 'oddrow' %}">
+        <div class="fieldWrapper">
+            {{ field.errors }}{% trans field.label_tag|title %}
+            {{ field }}
+        </div>
+    </div>
+    {% endfor %}
+{% endfor %}
     <div class="actionbar">
         <p align="center" style="font-size:larger">
             <input type="button" id="id_submit" class="show-page-loading-msg" value="Submit" onClick="submitEncounterWeb()">
         </p>
     </div>
 </div>
-</form>
+ 
 <script>
     // Input handlers
     $(function(){
@@ -149,6 +192,17 @@
         $('input[type="date"]').datepicker({ dateFormat: 'yy-mm-dd', changeYear: true , yearRange : "c-100:c+05"}).prop('type','text');
         $('input[type="date"]').prop('type','text');
     });
+    // Displays DateTime picker pop up
+    $(function(){
+        $('input[type="datetime"]').datetimepicker({ 
+            dateFormat: 'yy-mm-dd', 
+            changeYear: true , 
+            yearRange : "c-100:c+05",
+            timeformat: "HH:mm",
+            }).prop('type','text');
+        $('input[type="datetime"]').prop('type','text');
+     });
+
     // Workaround for safari issues
     $(function() {
       $( "select[multiple='multiple']").selectable();

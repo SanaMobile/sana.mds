@@ -2,7 +2,7 @@
 {% load url from future %}
 {% load static %}
 {% load i18n %}
-{% block title %}{{ model|title }} List{% endblock title %}
+{% block title %}{% trans model|title|pluralize %}{% endblock title %}
 {% block extrastyle %}
 <link rel="stylesheet" href="{{ STATIC_PREFIX }}web/css/liststyle.css" />
 {% endblock %}
@@ -28,22 +28,22 @@
         $('#tabs').tabs();
     });
 {% endblock extrascript %}
-{% block header %}<h3><strong>{{ model|title }} List</strong></h3>{% endblock %}
+{% block header %}{% trans model|title|pluralize %}{% endblock %}
 {% block content %}
 <div id="tabs">
     <ul>
-        <li><a href="#tabs-1">All</a></li>
-        <li><a href="#tabs-2">Unconfirmed</a></li>
+        <li><a href="#tabs-1">{% trans 'All' %}</a></li>
+        <li><a href="#tabs-2">{% trans 'Unconfirmed' %}</a></li>
     </ul>
 <div id="tabs-1">
 <table class="content-list" id="contentlist">
     <thead>
     <tr class="headerrow">
-        {% for label in  fields %}
+        {% for label in fields %}
         <th class="left" id="{{ label }}-sort">
             <table>
             <tr>
-                <td>{{ label|title }}</td>
+                <td>{% trans label|title %}</td>
                 <td>
                     <ul>
                         <li><button id="{{ label }}-sort-asc" title="{% trans 'Filter Ascending' %}">&#9650;</button></li>

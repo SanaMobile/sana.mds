@@ -1,23 +1,18 @@
 {% load i18n %}
 {% load static %}
-{% if menu %}
 <div class="horizontal-menu">
-    <nav>
+  <nav>
+	{% with roles=request.user.groups.all %}
     <ul>
-    {% with roles=request.user.groups.all %}
     {% for site in menu.sites %}
-        <li>
+      <li>
         <a href="#"><h4>{% trans site.label|title %}</h4></a>
         {% if site.views %}
             <ul>
-                {% for portal_view in site.views %}
-                    {% with label=portal_view.label %}
+                {% for view in site.views %}
+                    {% with label=view.label %}
                     <li>
-                        {% if portal_view.context_name %}
-                            <a href="{% url portal.app|add:':'|add:portal_view.context_name %}">{% trans label|title %}</a>
-                        {% else %}
-                            <a href="{{ portal_view.url }}">{% trans label|title %}</a>
-                        {% endif %}
+                        <a href="{% url view.context_name %}">{% trans label|title %}</a>
                     </li>
                     {% endwith %}
                 {% endfor %}
@@ -25,10 +20,16 @@
         {% endif %}
         </li>
     {% endfor %}
-    {% endwith %}
+    {% if 'admin' in roles %}
+        <li>
+            <a href="/mds/admin/"><h4>Django</h4></a>
+        </li>
+    {% endif %}
     </ul>
+	{% endwith %}
 </nav>
 </div>
+
 <script>
 $(document).ready(
   /* This is the function that will get executed after the DOM is fully loaded */
@@ -45,5 +46,4 @@ $(document).ready(
   }
 );
 </script>
-{% endif %}
 
