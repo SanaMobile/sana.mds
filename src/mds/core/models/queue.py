@@ -5,6 +5,8 @@ Created on Aug 9, 2012
 :version: 2.0
 '''
 from django.db import models
+from django.utils.translation import ugettext_lazy as _
+
 from mds.api.utils import make_uuid
 
 QUEUE_STATUS=((0,'Failed Dispatch'))

@@ -6,6 +6,8 @@ on a Subject.
 """
 
 from django.db import models
+from django.utils.translation import ugettext_lazy as _
+
 from mds.api.utils import make_uuid
 
 class Encounter(models.Model):
@@ -13,7 +15,8 @@ class Encounter(models.Model):
     """
     class Meta:
         app_label = "core"
-                   
+        verbose_name = 'encounter'
+
     def __unicode__(self):
         return "%s" % (self.uuid)
     

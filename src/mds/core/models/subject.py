@@ -7,6 +7,8 @@ import datetime
 import os
 from PIL import Image
 from django.db import models
+from django.utils.translation import ugettext_lazy as _
+
 from mds.api.utils import make_uuid
 
 __all__ = ["AbstractSubject","Subject","SurgicalSubject"]
@@ -32,19 +34,21 @@ class Subject(AbstractSubject):
     """
     class Meta:
         app_label = "core"
-    given_name = models.CharField(max_length=64)
+        verbose_name = 'subject'
+        
+    given_name = models.CharField(_('given name'),max_length=64)
 
-    family_name = models.CharField(max_length=64)
+    family_name = models.CharField(_('family name'),max_length=64)
 
-    dob = models.DateTimeField()
+    dob = models.DateTimeField(_('date of birth'),)
 
-    gender = models.CharField(choices=(("M","M"),("F","F")),max_length=2)
+    gender = models.CharField(_('gender'),choices=(("M","M"),("F","F")),max_length=2)
 
-    image = models.ImageField(blank=True, upload_to="core/subject")
+    image = models.ImageField(_('image'),blank=True, upload_to="core/subject")
 
     location = models.ForeignKey('Location', blank=True, to_field='uuid')
 
-    system_id = models.CharField(max_length=64, blank=True)
+    system_id = models.CharField(_('system id'),max_length=64, blank=True)
 
     @property
     def age(self):

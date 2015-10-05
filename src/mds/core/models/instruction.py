@@ -5,6 +5,8 @@
 """
 
 from django.db import models
+from django.utils.translation import ugettext_lazy as _
+
 from mds.api.utils import make_uuid
 
 ## ?Procedure step. First iteration

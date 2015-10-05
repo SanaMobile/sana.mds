@@ -8,6 +8,8 @@ The observation model for the Sana data engine.
 from django.db import models
 
 from django.contrib.auth.models import User
+from django.utils.translation import ugettext_lazy as _
+
 from mds.api.utils import make_uuid
 
 class Observer(models.Model):

@@ -5,6 +5,7 @@
 """
 
 from django.db import models
+from django.utils.translation import ugettext_lazy as _
 
 from mds.api.utils import make_uuid
 
@@ -13,6 +14,7 @@ class Device(models.Model):
     
     class Meta:
         app_label = "core"
+        verbose_name = 'device'
         
     uuid = models.SlugField(max_length=36, unique=True, default=make_uuid, editable=False)
     """ A universally unique identifier """

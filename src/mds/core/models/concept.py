@@ -6,6 +6,7 @@
 
 from django.conf import settings
 from django.db import models
+from django.utils.translation import ugettext_lazy as _
 
 from mds.api.utils import make_uuid
 
@@ -14,6 +15,7 @@ class Concept(models.Model):
     
     class Meta:
         app_label = "core"
+        verbose_name = _('concept')
         
     def __unicode__(self):
         return self.name
@@ -21,34 +23,40 @@ class Concept(models.Model):
     uuid = models.SlugField(max_length=36, unique=True, default=make_uuid, editable=False)
     """ A universally unique identifier """
     
-    created = models.DateTimeField(auto_now_add=True)
+    created = models.DateTimeField(_('created'),auto_now_add=True)
     """ When the object was created """
     
-    modified = models.DateTimeField(auto_now=True)
+    modified = models.DateTimeField(_('modified'), auto_now=True)
     """ updated on modification """
     
-    name = models.CharField(max_length=255, unique=True)
+    name = models.CharField(_('name'),max_length=255, unique=True)
     """ A short unique name."""
     
-    display_name = models.CharField(max_length=255, blank=True)
+    display_name = models.CharField(_('display name'),max_length=255, blank=True)
     """ Optional descriptive name or text. """
     
-    description = models.CharField(max_length=255, blank=True)
+    description = models.CharField(_('description'),max_length=255, blank=True)
     
-    conceptclass = models.CharField(max_length=255, blank=True)
+    conceptclass = models.CharField(_('concept class'),max_length=255, blank=True)
     
-    datatype = models.CharField(max_length=64,
+    datatype = models.CharField(_('data type'),
+                                max_length=64,
                                 choices=((x,x) for x in settings.DATATYPES),
                                 default="string")
     """ The data class, i.e. string, int, etc. """
     
-    mimetype = models.CharField(max_length=64,
+    mimetype = models.CharField(_('mimetype'),
+                                max_length=64,
                                 choices=settings.MIMETYPES,
                                 default="text/plain")
     
-    constraint = models.CharField(max_length=255, blank=True)
+    constraint = models.CharField(
+            _('constraint'),
+            max_length=255, blank=True)
     
-    voided = models.BooleanField(default=False)
+    voided = models.BooleanField(
+        _('voided'),
+        default=False)
     
     @property
     def is_complex(self):

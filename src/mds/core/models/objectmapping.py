@@ -2,6 +2,7 @@
 @author: Sana Development
 '''
 from django.db import models
+from django.utils.translation import ugettext_lazy as _
 
 from . import Concept, Device, Encounter, Observer, Observation
 
