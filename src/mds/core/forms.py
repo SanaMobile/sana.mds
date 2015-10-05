@@ -10,7 +10,8 @@ from django.forms.extras.widgets import SelectDateWidget
 
 from .models import *
 from .widgets import *
-from mds.core.extensions.forms import SurgicalSubjectForm, SurgicalAdvocateFollowUpForm, SurgicalPatientRegistrationForm, SurgicalIntakeForm
+from mds.core.extensions.forms import *
+#SurgicalSubjectForm, SurgicalAdvocateFollowUpForm, SurgicalPatientRegistrationForm, SurgicalIntakeForm
 
 __all__ = ['ConceptForm', 'RelationshipForm', 'RelationshipCategoryForm', 
            'DeviceForm',
@@ -25,7 +26,9 @@ __all__ = ['ConceptForm', 'RelationshipForm', 'RelationshipCategoryForm',
            'SessionForm',
            'SurgicalAdvocateFollowUpForm',
            'SurgicalPatientRegistrationForm',
-           'SurgicalIntakeForm'  ]
+           'SurgicalIntakeForm',
+           'EncounterReviewForm',
+    ]
 
 class SessionForm(forms.Form):
     """ Authentication Form """

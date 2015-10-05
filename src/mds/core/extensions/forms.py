@@ -7,6 +7,7 @@ import logging
 from datetime import datetime
 from django import forms
 from django.forms.extras.widgets import SelectDateWidget
+from django.utils.translation import ugettext_lazy as _
 
 from mds.core.models import *
 from mds.core.widgets import *
@@ -15,7 +16,8 @@ __all__ = [
            'SurgicalSubjectForm',
            'SurgicalAdvocateFollowUpForm',
            'SurgicalPatientRegistrationForm',
-           'SurgicalIntakeForm'  
+           'SurgicalIntakeForm',
+           'EncounterReviewForm',
            ]
 
 
@@ -142,5 +144,17 @@ class SurgicalAdvocateFollowUpForm(forms.Form):
             widget=DateSelectorInput())
 
 class EncounterReviewForm(forms.ModelForm):
-    pass
+
+    class Meta:
+        model = EncounterReview
+        fields = [
+            'encounter',
+            'reviewed_by',
+            'completed',
+        ]
+        widgets = {
+            'encounter': forms.HiddenInput(),
+            'reviewed_by': forms.HiddenInput(),
+            'completed' : forms.HiddenInput(),
+        }
 

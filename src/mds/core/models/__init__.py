@@ -17,7 +17,7 @@ from .observation import Observation
 from .observer import Observer
 from .procedure import Procedure
 from .subject import Subject
-from mds.core.extensions.models import Surgeon, SurgicalAdvocate, SurgicalSubject
+from mds.core.extensions.models import Surgeon, SurgicalAdvocate, SurgicalSubject, EncounterReview
 
 __all__ = ['Concept', 'Relationship','RelationshipCategory',
            'Device', 
@@ -32,4 +32,6 @@ __all__ = ['Concept', 'Relationship','RelationshipCategory',
            'Subject',
            'SurgicalSubject',
            'Surgeon',
-           'SurgicalAdvocate']
+           'SurgicalAdvocate',
+           'EncounterReview' 
+    ]
