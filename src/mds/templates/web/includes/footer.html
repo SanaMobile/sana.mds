@@ -1,7 +1,24 @@
 {% load i18n %}
-<div class="navbar">
-    <ul>
-        <li>{% trans "Copyright 2015, Sana Mobile %}</li>
-    </ul>
-</div>
-
+<ul>
+    <li>
+        <div>
+            <label for='id_language'>{% trans 'Language' %}</label>
+            <select id="id_language" name="language">
+            {% for language in available_languages %}
+                <option value="{{ language.code }}"{% ifequal lang language.code %}selected="selected"{% endifequal%}>
+                <div><img src="{{ STATIC_PREFIX }}web/img/i18n/{{ language.code }}.png"/>{{ language.name }}</div>
+                </option>
+            {% endfor %}
+            </select>
+            
+            <script>
+                $('#id_language').change(function() {
+                    var lang = $(this).val();
+                    $.cookie('language', lang);
+                    location.reload();
+                });
+            </script>
+        </div>
+    </li>
+    <li><img src="{{ STATIC_PREFIX }}web/img/sana_small.png"/>{% trans 'Copyright 2015 Sana Mobile' %}</li>
+</ul>
