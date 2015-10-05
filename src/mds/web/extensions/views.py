@@ -5,6 +5,9 @@ from django.views.generic import DetailView, ListView, CreateView, UpdateView
 from django.views.generic.detail import *
 from django.utils.translation import ugettext_lazy as _
 
+from extra_views import ModelFormSetView
+
+from .forms import *
 from ..views import ModelFormMixin, ModelListMixin, ModelSuccessMixin
 
 class SurgicalSubjectListView(ModelListMixin, ListView):
@@ -29,3 +32,9 @@ class SurgicalSubjectDetailView(ModelFormMixin,DetailView):
     template_name = 'web/detail.html'
     context_object_name = 'surgicalsubject'
     slug_field = 'uuid'
+
+class EncounterTaskSetView(ModelFormSetView):
+    template_name = 'web/formset.html'
+    model = EncounterTask
+    form_class = SimpleEncounterTaskForm
+    
