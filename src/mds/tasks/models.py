@@ -48,24 +48,24 @@ class Task(models.Model):
     status = models.ForeignKey(Status)
     """The current status."""
 
-    due_on = models.DateTimeField()
+    due_on = models.DateTimeField(_('due on'),)
     """ updated on modification """
 
-    created = models.DateTimeField(auto_now_add=True)
+    created = models.DateTimeField(_('created'),auto_now_add=True)
     """ When the object was created """
 
-    modified = models.DateTimeField(auto_now=True)
+    modified = models.DateTimeField(_('modified'),auto_now=True)
     """ updated on modification """
 
-    started = models.DateTimeField(blank=True, null=True)
+    started = models.DateTimeField(_('started'),blank=True, null=True)
     """ Marks when task moved to being in progress """
 
-    completed = models.DateTimeField(blank=True, null=True)
+    completed = models.DateTimeField(_('completed'),blank=True, null=True)
     """ Marks when task was complete """
 
     concept = models.ForeignKey(Concept, to_field='uuid', default="b58f5501-0b97-4abf-b564-65cc3faadbbf")
 
-    voided = models.BooleanField(default=False)
+    voided = models.BooleanField(_('voided'),default=False)
 
     def is_late(self):
         now = datetime.datetime.now()
@@ -113,3 +113,12 @@ class ObservationTask(Task):
     instruction = models.ForeignKey(Instruction, to_field='uuid',
         verbose_name=_('instruction'))
     """What will be executed."""
+"""
+class EncounterReview(models.Model):
+    class Meta:
+        verbose_name = _('encounter review')
+        verbose_name_plural = _('encounter reviews')
+
+    reviewer = models.ForeignKey(Observer, to_field='uuid',
+        verbose_name=_('reviewer'))
+"""
