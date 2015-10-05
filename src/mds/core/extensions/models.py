@@ -93,7 +93,7 @@ class EncounterReview(models.Model):
 
     reviewed_by = models.ForeignKey(Observer, 
         to_field='uuid',
-        verbose_name=_('reueviewed by'))
+        verbose_name=_('reviewed by'))
     """Who the task is assigned to"""
 
     viewed_on = models.DateTimeField(_('viewed on'),
