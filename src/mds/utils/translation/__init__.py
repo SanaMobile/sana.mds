@@ -39,6 +39,8 @@ def activate(language):
 def get_and_activate(request, lang="en", field_key=LANGUAGE_FIELD_KEY):
     language = get_request_language(request, lang=lang, field_key=LANGUAGE_FIELD_KEY)
     activate(language)
+    if request.session:
+        request.session[settings.LANGUAGE_SESSION_KEY] = language
     return language
     
 def i18n(view_klazz):
