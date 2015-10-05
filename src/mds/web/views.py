@@ -19,9 +19,13 @@ from django.db.models import ForeignKey, FileField, ImageField, DateField, DateT
 from django.shortcuts import render_to_response,redirect
 from django.template import RequestContext
 from django.template.response import TemplateResponse 
-from django.views.generic import DetailView, ListView, CreateView, UpdateView, TemplateView
+from django.views.generic import *
 from django.views.generic.detail import *
+from django.views.generic.base import RedirectView
+from django.core.urlresolvers import reverse_lazy
 from django.utils.translation import ugettext_lazy as _
+from django.utils import translation 
+from django.utils.datastructures import SortedDict
 
 from extra_views import CreateWithInlinesView, UpdateWithInlinesView
 from django.contrib.auth.models import User
@@ -37,39 +41,80 @@ from mds.core.widgets import *
 from mds.web.generic.filtering import FilterMixin
 from .generic.sorting import SortMixin
 from mds.tasks.models import *
-from .portal import site as portal_site
+from . import portal
 
-def login(request,*args,**kwargs):
+from mds.utils.translation import *
+
+
+CK_LANGUAGE = "language"
+def set_cookie(response, key, value, days_expire = 7):
+  if days_expire is None:
+    max_age = 365 * 24 * 60 * 60  #one year
+  else:
+    max_age = days_expire * 24 * 60 * 60 
+  expires = datetime.datetime.strftime(datetime.datetime.utcnow() + datetime.timedelta(seconds=max_age), "%a, %d-%b-%Y %H:%M:%S GMT")
+  response.set_cookie(key, value, max_age=max_age, expires=expires, domain=settings.SESSION_COOKIE_DOMAIN, secure=settings.SESSION_COOKIE_SECURE or None)
+
+def set_lang(response, lang="en"):
+    if not lang:
+        lang = "en"
+    set_cookie(response, CK_LANGUAGE, lang, days_expire = 365)
+
+def login(request,*args,**kwargs):    
+	
+	# set the next page
+    redirect_to = request.REQUEST.get("next", None)
+    next_page = redirect_to if redirect_to else reverse("web:portal")
+    
+    # set the language
+    lang = get_request_language(request)
+
     if request.method == "POST":
-        form = {}
         username = request.POST['username']
         password = request.POST['password']
+        
+        #lang = request.POST.get('language')
+        
+        activate(lang)
         user = authenticate(username=username, password=password)
-        redirect_to = request.REQUEST.get("next", "")
-        next_page = redirect_to if redirect_to else reverse("web:portal")
         if user is None:
-            return TemplateResponse(request,
-                'web/login.html',
+            response = TemplateResponse(request,
+                'web/login.html'.format(lang=lang),
                 {
                     'form': LoginForm(),
-                    'next': next_page
+                    'next': next_page,
+                    'lang': lang,
                 })
             
         else:
             auth_login(request, user)
-            return HttpResponseRedirect(next_page)
+            response =  HttpResponseRedirect(next_page)
+
     else:
-        form = modelform_factory(User)
-        return TemplateResponse(request,
+        response = TemplateResponse(request,
             'web/login.html',
             {
                 'form': LoginForm(),
+                'lang':lang,
+                'available_languages' : get_available_languages(),
+                'next': next_page,
             })
+            
+    # Update the cookie
+    #activate(lang)
+    response.set_cookie(settings.LANGUAGE_SESSION_KEY, lang)
+    return response
 
-def logout(request):
+def logout(request, *args, **kwargs):
+	# set the language
+    lang =  get_request_language(request)
+    #lang = request.session.get(settings.LANGUAGE_SESSION_KEY, "en")
     auth_logout(request)
     url = reverse('web:login')
-    return redirect(url)
+    activate(lang)
+    response = redirect(url)
+    #response.set_cookie(settings.LANGUAGE_SESSION_KEY, lang)
+    return response
 
 def home(request):
     """Top level url
@@ -148,28 +193,41 @@ class _metadata(object):
 def web_root(request, **kwargs):
     from mds.core import models as objects
     metadata = _metadata(request)
-    return render_to_response("web/index.html", 
-                              context_instance=RequestContext(request,{
-                              'flavor': metadata.flavor,
-                              'errors': metadata.errors,
-                              'messages' : metadata.messages,
-                              'models' : objects.__all__,
-                              'portal': portal_site,
-                            }))
+    lang = kwargs.get('lang','en')
+    return render_to_response(
+        "web/index.html".format(lang=lang), 
+        context_instance=RequestContext(
+            request,
+            {
+              'flavor': metadata.flavor,
+              'errors': metadata.errors,
+              'messages' : metadata.messages,
+              'models' : objects.__all__,
+              'portal': portal.nav(request),
+              'lang': lang,
+              'available_languages': get_available_languages(),
+            }))
 
 def registration(request, **kwargs):
     metadata = _metadata(request)
-    return render_to_response("web/registration.html", 
-                              context_instance=RequestContext(request,{
-                              'form':  SurgicalSubjectForm(),
-                              'flavor': metadata.flavor,
-                              'errors': metadata.errors,
-                              'messages' : metadata.messages,
-                              'portal': portal_site,
-                               }))
+    lang = get_and_activate(request)
+    return render_to_response(
+        "web/registration.html".format(lang=lang), 
+        context_instance=RequestContext(
+            request,
+            {
+              'form':  SurgicalSubjectForm(),
+              'flavor': metadata.flavor,
+              'errors': metadata.errors,
+              'messages' : metadata.messages,
+              'portal': portal.nav(request),
+              'lang':lang,
+              'available_languages': get_available_languages(),
+        }))
 
 @login_required(login_url='/mds/web/login/')
 def encounter_task(request, **kwargs):
+    lang = get_and_activate(request)
     flavor = kwargs.get('flavor',None) if kwargs else None
     params = request.COOKIES
     data = {}
@@ -197,16 +255,19 @@ def encounter_task(request, **kwargs):
     data["subject"] = subject
     
     form = EncounterTaskForm(initial=data)
-    return render_to_response(tmpl, 
-                              context_instance=RequestContext( request, 
-                                {
-                                 'form':form,
-                                 'flavor': flavor,
-                                 'errors': errors,
-                                 #'debug' : debug,
-                                 'portal': portal_site,
-                                })
-                             )
+    lang = kwargs.get('lang','en')
+    return render_to_response(
+        tmpl, 
+        context_instance=RequestContext( 
+            request, 
+            {
+             'form':form,
+             'errors': errors,
+             'portal': portal.nav(request),
+             'language':lang,
+              'available_languages': get_available_languages(),
+            })
+        )
 # TODO make this better
 # Procedure UUid tp form mappings
 _procedure_forms = {
@@ -215,6 +276,7 @@ _procedure_forms = {
 
 @login_required(login_url='/mds/web/login/')
 def edit_encounter_task(request, uuid, **kwargs):
+    lang = get_and_activate(request)
     if(uuid):
         try:
             task = EncounterTask.objects.get(uuid=uuid)
@@ -237,8 +299,6 @@ def edit_encounter_task(request, uuid, **kwargs):
     data['device'] = device
     task = None
     # Check for a preassigned subject
-
-    
     form = EncounterTaskForm(task)
     return render_to_response(tmpl, 
                               context_instance=RequestContext( request, 
@@ -247,11 +307,14 @@ def edit_encounter_task(request, uuid, **kwargs):
                                  'flavor': flavor,
                                  'errors': errors,
                                  #'debug' : debug,
-                                 'portal': portal_site,
+                                 'portal': portal.nav(request),
+                                 'lang': lang,
+                                 'available_languages': get_available_languages(),
                                 })
                              )
 @login_required(login_url='/mds/web/login/')
 def web_encounter(request, **kwargs):
+    lang = get_and_activate(request)
     _cookies = request.COOKIES
     params = request.COOKIES
     data = {}
@@ -317,21 +380,26 @@ def web_encounter(request, **kwargs):
         errors.append(u"%s" % form_klazz)
         for k,v in data.items():
             errors.append(u"%s : %s" % (k,v))
+    
+    extra_forms = [InitialTaskSetForm(),]
 
-    return render_to_response("web/encounter_form.html", 
+
+    return render_to_response("web/encounter_form.html".format(lang=lang), 
                               context_instance=RequestContext( request, 
                                 {
                                  'form': form,
+                                 'extra_forms': extra_forms,
                                  'flavor': flavor,
                                  'errors': errors,
-                                 #'messages' : debug,
-                                 #'debug' : debug,
-                                 'portal': portal_site,
+                                 'portal': portal.nav(request),
+                                 'lang': lang,
+                                 'available_languages': get_available_languages(),
                                 })
                              )
 
 @login_required(login_url='/mds/web/login/')
 def task_list(request):
+    lang = get_and_activate(request)
     query = dict(request.GET.items())
     page = int(query.get('page', 1))
     page_size = int(query.get('page_size', 20))
@@ -349,12 +417,14 @@ def task_list(request):
     except (EmptyPage, InvalidPage):
         tasks = paginator.page(paginator.num_pages)
     prange = range(1,paginator.num_pages + 1)
+    lang = kwargs.get('lang','en')
     return render_to_response("web/etask_list.html", 
                               context_instance=RequestContext( request, 
                                 {
                                  'tasks':tasks.object_list,
                                  'range':prange,
                                  'page': page,
+                                 'available_languages': get_available_languages(),
                                 }
                               )
     )
@@ -397,13 +467,19 @@ def _list(request,*args,**kwargs):
     return data
 
 def logs(request,*args,**kwargs):
+    lang = get_and_activate(request)
     data = _list(request)
-    data['portal'] = portal_site
-    return render_to_response('web/logs.html', RequestContext(request,data))
+    data['portal'] = portal.nav(request)
+    data['lang'] = kwargs.get('lang','en')
+    data['available_languages'] = get_available_languages()
+    return render_to_response('web/logs.html'.format(lang=data['lang']), RequestContext(request,data))
 
 def log_list(request):
     data = _list(request)
-    return render_to_response('web/log_list.html', RequestContext(request,data))
+    data['available_languages'] = get_available_languages()
+    lang = kwargs.get('lang','en')
+    return render_to_response('web/log_list.html'.format(lang=lang),
+        RequestContext(request,data))
 
 def log_report(request):
     post = dict(request.POST.items())
@@ -434,6 +510,7 @@ def log_detail(request, uuid):
     return HttpResponse(cjson.encode(message))
 
 def log(request,*args,**kwargs):
+    lang = get_and_activate(request)
     query = dict(request.GET.items())
     page = int(query.get('page', 1))
     page_size = int(query.get('page_size', 20))
@@ -442,6 +519,7 @@ def log(request,*args,**kwargs):
             'page_range': range(0, 1),
             'page_size': page_size,
             'page': page,
+            'available_languages': get_available_languages(),
             "rate": int(query.get('refresh', 5)) }
     return render_to_response('logging/index.html', RequestContext(request,data))
 
@@ -474,14 +552,32 @@ _tasks = [
     EncounterTask,
 ]
 
+
+class TranslationMixin(object):
+    lang = 'en'
+    def __init__(self,*args, **kwargs):
+        super(TranslationMixin,self)
+
+    def dispatch(self, request, *args, **kwargs):
+        self.lang = get_and_activate(request)
+        request.session[settings.LANGUAGE_SESSION_KEY] = self.lang
+        return super(TranslationMixin, self).dispatch(request,*args, **kwargs)
+
+    def get_context_data(self, **kwargs):
+        context = super(TranslationMixin, self).get_context_data(**kwargs)
+        context['lang'] = self.lang
+        #context[settings.LANGUAGE_FIELD_NAME] = self.lang
+        context['available_languages'] = get_available_languages()
+        return context
+
 class LoginRequiredMixin(object):
     @classmethod
     def as_view(cls, **initkwargs):
         view = super(LoginRequiredMixin, cls).as_view(**initkwargs)
         return login_required(view,login_url='/mds/web/login/')
 
-class ModelListMixin(LoginRequiredMixin, SortMixin):
-    template_name = "web/form.html"
+class ModelListMixin(TranslationMixin, LoginRequiredMixin,  SortMixin ):
+    template_name = "web/list.html"
     exclude = ()
     _fields = []
     default_sort_params = ('created', 'asc')
@@ -493,6 +589,8 @@ class ModelListMixin(LoginRequiredMixin, SortMixin):
             self.form = modelform_factory(self.model)
         if not hasattr(self,'exclude'):
             self.exclude = ()
+        #template = getattr(self, 'template_name')
+        #setattr(self, 'template_name', template.format(lang=self.lang))
 
     def field_names(self):
         if not getattr(self,'fields',None):
@@ -502,7 +600,6 @@ class ModelListMixin(LoginRequiredMixin, SortMixin):
 
     def get_object_dict(self, obj):
         opts = obj._meta
-        from django.utils.datastructures import SortedDict
         _obj = SortedDict()
         fields = SortedDict()
         for f in self._fields:
@@ -542,13 +639,20 @@ class ModelListMixin(LoginRequiredMixin, SortMixin):
         context = super(ModelListMixin, self).get_context_data(**kwargs)
         context['model'] = self.model.__name__.lower()
         #context['form'] = self.form(self.object)
-        context['fields'] = self._fields
+        #context['fields'] = self._fields
+        labels = {}
+        for x in self.model._meta.fields:
+            labels[x.name] = x.verbose_name
+        
+        context['fields'] = [ labels[x] for x in self._fields ]
+        
+        #    context['fields'] = [y.verbose_name for y in [ getattr(self.model, x) for x in self._fields]]
         if context.has_key('object'):
             context['object_list'] = [context['object'],]
-        context['objects'] = list(self.get_object_dict(x) for x in context['object_list'])
+        context['objects'] = [self.get_object_dict(x) for x in context['object_list']]
         #sort_by, order = self.get_sort_params()
         #context.update({'sort_by': sort_by, 'order': order})
-        context['portal'] = portal_site
+        context['portal'] = portal.nav(getattr(self,'role',None))
         return context
 
 class ModelMixin(object):
@@ -566,7 +670,7 @@ class ModelMixin(object):
         context['model'] = self.model.__name__.lower()
         return context
         
-class ModelFormMixin(LoginRequiredMixin):
+class ModelFormMixin(TranslationMixin, LoginRequiredMixin):
     template_name = "web/form.html"
     default_sort_params = ('created', 'asc')
     exclude = ()
@@ -583,14 +687,15 @@ class ModelFormMixin(LoginRequiredMixin):
             self.form = modelform_factory(self.model)
         if not hasattr(self,'exclude'):
             self.exclude = ()
+        
+        _app=getattr(self,'app').replace(".","/")
         _model = getattr(self,"model").__name__.lower()
-        _app = getattr(self,'app').replace(".","/")
         setattr(self,'success_url', 
                 self.success_url_format.format(app=_app,model=_model))
 
     def field_names(self):
         if not getattr(self,'fields',None):
-            return list(x.name for x in self.model._meta.fields)
+            return [x.name for x in self.model._meta.fields]
         else:
             return self.fields
 
@@ -634,9 +739,6 @@ class ModelFormMixin(LoginRequiredMixin):
         _obj = SortedDict()
         fields = SortedDict()
         for f in self._fields:
-            #_field = field.name 
-            #for _field  in self._fields:
-            #if field.name in self._fields:
             field = getattr(opts, f, None)
             _field = None
             for x in obj._meta.fields:
@@ -682,8 +784,10 @@ class ModelFormMixin(LoginRequiredMixin):
         if context.has_key('object'):
             context['objects'] = [self.get_object_dict(context['object']),]
         if context.has_key('object_list'):
-            context['objects'] = list(self.get_object_dict(x) for x in context['object_list'])
-        context['portal'] = portal_site
+            context['objects'] = [ self.get_object_dict(x) for x in context['object_list']]
+        context['portal'] = portal.nav(getattr(self,'role',None))
+
+        context['lang'] = self.kwargs.get('lang','en')
         return context
         
 class ModelSuccessMixin(SuccessMessageMixin):
@@ -721,7 +825,7 @@ class UserCreateView(SuccessMessageMixin,CreateView):
     def get_context_data(self, **kwargs):
         context = super(UserCreateView, self).get_context_data(**kwargs)
         context['model'] = self.model.__name__.lower()
-        context['portal'] = portal_site
+        context['portal'] = portal.nav(getattr(self,'role',None))
         return context
 
 class UserUpdateView(ModelFormMixin, SuccessMessageMixin, UpdateView):
@@ -755,7 +859,7 @@ class ConceptCreateView(ModelFormMixin,SuccessMessageMixin,CreateView):
 class ConceptUpdateView(ModelFormMixin, SuccessMessageMixin, UpdateView):
     model = Concept
     template_name = 'web/form.html'
-    success_message = _("Concept: %(name)s was updated successfully")
+    success_message = _("Concept was updated successfully") + ": %(name)s"
     
     def get_success_message(self, cleaned_data):
         return self.success_message % dict(cleaned_data)
@@ -999,15 +1103,20 @@ def surgeon_clinic_form(request, *args, **kwargs):
     #if device:
     #    device = Device.objects.get(uuid=device)
     patients = Subject.objects.filter(voided=False)
+    
+    lang = get_and_activate(request)
+    tmpl = "web/surgical_clinic_form.html"
     return render_to_response(
-        "web/surgical_clinic_form.html",
+        tmpl,
         context_instance=RequestContext(
             request, 
             {
-                'portal':portal_site,
+                'portal':portal.nav(request),
                 'patients': patients,
                 'device': device,
                 'procedure': None,
+                'lang': lang,
+                'available_languages': get_available_languages(),
             }
         )
     )
@@ -1016,44 +1125,79 @@ def surgeon_clinic_form(request, *args, **kwargs):
 def setlang(request, *args, **kwargs):
     method = request.method
     if method == 'GET':
-        path = request.REQUEST.get('next',None)
-        params = request.COOKIES
+        lang = get_and_activate(request)
+        path = request.REQUEST.get('next',reverse('web:portal'))
+        languages = get_available_languages()
         return render_to_response(
             "web/setlang.html",
             context_instance=RequestContext(
-            request, 
-            {
-                'available_languages': ['en','fr','ht'],
-                'portal':portal_site,
-                'next': path,
-            }))
+                request, 
+                {
+                    'available_languages': languages,
+                    'portal':portal.nav(request),
+                    'next': path,
+                    'lang': lang,
+                    'available_languages': get_available_languages(),
+                }))
+
     elif method == 'POST':
-        lang = request.POST.get('language', None)
-        path = request.POST.get('next', '/mds/web/')
-        path = path if path else '/mds/web/'
-        # set the language cookie here
-        response = HttpResponseRedirect(path)
-        response.set_cookie('lang',lang)
-        return response
+        path = request.POST.get('next', reverse('web:portal'))
+        lang = request.POST.get('language', "en")
+        activate(lang)
         
+        response = HttpResponseRedirect(path)
+        # set the language cookie here
+        response.set_cookie(settings.LANGUAGE_SESSION_KEY,lang)
+        return response
+
+class PortalView(TranslationMixin, LoginRequiredMixin, TemplateView):
+    template_name = 'web/index.html'
+    
+    def get_context_data(self,*args,**kwargs):
+        context = super(PortalView,self).get_context_data(*args,**kwargs)
+        context['portal'] = portal.nav(self.request)
+        return context
+
+class PortalListView(TranslationMixin, LoginRequiredMixin, ListView):
+    template_name = 'web/index.html'
+
+class PortalCreateView(TranslationMixin, LoginRequiredMixin, CreateView):
+    template_name = 'web/form_new.html'
+
+class PortalUpdateView(TranslationMixin, LoginRequiredMixin, UpdateView):
+    template_name = 'web/form.html'
+    
 @login_required(login_url="/mds/web/login/")
-def portal(request):
+def portal_index(request,*args,**kwargs):
     from mds.core import models as objects
     metadata = _metadata(request)
+    #lang = request.session.get(settings.LANGUAGE_SESSION_KEY)
+    lang = get_and_activate(request)
+    template = 'web/index.html'
     context = {
         'flavor': metadata.flavor,
         'errors': metadata.errors,
         'messages' : metadata.messages,
-        'models' : objects.__all__
+        'models' : objects.__all__,
+        'lang': lang,
+        'available_languages': get_available_languages(),
     }
     
-    context['portal'] = portal_site
-    return TemplateResponse(request,
-        'web/index.html',
+    context['portal'] = portal.nav(request)
+    response =  TemplateResponse(request,
+        template,
         context,
     )
+    return response
 
+class PortalDefaultRedirect(RedirectView):
+    def get_redirect_url(self, *args, **kwargs):
+        return reverse_lazy('portal', current_app='web')
+
+
+@login_required(login_url="/mds/web/login/")
 def encounter_review(request,**kwargs):
+    lang = kwargs.get('lang','en')
     tmpl = 'web/surgical_encounter_review.html'
     uuid = kwargs.get('uuid',None) if kwargs else None
     messages = []
@@ -1075,8 +1219,10 @@ def encounter_review(request,**kwargs):
             { 
                 'object': encounter,
                 "observations": observations , 
-                'portal': portal_site,
+                'portal': portal.nav(request),
                 'messages': messages,
+                'lang' :  lang,
+                'available_languages': get_available_languages(),
             }))
 
 class ClientDownloadsView(TemplateView):
@@ -1087,5 +1233,7 @@ class ClientDownloadsView(TemplateView):
         context = super(ClientDownloadsView, self).get_context_data(**kwargs)
         context['title'] = _("Mobile Client Downloads")
         context['objects'] = Client.objects.order_by("-version")
-        context['portal'] = portal_site
+        context['portal'] = portal.nav(getattr(self,'role',None))
+        context['lang'] = self.kwargs.get('lang','en')
+        context['available_languages'] = get_available_languages()
         return context
