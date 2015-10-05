@@ -1,0 +1,748 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: 2.0\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2015-10-05 17:40-0500\n"
+"PO-Revision-Date: 2015-10-05 14:03-0500\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: Sana Mobile <dev@sanamobile.org>\n"
+"Language: fr\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n > 1);\n"
+"X-Generator: Poedit 1.5.4\n"
+"X-Poedit-SourceCharset: UTF-8\n"
+
+#: settings.py:69
+msgid "English"
+msgstr "Angle"
+
+#: settings.py:70
+msgid "French"
+msgstr "Franse"
+
+#: settings.py:71
+msgid "Kreyol"
+msgstr "Créole Haïtien"
+
+#: core/extensions/models.py:34
+msgid "email"
+msgstr "email"
+
+#: core/extensions/models.py:70
+#, fuzzy
+msgid "house number"
+msgstr "Téléphone # 1"
+
+#: core/extensions/models.py:71
+msgid "family number"
+msgstr "numéro de famille"
+
+#: core/extensions/models.py:72
+msgid "national id"
+msgstr "numéro national d'identité"
+
+#: core/extensions/models.py:73
+msgid "conctact one"
+msgstr "Contactez un"
+
+#: core/extensions/models.py:74
+msgid "contact two"
+msgstr "contact deux"
+
+#: core/extensions/models.py:75
+#, fuzzy
+msgid "telephone number three"
+msgstr "Téléphone # 3"
+
+#: core/extensions/models.py:76
+#, fuzzy
+msgid "telephone number four"
+msgstr "Téléphone # 4"
+
+#: core/extensions/models.py:77
+msgid "confirmed"
+msgstr "confirmé"
+
+#: core/extensions/models.py:91 tasks/models.py:98 tasks/models.py:110
+msgid "encounter"
+msgstr "rencontre"
+
+#: core/extensions/models.py:96
+msgid "reviewed by"
+msgstr "revisé par"
+
+#: core/extensions/models.py:99
+msgid "viewed on"
+msgstr "date consulté"
+
+#: core/extensions/models.py:103 tasks/models.py:63
+#, fuzzy
+msgid "completed"
+msgstr "Terminé"
+
+#: core/models/concept.py:18
+msgid "concept"
+msgstr "concept"
+
+#: core/models/concept.py:26 tasks/models.py:54
+msgid "created"
+msgstr "créé"
+
+#: core/models/concept.py:29 tasks/models.py:57
+msgid "modified"
+msgstr "modifié"
+
+#: core/models/concept.py:32
+msgid "name"
+msgstr "nom"
+
+#: core/models/concept.py:35
+msgid "display name"
+msgstr "marque"
+
+#: core/models/concept.py:38
+msgid "description"
+msgstr "description"
+
+#: core/models/concept.py:40
+msgid "concept class"
+msgstr "classification"
+
+#: core/models/concept.py:42
+msgid "data type"
+msgstr "type de données"
+
+#: core/models/concept.py:48
+msgid "mimetype"
+msgstr "mimetype"
+
+#: core/models/concept.py:54
+msgid "constraint"
+msgstr "restriction"
+
+#: core/models/concept.py:58 tasks/models.py:68
+msgid "voided"
+msgstr "annulé"
+
+#: core/models/observation.py:169
+msgid "complex data"
+msgstr "données complexe"
+
+#: core/models/requestlog.py:71
+#, python-format
+msgid "%6s%12s%12s%s"
+msgstr "%6s%12s%12s%s"
+
+#: core/models/subject.py:39
+msgid "given name"
+msgstr "prénom"
+
+#: core/models/subject.py:41
+msgid "family name"
+msgstr "nom de famille"
+
+#: core/models/subject.py:43
+msgid "date of birth"
+msgstr "date d'anniversaire"
+
+#: core/models/subject.py:45
+msgid "gender"
+msgstr "sexe"
+
+#: core/models/subject.py:47
+msgid "image"
+msgstr "image"
+
+#: core/models/subject.py:51
+msgid "system id"
+msgstr "id patients"
+
+#: tasks/models.py:39
+msgid "Task"
+msgstr "tâche"
+
+#: tasks/models.py:40 web/portal.py:313
+msgid "Tasks"
+msgstr "tâches"
+
+#: tasks/models.py:51
+msgid "due on"
+msgstr "date d'échéance"
+
+#: tasks/models.py:60
+msgid "started"
+msgstr "commencé"
+
+#: tasks/models.py:88
+msgid "Encounter Task"
+msgstr "Visitez assigné"
+
+#: tasks/models.py:89
+msgid "Encounter Tasks"
+msgstr "Visites Assigned"
+
+#: tasks/models.py:94
+msgid "procedure"
+msgstr "procédure"
+
+#: tasks/models.py:106
+msgid "Observation Task"
+msgstr "Question attribuée"
+
+#: tasks/models.py:107
+msgid "Observation Tasks"
+msgstr "Questions assignées"
+
+#: tasks/models.py:114
+msgid "instruction"
+msgstr "instruction"
+
+#: templates/web/detail.html:28 templates/web/encounter_detail.html:38
+#: templates/web/encountertask_detail.html:29 templates/web/list.html:113
+#: templates/web/list_simple.html:39
+msgid "Back"
+msgstr "Reculer"
+
+#: templates/web/detail.html:29 templates/web/encounter_detail.html:39
+#: templates/web/encountertask_detail.html:30 templates/web/list.html:107
+#: templates/web/list_subjects.html:113 templates/web/task_list.html:108
+msgid "Edit"
+msgstr "Modifier"
+
+#: templates/web/download.html:11
+msgid "Download latest"
+msgstr "Téléchargez la dernière"
+
+#: templates/web/download.html:15
+msgid "Available versions:"
+msgstr "Versions disponibles"
+
+#: templates/web/encounter_detail.html:69
+msgid "Observations"
+msgstr "Observations"
+
+#: templates/web/form_snippet.html:15
+msgid "Update"
+msgstr "Soumettre"
+
+#: templates/web/form_snippet.html:17
+msgid "Add"
+msgstr "ajouter"
+
+#: templates/web/index.html:6
+msgid "Welcome to the MDS web portal"
+msgstr "Bienvenue sur le portail web MDS"
+
+#: templates/web/list.html:40 templates/web/list_subjects.html:49
+#: templates/web/task_list.html:41
+msgid "Filter Ascending"
+msgstr "trier par ordre croissant"
+
+#: templates/web/list.html:41 templates/web/list_subjects.html:50
+#: templates/web/task_list.html:42
+msgid "Filter Descending"
+msgstr "trier par ordre décroissant"
+
+#: templates/web/list.html:77 templates/web/list_simple.html:40
+#: web/portal.py:321
+msgid "New"
+msgstr "Nouveau"
+
+#: templates/web/list.html:79 templates/web/list_simple.html:42
+#: templates/web/list_subjects.html:85 templates/web/task_list.html:80
+msgid "Page"
+msgstr "Page"
+
+#: templates/web/list_simple.html:28
+#, fuzzy, python-format
+msgid "%(model|title)s List"
+msgstr "%(label|title)s"
+
+#: templates/web/list_subjects.html:35
+msgid "All"
+msgstr ""
+
+#: templates/web/list_subjects.html:36
+#, fuzzy
+msgid "Unconfirmed"
+msgstr "confirmé"
+
+#: templates/web/login.html:29
+msgid "Login"
+msgstr "Entrer"
+
+#: templates/web/setlang.html:3 templates/web/setlang.html.py:10
+#: templates/web/includes/footer.html:5
+msgid "Language"
+msgstr "Langue"
+
+#: templates/web/setlang.html:4
+msgid "Set Language"
+msgstr "Définir la langue"
+
+#: templates/web/setlang.html:20 templates/web/surgical_clinic_form.html:153
+msgid "Submit"
+msgstr "Soumettre"
+
+#: templates/web/surgical_clinic_form.html:12 web/portal.py:339
+msgid "Clinic Form"
+msgstr "Formulaire Clinique"
+
+#: templates/web/surgical_clinic_form.html:13
+msgid "Surgeon Clinic Form"
+msgstr "Chirurgien Clinique formulaire"
+
+#: templates/web/surgical_clinic_form.html:22
+msgid "Date"
+msgstr "Date"
+
+#: templates/web/surgical_clinic_form.html:26 web/forms.py:121
+msgid "Patient"
+msgstr "Patient"
+
+#: templates/web/surgical_clinic_form.html:34
+msgid "Type of clinic visit"
+msgstr "Type de visite à la clinique"
+
+#: templates/web/surgical_clinic_form.html:36
+#: templates/web/surgical_clinic_form.html:72
+#: templates/web/surgical_clinic_form.html:82
+#: templates/web/surgical_clinic_form.html:125
+#: templates/web/surgical_clinic_form.html:133
+#: templates/web/surgical_clinic_form.html:145
+msgid "Select"
+msgstr "Choisir"
+
+#: templates/web/surgical_clinic_form.html:37
+msgid "Routine post-op"
+msgstr "Post-op de routine"
+
+#: templates/web/surgical_clinic_form.html:38
+msgid "Referral for symptoms"
+msgstr "Renvoi des symptômes"
+
+#: templates/web/surgical_clinic_form.html:47
+msgid "Please use the following definition of surgical site infection (SSI)"
+msgstr ""
+"S'il vous plaît utiliser la définition suivante de l'infection du site "
+"opératoire (ISO)"
+
+#: templates/web/surgical_clinic_form.html:48
+msgid ""
+"Infection occurs within 30 days after any operative procedure \n"
+"    <strong>AND</strong> the patient has at least one of the following"
+msgstr ""
+"L'infection se produit dans les 30 jours après toute procédure opératoire \n"
+"     <strong> </ strong> le patient a au moins un des éléments suivants"
+
+#: templates/web/surgical_clinic_form.html:52
+msgid "a. Purulent drainage from the incision."
+msgstr "a.  Écoulement purulent de l'incision."
+
+#: templates/web/surgical_clinic_form.html:53
+msgid ""
+"b. Organisms isolated from a culture of fluid or tissue from the incision."
+msgstr ""
+"b. Les organismes isolés à partir d'une culture de tissu ou de fluide à "
+"partir de l'incision."
+
+#: templates/web/surgical_clinic_form.html:54
+msgid ""
+"c. Incision that spontaneously dehisces or is deliberately opened by a "
+"surgeon."
+msgstr ""
+"Incision que déhiscence spontanément ou est délibérément ouvert par un "
+"chirurgien."
+
+#: templates/web/surgical_clinic_form.html:55
+msgid "d. Diagnosis of an SSI by the surgeon."
+msgstr "d. Le diagnostic d'un SSI par le chirurgien."
+
+#: templates/web/surgical_clinic_form.html:57
+msgid "<strong>DO NOT</strong> report SSI if:"
+msgstr "<strong> ne pas </ strong> Rapport SSI si:"
+
+#: templates/web/surgical_clinic_form.html:59
+msgid ""
+"Stitch abscess: minimal inflammation and discharge confined to the points of "
+"suture penetration."
+msgstr ""
+"Abcès Stitch: une inflammation minimale et de décharge limitée aux points de "
+"pénétration de suture."
+
+#: templates/web/surgical_clinic_form.html:60
+msgid ""
+"Cellulits: erythema without swelling, fluctuance or drainage from the "
+"incision."
+msgstr ""
+"Cellulite: érythème sans gonflement, de fluctuation ou de drainage de "
+"l'incision."
+
+#: templates/web/surgical_clinic_form.html:70
+msgid "Is there an SSI?"
+msgstr "Y at-il un SSI?"
+
+#: templates/web/surgical_clinic_form.html:73
+#: templates/web/surgical_clinic_form.html:83
+#: templates/web/surgical_clinic_form.html:135
+#: templates/web/surgical_encounter_review.html:79
+#: templates/web/includes/observations.html:67
+msgid "Yes"
+msgstr "Oui"
+
+#: templates/web/surgical_clinic_form.html:74
+#: templates/web/surgical_clinic_form.html:84
+#: templates/web/surgical_clinic_form.html:134
+#: templates/web/surgical_clinic_form.html:146
+#: templates/web/surgical_encounter_review.html:80
+#: templates/web/includes/observations.html:68
+msgid "No"
+msgstr "Non"
+
+#: templates/web/surgical_clinic_form.html:80
+msgid "Would an earlier evaluation have been beneficial?"
+msgstr "Serait une évaluation antérieure été bénéfique?"
+
+#: templates/web/surgical_clinic_form.html:88
+msgid "What is the treatment plan?(Check all that apply)"
+msgstr "Quel est le plan de traitement? (Cochez toutes les cases)"
+
+#: templates/web/surgical_clinic_form.html:95
+msgid "Antibiotics"
+msgstr "Antibiotiques"
+
+#: templates/web/surgical_clinic_form.html:100
+msgid "Open the incision and pack at the bedside"
+msgstr "Ouvrez l'incision et de l'emballage au chevet"
+
+#: templates/web/surgical_clinic_form.html:103
+msgid "Drainage in the operating room - local anesthesia"
+msgstr "Drainage dans la salle d'opération - anesthésie locale"
+
+#: templates/web/surgical_clinic_form.html:104
+msgid "Drainage in the operating room -general or spinal anesthesia"
+msgstr ""
+"Drainage dans la Directrice générale de salle d'opération ou rachianesthésie"
+
+#: templates/web/surgical_clinic_form.html:111
+msgid "Readmission"
+msgstr "réadmission"
+
+#: templates/web/surgical_clinic_form.html:120
+msgid ""
+"Stop here if this is a routine post-op visit. Continue if the patient was "
+"referred for symptoms."
+msgstr ""
+"Arrêtez-vous ici si cela est une visite de routine post-op. Continuer si le "
+"patient a été référé pour des symptômes."
+
+#: templates/web/surgical_clinic_form.html:123
+msgid "Was the referral appropriate?"
+msgstr "La saisine était appropriée?"
+
+#: templates/web/surgical_clinic_form.html:126
+msgid "Yes, the symptoms warranted evaluation"
+msgstr "L'évaluation Oui, les symptômes garantis"
+
+#: templates/web/surgical_clinic_form.html:127
+msgid "No, evaluation was not necessary"
+msgstr "Non, l'évaluation n'a pas été nécessaire"
+
+#: templates/web/surgical_clinic_form.html:131
+msgid "Is any treatment necessary?"
+msgstr "Est tout traitement nécessaire?"
+
+#: templates/web/surgical_clinic_form.html:139
+msgid "If Yes (please describe)"
+msgstr "Si Oui (s'il vous plaît décrire)"
+
+#: templates/web/surgical_clinic_form.html:143
+msgid "Is another follow up necessary?"
+msgstr "Est un autre suivi nécessaire?"
+
+#: templates/web/surgical_clinic_form.html:147
+msgid "Yes, another visit is justified"
+msgstr "Oui, une autre visite est justifiée"
+
+#: templates/web/includes/footer.html:29
+msgid "Copyright 2015 Sana Mobile"
+msgstr "droit d'auteur 2015, Sana Mobile"
+
+#: templates/web/includes/header.html:4
+msgid "Home"
+msgstr "point d'accès"
+
+#: templates/web/includes/header.html:6 templates/web/includes/nav.html:16
+msgid "Logout"
+msgstr "Sortie"
+
+#: web/forms.py:124
+msgid "Procedure"
+msgstr "Procédure"
+
+#: web/forms.py:127
+msgid "Assigned To"
+msgstr "Assigné à"
+
+#: web/forms.py:130
+msgid "Type"
+msgstr "Type"
+
+#: web/forms.py:134 web/extensions/forms.py:25
+msgid "Due On"
+msgstr "Sur due"
+
+#: web/forms.py:138
+msgid "Started"
+msgstr "Commencé"
+
+#: web/forms.py:142
+msgid "Completed"
+msgstr "Terminé"
+
+#: web/forms.py:152
+msgid "Initial Visit"
+msgstr "Première visite"
+
+#: web/forms.py:153
+msgid "Regular follow up"
+msgstr "Un suivi régulier"
+
+#: web/forms.py:154
+msgid "30 day follow up"
+msgstr "30 jours de suivi"
+
+#: web/forms.py:163
+msgid "HAS Number"
+msgstr "Nombre HAS"
+
+#: web/forms.py:165
+msgid "Telephone number one"
+msgstr "Téléphone # 1"
+
+#: web/forms.py:167
+msgid "Telephone number two"
+msgstr "Téléphone # 2"
+
+#: web/forms.py:169
+msgid "Telephone number three"
+msgstr "Téléphone # 3"
+
+#: web/forms.py:171
+msgid "Telephone number four"
+msgstr "Téléphone # 4"
+
+#: web/forms.py:191
+msgid "Date of Birth"
+msgstr "Date d'anniversaire"
+
+#: web/forms.py:195
+msgid "Inguinal Hernia"
+msgstr "Hernie inguinale"
+
+#: web/forms.py:196
+msgid "Other Hernia"
+msgstr "Autres Hernie"
+
+#: web/forms.py:197
+msgid "Breat Mass"
+msgstr "Masse du sein"
+
+#: web/forms.py:198
+msgid "Other Mass"
+msgstr "Autres masse"
+
+#: web/forms.py:199
+msgid "Other"
+msgstr "Other"
+
+#: web/forms.py:215
+msgid "Inguinal Hernia Repair"
+msgstr "Réparation hernie inguinale"
+
+#: web/forms.py:216
+msgid "Other Hernia Repair"
+msgstr "Autres hernie"
+
+#: web/forms.py:217
+msgid "Breat Biopsy"
+msgstr "Biopsie du sein"
+
+#: web/forms.py:218
+msgid "Mastectomy"
+msgstr "Mastectomie"
+
+#: web/forms.py:219
+msgid "Mastectomy+Axillary LN Dissection"
+msgstr "Mastectomie + excision axillaire"
+
+#: web/forms.py:220
+msgid "Mastectomy+Axillary LN Biospy"
+msgstr "Mastectomie + biopsie axillaire"
+
+#: web/forms.py:221
+msgid "Biopsy, other"
+msgstr "Biopsie, d'autres"
+
+#: web/forms.py:222
+msgid "Excision of Mass other than breast"
+msgstr "L'excision de masse"
+
+#: web/forms.py:223
+msgid "Other Operation"
+msgstr "Autre opération"
+
+#: web/forms.py:253
+#, fuzzy
+msgid "subject"
+msgstr "Objet"
+
+#: web/forms.py:255
+msgid "diagnosis"
+msgstr "diagnostic"
+
+#: web/forms.py:258 web/forms.py:264
+#, fuzzy
+msgid "other"
+msgstr "Other"
+
+#: web/forms.py:261
+#, fuzzy
+msgid "operation"
+msgstr "observations"
+
+#: web/forms.py:268
+#, fuzzy
+msgid "date of operation"
+msgstr "Autre opération"
+
+#: web/forms.py:271
+#, fuzzy
+msgid "date of discharge"
+msgstr "Date d'anniversaire"
+
+#: web/portal.py:244 web/portal.py:270
+msgid "MDS2 Web Portal"
+msgstr "Portail Web "
+
+#: web/portal.py:250
+msgid "Users"
+msgstr "Utilisateurs"
+
+#: web/portal.py:254
+msgid "View all users"
+msgstr "Voir tout"
+
+#: web/portal.py:259
+msgid "All Observers"
+msgstr "Voir tout"
+
+#: web/portal.py:263
+msgid "New Observer"
+msgstr "Nouveau"
+
+#: web/portal.py:274
+msgid "Data"
+msgstr "Données"
+
+#: web/portal.py:278
+#, fuzzy
+msgid "concepts"
+msgstr "concept"
+
+#: web/portal.py:282
+msgid "devices"
+msgstr "appareils"
+
+#: web/portal.py:286
+msgid "encounters"
+msgstr "visites"
+
+#: web/portal.py:290
+msgid "locations"
+msgstr "emplacements"
+
+#: web/portal.py:294
+msgid "observations"
+msgstr "observations"
+
+#: web/portal.py:298
+msgid "patients"
+msgstr "patients"
+
+#: web/portal.py:302
+msgid "procedures"
+msgstr "procédures"
+
+#: web/portal.py:317
+msgid "Assigned"
+msgstr "Attribué"
+
+#: web/portal.py:327
+msgid "Forms"
+msgstr "Formulaires"
+
+#: web/portal.py:331
+msgid "Intake Form"
+msgstr "Formule d'admission"
+
+#: web/portal.py:335
+msgid "Patient Registration"
+msgstr "Inscription des patients"
+
+#: web/portal.py:345
+msgid "Reports"
+msgstr "Dossier"
+
+#: web/portal.py:350
+msgid "Admin"
+msgstr "Administrateur"
+
+#: web/portal.py:354
+msgid "Downloads"
+msgstr "Téléchargements"
+
+#: web/portal.py:358
+msgid "Logs"
+msgstr "Registre"
+
+#: web/views.py:801
+msgid "Object"
+msgstr "Objet"
+
+#: web/views.py:862
+msgid "Concept was updated successfully"
+msgstr "Concept a été mis à jour avec succès"
+
+#: web/views.py:1234
+msgid "Mobile Client Downloads"
+msgstr "Téléchargements client mobile"
+
+#: web/widgets.py:47
+msgid "Show all"
+msgstr "afficher tous"
+
+#, fuzzy
+#~ msgid "date of regular follow up"
+#~ msgstr "Un suivi régulier"
+
+#, fuzzy
+#~ msgid "location"
+#~ msgstr "emplacements"
+
+#, fuzzy
+#~ msgid "assigned to"
+#~ msgstr "Assigné à"
+
+#~ msgid "%(label|title)s"
+#~ msgstr "%(label|title)s"
+
+#~ msgid "%(view.label|title)s"
+#~ msgstr "%(view.label|title)s"
