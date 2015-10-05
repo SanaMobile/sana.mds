@@ -11,7 +11,8 @@ from .views import *
 urlpatterns = patterns(    
     #'mds.web',
     '',
-    url(r'^$','mds.web.views.portal', name="portal"),
+    url(r'^$',PortalView.as_view(), name="portal"),
+    #'mds.web.views.portal_index', name="portal"),
 
     url(r'^login/$', 'mds.web.views.login', name='login'),
     url(r'^logout/$', 'mds.web.views.logout',name='logout'),
@@ -82,11 +83,14 @@ urlpatterns = patterns(
     url(r'^subject/(?P<pk>[^/]+)/$', SubjectUpdateView.as_view(),name='subject-edit'),
     url(r'^subject/(?P<pk>\d+)/detail/$', SubjectDetailView.as_view(), name='subject-detail'),
     
-
     url(r'^encountertask/$', EncounterTaskListView.as_view(),name='encountertask-list'),
     url(r'^encountertask/new/$', EncounterTaskCreateView.as_view(),name='encountertask-create'),
     url(r'^encountertask/(?P<pk>[^/]+)/$', EncounterTaskUpdateView.as_view(),name='encountertask-edit'),
     url(r'^encountertask/(?P<pk>\d+)/detail/$', EncounterTaskDetailView.as_view(), name='encountertask-detail'),
+    #url(r'^encountertask/$', EncounterTaskListView.as_view(),name='encountertask-list'),
+    #url(r'^encountertask/new/$', 'mds.web.views.encounter_task', name='encountertask-create'),
+    #url(r'^encountertask/(?P<uuid>[^/]+)/$','mds.web.views.edit_encounter_task',name='encountertask-edit'),
+    #url(r'^encountertask/(?P<pk>\d+)/detail/$', EncounterTaskDetailView.as_view(), name='encountertask-detail'),
 
     # Forms
     url(r'^forms/surgeon/review/(?P<uuid>[^/]+)/$', 'mds.web.views.encounter_review', name='surgeon-review'),
