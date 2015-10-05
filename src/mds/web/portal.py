@@ -7,12 +7,20 @@ import copy
 from django.core.exceptions import ImproperlyConfigured
 from django.core.urlresolvers import reverse, NoReverseMatch
 from django.template.response import TemplateResponse
+
 from django.utils import six
+from django.utils.decorators import classonlymethod
 from django.utils.text import capfirst
 from django.utils.translation import ugettext as _
+from django.utils import six
 from django.views import generic
-
 from django.conf import settings
+
+__all__ = [
+    'generate',
+    'nav',
+    'NavMixin',
+]
 
 def build_urls(model_list):
     pass
@@ -34,7 +42,11 @@ class Portal(object):
         self.name = name
         if sites:
             self.sites = sites
-    
+            
+    @classonlymethod
+    def autocreate(cls):
+        pass
+
     def render(self, user):
         _rendered = {
             'app': self.app,
@@ -109,18 +121,19 @@ class PortalView(object):
     fields = ()
     form = None
     opts = {}
-    _name = None
-    _model = None
+    requires = None
+    name = None
+    model = None
     
     def __init__(self, name, **options):
         super(PortalSite,self)
-        self._model = model
-        self._name = name
-        opts = copy.deepcopy(options)
+        self.model = model
+        self.name = name
+        self.opts = copy.deepcopy(options)
     
     @property
     def name(self):
-        return self._name
+        return self.name
 
 
 
@@ -150,31 +163,33 @@ def PortalReportView(PortalView):
     pass
 
 class PortalSite(object):
-    name = None
-    _registry = {}
-    opts = {}
     
     class NavItem(object):
         label = None
         url = None
         children = []
         
-        def __init__(self, label, url):
-            super(NavItem, url) 
-    
+        def __init__(self, label=None, url=None):
+            super(NavItem, self)
+            self.label = label if label else None
+            self.url = url if url else None
+
     def __init__(self, name='portal',  **kwargs):
         super(PortalSite,self)
         self.name = name
         opts = copy.deepcopy(kwargs)
-        
+    
+    urlpatterns = None
+    name = None
+    _registry = {}
+    opts = {}
     @property
     def sidebar(self):
         ''' Return a list of menu items to include in a sidebar menu.
         '''
         pass
 
-
-    def index(self, request, extra_context=None):
+    def home(self, request, extra_context=None):
         pass
 
     def register(self, model_or_iterable, portal_class=None, **options):
@@ -225,124 +240,128 @@ class PortalSite(object):
     def register(self, portal_view,  **options):
         pass
         
+EMPTY = {
+        'name' : _('MDS2 Web Portal'),
+        'app' : 'web',
+        'sites' : []
+        }
+
+USERS = {
+                'label':_('Users'),
+                'requires': 'admin',
+                'views': [
+                    { 
+                        'label': _('View all users'),
+                        'context_name':'web:user-list',
+                        'requires': None,
+                    },
+                    { 
+                        'label': _('All Observers'),
+                        'context_name':'web:observer-list',
+                    },
+                    { 
+                        'label': _('New Observer'),
+                        'context_name':'web:observer-create',
+                    }
+                ]
+            }
 
 site = {
         'name' : _('MDS2 Web Portal'),
         'app' : 'web',
         'sites' : [
-           {
-                'label':_('Users'),
+            {
+                'label':_('Data'),
                 'requires': None,
                 'views': [
                     { 
-                        'label': 'View all users',
-                        'context_name':'user-list',
-                        'requires': None,
+                        'label': _('concepts'),
+                        'context_name':'web:concept-list',
                     },
                     { 
-                        'label': 'New User',
-                        'context_name':'user-create',
+                        'label': _('devices'),
+                        'context_name':'web:device-list',
                     },
                     { 
-                        'label': 'View all CHWs',
-                        'context_name':'observer-list',
+                        'label': _('encounters'),
+                        'context_name':'web:encounter-list',
                     },
                     { 
-                        'label': 'New CHW',
-                        'context_name':'observer-create',
-                    }
+                        'label': _('locations'),
+                        'context_name':'web:location-list',
+                    },
+                    { 
+                        'label': _('observations'),
+                        'context_name':'web:observation-list',
+                    },
+                    { 
+                        'label': _('patients'),
+                        'context_name':'web:subject-list',
+                    },
+                    { 
+                        'label': _('procedures'),
+                        'context_name':'web:procedure-list',
+                    },
+                    #{ 
+                    #    'label': _('encounter reviews'),
+                    #    'context_name':'web:encounterreview-list',
+                    #},
                 ]
             },
 
             {
-                'label':'Data',
+                'label': _('Tasks'),
                 'requires': None,
                 'views': [
                     { 
-                        'label': 'concepts',
-                        'context_name':'concept-list',
+                        'label': _('Assigned'),
+                        'context_name':'web:encountertask-list',
                     },
                     { 
-                        'label': 'devices',
-                        'context_name':'device-list',
-                    },
-                    { 
-                        'label': 'encounters',
-                        'context_name':'encounter-list',
-                    },
-                    { 
-                        'label': 'locations',
-                        'context_name':'location-list',
-                    },
-                    { 
-                        'label': 'observations',
-                        'context_name':'observation-list',
-                    },
-                    { 
-                        'label': 'patients',
-                        'context_name':'subject-list',
-                    },
-                    { 
-                        'label': 'procedures',
-                        'context_name':'procedure-list',
-                    },
-                ]
-            },
-
-            {
-                'label':'Tasks',
-                'requires': None,
-                'views': [
-                    { 
-                        'label': 'Assigned Tasks',
-                        'context_name':'encountertask-list',
-                    },
-                    { 
-                        'label': 'New',
-                        'context_name':'encountertask-create',
+                        'label': _('New'),
+                        'context_name':'web:encountertask-create',
                     }
                 ]
             },
             {
-                'label':'Forms',
+                'label':_('Forms'),
                 'requires': None,
                 'views':[
                     { 
-                        'label': 'Intake Form',
-                        'context_name':'intake',
+                        'label': _('Intake Form'),
+                        'context_name':'web:intake',
                     },
                     { 
-                        'label': 'Patient Registration',
-                        'context_name':'register-patient',
+                        'label': _('Patient Registration'),
+                        'context_name':'web:register-patient',
                     },
                     { 
-                        'label': 'Clinic Form',
-                        'context_name':'clinic-form',
+                        'label': _('Clinic Form'),
+                        'context_name':'web:clinic-form',
                     }
                 ]
             },
             {
-                'label':'Reports',
-                'requires': None,
+                'label':_('Reports'),
+                'requires': ['admin',],
                 'views':[]
             },
             {
-                'label':'Admin',
-                'requires': None,
+                'label':_('Admin'),
+                'requires': [ 'admin', ],
                 'views':[
                     { 
-                        'label': 'Downloads',
-                        'context_name':'download-client',
+                        'label': _('Downloads'),
+                        'context_name':'web:download-client',
                     },
                     { 
-                        'label': 'Logs',
-                        'context_name':'log-index',
+                        'label': _('Logs'),
+                        'context_name':'web:log-index',
                     },
-                    { 
-                        'label': 'Default Admin',
-                        'context_name': None,
-                        'url' : '/mds/admin/',
-                    }
+                    #{ 
+                    #    'label': _('Default Admin'),
+                    #    'context_name': 'admin:index',
+                    #}
                 ]
             },
         ]
@@ -368,3 +387,17 @@ def get_or_create_portal(portal_site=None):
 
     _portal.register(portal_view, **options)
 
+def generate(request, *args, **kwargs):
+    pass
+
+def nav(request, *args, **kwargs):
+    if request and not request.user:
+        return _empty
+    else:
+        return site
+
+def NavMixin(object):
+
+    def dispatch(self,request,*args,**kwargs):
+        setattr(self,'nav', nav(request))
+        super(NavMixin,self).dispatch(request, *args, **kwargs)
