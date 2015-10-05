@@ -1,8 +1,10 @@
 .content-list{
     /* color:#efefef; */
-    margin: 0 auto;
-    min-width: 100%;
     padding: 5px;
+    width:100%;
+}
+.conten-list tr{
+    width: 100%;
 }
 .content-list thead{
     padding: 0px;
@@ -26,6 +28,7 @@
 }
 .content-list tr.headerrow table td{
     min-width:0px;
+    padding: 1px 3px;
 }
 .content-list tr.headerrow button{
     font-size:0.5em;
@@ -34,7 +37,7 @@
 }
 
 .content-list tr.headerrow th{
-    min-width: 64px;
+    min-width: 48px;
 }
 .content-list tr.headerrow th.edit{
     max-width: 32px;
@@ -46,7 +49,6 @@
 .content-list tr.footerrow{
     background-color: darkgray;
     color: #ffffff;
-    width:100%;
     padding: 10px;
     margin: 10px;
 }
@@ -65,7 +67,6 @@
 }
 .content-list tr.evenrow{
     background-color: #efefef; 
-    width:100%;
     color: #6e6e6e;
 }
 .content-list tr.evenrow:hover{
@@ -73,7 +74,6 @@
 }
 .content-list tr.oddrow{
     background-color: #ffffff; 
-    width:100%;
     color: #6e6e6e;
 }
 .content-list tr.oddrow:hover{

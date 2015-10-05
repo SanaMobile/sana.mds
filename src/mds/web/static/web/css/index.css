@@ -104,12 +104,10 @@ a.listfooter {
 }
 .wrapper {
     height: auto;
-    min-height:100%;
     width: 100%;
     box-sizing: border-box;
-    border-top: 2px solid #6c6c6c;
     background-color: #fefefe; 
-    padding-bottom:48px;
+    /* padding-bottom:48px;*/
 }
 
 .link-menu {
@@ -121,10 +119,9 @@ a.listfooter {
 .main-content {
     padding: 0px;
     text-align: center;
+    
 }
 .main-content > .main-content-footer {
-    padding-left: 10px;
-    padding-right: 10px;
     padding:0px;
     position: absolute;
     bottom: 0px;
@@ -152,14 +149,22 @@ a.listfooter {
 .main-content > .main-content-header {
     background-color:rgba(20, 20, 20, 0.8);
     font-size: 1.1em;
+    min-height: 56px;
 }
-.main-content > .main-content-header table{
-    width: 100%;
+.main-content > .main-content-header >.title {
+    float: left;
 }
-.main-content > .main-content-header td.title{
-    color: #9090aa;
-    font-size: 1.15em;
+.main-content > .main-content-header >.title h3{
+        color: #9090aa;
+        font-size: 1.15em;
+        display: block;
+        text-decoration: none;
+        font-weight: 600;
+        padding: 16px 8px;
+        min-width: 64px;
+    }
 }
+.main-content > .main-content-header > .title{}
 .main-content > .main-content-header table ul{
     display:block;
 }
@@ -173,13 +178,7 @@ a.listfooter {
     padding: 5px;
     color: #ABB6BE;
 }
-.main-content > .main-content-header table a h3{
-    display: block;
-    text-decoration: none;
-    font-weight: bold;
-    padding: 5px;
-    min-width: 64px;
-}
+
 .main-content > .main-content-header table a:hover {
     color: #ffffff; 
     border-radius: 5px;
@@ -187,8 +186,17 @@ a.listfooter {
     
 }
 .main-content > .main-content-body {
-    padding: 5px;
     text-align: left;
+    margin-right: 196px;
+    margin-top: 3px;
+    margin-left: 3px;
+    margin-bottom: 64px;
+    width: 100%;
+    @media screen and (max-width: 800px) {
+        clear: both; 
+        margin-left: 3px;
+        margin-right: 3px;
+    }
 }
 .main-content > .main-content-body a {
     text-decoration: underline;
@@ -198,6 +206,17 @@ a.listfooter {
     
 }
 .main-content > .main-content-body > .main-content-body-inner {
+    text-align: left;
+     margin-right: 196px;
+    margin-top: 3px;
+    margin-left: 3px;
+    margin-right: 3px;
+    @media screen and (max-width: 800px) {
+        clear: both;
+        margin-left: 3px;
+        margin-right: 3px;
+    }
+
 }
 
 .main-content > .main-content-body > .main-content-body-inner > h2 {
@@ -335,41 +354,7 @@ td.text-top{
 .errorlist li{
     color:red;
 }
-/*
-.content-form{
-    margin: 0 auto;
-    min-width: 420px;
-}
-.content-form  ul li..evenrow{
-    background-color: #efefef;
-}
-.content-form ul li.oddrow{
-    background-color: #ffffff;
-}
-.content-form ul{
-    min-width: 420px;
-}
-.content-form ul li{
-    width: 420px;
-    margin: 5px;
-}
-.content-form ul li div.fieldwrapper{
-    min-width: 420px;
-    margin: 5px;
-}
-.content-form ul li div label{
-    left: 0px;
-    position: relative;
-}
-.content-form ul li div input{
-    right: 0px;
-    position: relative;
-}
-.content-form ul li div input{
-    right: 0px;
-    position: relative;
-}
-*/
+
 .block-border-thin{
     border: 3px solid #000000;
     padding: 10px;
@@ -377,7 +362,10 @@ td.text-top{
 }
 .main-content > .main-content-body > .main-content-body-inner div{
     margin-bottom: 10px;
-}
+    @media screen and (max-width: 800px) {
+        clear: both;
+        margin: 0 auto;
+    }
 .main-content > .main-content-body > .main-content-body-inner div.backnav{
     width: 100%;
     padding: 5px 16px 0 0;
@@ -393,4 +381,38 @@ td.text-top{
 }
 .hidden-initial{
     display: none;
+}
+
+.main-content > .main-content-header {
+    background-color:rgba(20, 20, 20, 0.8);
+    font-size: 1.1em;
+    height: 56px;
+    width: 100%;
+}
+.main-content > .main-content-header > .title{
+    color: #9090aa;
+    font-size: 1.15em;
+    float: left;
+    padding-top: 10px;
+}
+.main-content > .main-content-header a.site-link {
+    display: block;  
+    text-decoration: none;
+    font-weight: bold;
+    padding: 3px;
+    color: #ABB6BE;
+}
+.main-content > .main-content-header h3{
+    display: block;
+    text-decoration: none;
+    font-weight: bold;
+    padding: 5px;
+    min-width: 64px;
+}
+.main-content > .main-content-header a:hover {
+    color: #bfbfbf; 
+    /*
+     * border-radius: 5px;
+    //background-color: darkgrey;
+    */
 }
