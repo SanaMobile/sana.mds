@@ -22,7 +22,7 @@
     <!--
     link rel="stylesheet" href="{{ STATIC_PREFIX }}web/css/sidebar.css" /
     -->
-    <link rel="stylesheet" href="{{ STATIC_PREFIX }}web/css/menu.css" />
+    <link rel="stylesheet" href="{{ STATIC_PREFIX }}web/css/nav.css" />
     <link rel="stylesheet" href="{{ STATIC_PREFIX }}web/css/footer.css" />
     <link rel="stylesheet" href="{{ STATIC_PREFIX }}web/css/loader.css" />
     <link rel="stylesheet" href="{{ STATIC_PREFIX }}web/css/jquery-ui-timepicker-addon.css" />
@@ -175,16 +175,11 @@
 <body>
 <div class="wrapper">
   <section class="main-content">
-  <div class="main-content-header">
-    <table >
-        <tr>
-            <td class="text-left"><a href="{% url 'web:portal' %}">{% trans "Home" %}</a></td>
-            <td class="title"><strong>{% block header %}{% endblock %}</strong></td>
-            <td class="text-right"><a href="{% url 'web:logout' %}">{% trans "Logout" %}</a></td>
-        </tr>
-    </table>
+  <div class="main-content-header wrapper">
+    <div class="title" ><h3>{% block header %}{% endblock %}</h3></div>
+
     {% if portal %}
-        {% include 'web/includes/menu.html' with menu=portal %}
+        {% include 'web/includes/nav.html' with menu=portal lang=lang %}
     {% endif %}
   </div>
   <div class="main-content-body">
@@ -205,15 +200,16 @@
         $("#loader").css("display","none");
     });
 </script>
+
 <footer>
 <div>
 {% block footer %}
-    <ul>
-        <li><img src="{{ STATIC_PREFIX }}web/img/sana_small.png"/></li>
-        <li>Copyright 2015 Sana Mobile</li>
-    </ul>
+    {% include 'web/includes/footer.html' %}
 {% endblock footer %}
 </div>
 </footer>
+    <script type="text/javascript" src="{{ STATIC_PREFIX }}web/js/jquery.slide-transition.js"></script>
+
+    <script type="text/javascript" src="{{ STATIC_PREFIX }}web/js/toggle.js"></script>
 </body>
 </html>
