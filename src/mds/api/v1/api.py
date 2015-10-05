@@ -336,8 +336,10 @@ def maybe_upload_procedure(saved_procedure):
             obs.save()
         if result:
             try:
-                notification_sent = sender.send_review_notification(encounter)
-                logging.info("Sent notification for Observation: %s" % encounter.uuid)
+                notification_sent = sender.send_review_notification(
+                    encounter, settings.REVIEW_ADDRESSES, 
+                    settings.REVIEW_SUBJECT)
+                logging.info("Sent notification for encounter: %s" % encounter.uuid)
             except:
                 logging.warn("Problem sending notifications")
     return result, message
