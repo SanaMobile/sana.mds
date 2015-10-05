@@ -284,8 +284,6 @@ class CompoundFormHandler(object):
 class SurgicalSubjectHandler(DispatchingHandler):
     """ Handles subject requests. """
     allowed_methods = ('GET', 'POST')
-    #fields = ['uuid']
-    #exclude = ("location")
     fields = (
         "uuid",
         "family_name",
@@ -310,6 +308,22 @@ class SurgicalSubjectHandler(DispatchingHandler):
     
     model = SurgicalSubject
     form = SurgicalSubjectForm
+    signals = { LOGGER:( EventSignal(), EventSignalHandler(Event))}
+
+
+@logged
+class EncounterReviewHandler(DispatchingHandler):
+    """ Handler for EncounterReview Requests. """
+    allowed_methods = ('GET', 'POST')
+    fields = [
+            'uuid',
+            'encounter',
+            'reviewed_by',
+            'viewed_on',
+            'completed',
+        ]
+    model = EncounterReview
+    form = EncounterReviewForm
     signals = { LOGGER:( EventSignal(), EventSignalHandler(Event))}
 
 def intake_handler(request,*args,**kwargs):
