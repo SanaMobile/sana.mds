@@ -100,7 +100,7 @@ msgstr "non"
 
 #: core/models/concept.py:35
 msgid "display name"
-msgstr "non ekspozisyon"
+msgstr "non"
 
 #: core/models/concept.py:38
 msgid "description"
@@ -141,7 +141,7 @@ msgstr "prenon"
 
 #: core/models/subject.py:41
 msgid "family name"
-msgstr "non ekspozisyon"
+msgstr "non"
 
 #: core/models/subject.py:43
 msgid "date of birth"
@@ -511,7 +511,7 @@ msgstr "Date de la visite de la maison finale"
 
 #: web/forms.py:163
 msgid "HAS Number"
-msgstr "HAS #"
+msgstr "Nimewo HAS"
 
 #: web/forms.py:165
 msgid "Telephone number one"
