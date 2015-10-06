@@ -9,10 +9,8 @@ from django.conf.urls import patterns, url, include
 from .views import *
 
 urlpatterns = patterns(    
-    #'mds.web',
     '',
     url(r'^$',PortalView.as_view(), name="portal"),
-    #'mds.web.views.portal_index', name="portal"),
 
     url(r'^login/$', 'mds.web.views.login', name='login'),
     url(r'^logout/$', 'mds.web.views.logout',name='logout'),
