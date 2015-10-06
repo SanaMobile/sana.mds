@@ -2,7 +2,7 @@
 {% load url from future %}
 {% load static %}
 {% load i18n %}
-{% block title %}{{ model|title }} List{% endblock title%}
+{% block title %}{% trans model|title|pluralize  %}{% endblock %}
 {% block extrastyle %}
 <link rel="stylesheet" href="{{ STATIC_PREFIX }}web/css/liststyle.css">
 {% endblock %}

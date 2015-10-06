@@ -72,14 +72,14 @@ function submitSubjectWeb(){
     {% for field in form.visible_fields %}
     <div class="formrow {% cycle 'evenrow' 'oddrow' %}">
         <div class="fieldWrapper">
-            {{ field.errors }}{{ field.label_tag }}
+            {{ field.errors }}{% trans field.label_tag %}
             {{ field }}
         </div>
     </div>
     {% endfor %}
     <div class="formrow">
         <p align="center" style="font-size:larger">
-            <input type="button" id="id_submit_patient" class="show-page-loading-msg" value="Create Patient" onClick="submitSubjectWeb()">
+            <input type="button" id="id_submit_patient" class="show-page-loading-msg" value="{% trans 'Submit' %}" onClick="submitSubjectWeb()">
         </p>
     </div>
 </div>
