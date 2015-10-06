@@ -1,13 +1,16 @@
 from django import forms
+from django.utils.translation import ugettext_lazy as _
 from extra_views import ModelFormSetView
 
 from mds.core.widgets import *
-from .models import *
+from mds.core.models import *
+from mds.tasks.models import *
+#from .models import *
 
-__all__ = [ 'EncounterTaskForm',
-            'ObservationTaskForm']
+__all__ = [ 'SimpleEncounterTaskSetForm',
+            'SurgicalAdvocateFollowUpForm']
             
-class SharedValueSimpleEncounterTaskForm(forms.ModelForm):
+class SimpleEncounterTaskSetForm(forms.ModelForm):
     """ Visits assigned to surgical advocate post S/P
     """
     class Meta:

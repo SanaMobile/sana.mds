@@ -7,8 +7,18 @@ from django.utils.translation import ugettext_lazy as _
 
 from extra_views import ModelFormSetView
 
+from mds.core.models import *
+from mds.tasks.models import *
+from mds.core.forms import *
 from .forms import *
 from ..views import ModelFormMixin, ModelListMixin, ModelSuccessMixin
+
+__all__ = [
+    'SurgicalSubjectListView',
+    'SurgicalSubjectCreateView',
+    'SurgicalSubjectUpdateView',
+    'SurgicalSubjectDetailView',
+]
 
 class SurgicalSubjectListView(ModelListMixin, ListView):
     model = SurgicalSubject
@@ -36,5 +46,5 @@ class SurgicalSubjectDetailView(ModelFormMixin,DetailView):
 class EncounterTaskSetView(ModelFormSetView):
     template_name = 'web/formset.html'
     model = EncounterTask
-    form_class = SimpleEncounterTaskForm
+    form_class = SimpleEncounterTaskSetForm
     

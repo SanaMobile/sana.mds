@@ -101,3 +101,7 @@ urlpatterns = patterns(
 
 )
 
+from .extensions.urls import urlpatterns as extpatterns
+
+urlpatterns += extpatterns
+
