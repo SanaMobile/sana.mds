@@ -1,4 +1,5 @@
 {% extends "web/base.html" %}
+{% load i18n %}
 {% block extrastyle %}
 <link rel="stylesheet" href="{{ STATIC_PREFIX }}web/css/liststyle.css">
 <link rel="stylesheet" href="{{ STATIC_PREFIX }}web/css/formstyle.css">
@@ -72,7 +73,7 @@ function submitSubjectWeb(){
     {% for field in form.visible_fields %}
     <div class="formrow {% cycle 'evenrow' 'oddrow' %}">
         <div class="fieldWrapper">
-            {{ field.errors }}{% trans field.label_tag %}
+            {{ field.errors }}{% trans field.label_tag|title %}
             {{ field }}
         </div>
     </div>

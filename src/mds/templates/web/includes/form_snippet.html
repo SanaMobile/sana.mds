@@ -3,14 +3,15 @@
 {% for hidden in form.hidden_fields %}
     {{ hidden }}
 {% endfor %}
+
 {# Include the visible fields #}
 {% for field in form.visible_fields %}
-<div class="formrow {% cycle 'evenrow' 'oddrow' %}">
-    <div class="fieldWrapper">
-        {{ field.errors }}{% trans field.label_tag|title %}
-        {{ field }}
+    <div class="formrow {% cycle 'evenrow' 'oddrow' %}">
+        <div class="fieldWrapper">
+            {{ field.errors }}{% trans field.label_tag|title %}
+            {{ field }}
+        </div>
     </div>
-</div>
 {% endfor %}
 <div class="formrow">
     <p align="center" style="font-size:larger">
