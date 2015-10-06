@@ -1797,23 +1797,24 @@ jQuery(function($){
 /* Written by 
  */
 jQuery(function($){
-	$.datepicker.regional['ht'] = {
-		closeText: 'Fermer',
-		prevText: 'Précédent',
-		nextText: 'Suivant',
-		currentText: 'Aujourd\'hui',
-		monthNames: ['Janvier','Février','Mars','Avril','Mai','Juin',
-		'Juillet','Août','Septembre','Octobre','Novembre','Décembre'],
-		monthNamesShort: ['Janv.','Févr.','Mars','Avril','Mai','Juin',
-		'Juil.','Août','Sept.','Oct.','Nov.','Déc.'],
-		dayNames: ['Dimanche','Lundi','Mardi','Mercredi','Jeudi','Vendredi','Samedi'],
-		dayNamesShort: ['Dim.','Lun.','Mar.','Mer.','Jeu.','Ven.','Sam.'],
-		dayNamesMin: ['D','L','M','M','J','V','S'],
-		weekHeader: 'Sem.',
-		dateFormat: 'dd/mm/yy',
-		firstDay: 1,
-		isRTL: false,
-		showMonthAfterYear: false,
-		yearSuffix: ''};
-	$.datepicker.setDefaults($.datepicker.regional['ht']);
+    $.datepicker.regional['ht'] = {
+        closeText: "Fermer",
+        prevText: "Précédent",
+        nextText: "Suivant",
+        currentText: "Aujourd'hui",
+        monthNames: [ 'Janvye', 'Fevriye', 'Mas', 'Avril', 'Me', 'Jwen', 
+        'Jiye', 'Out', 'Septanm', 'Oktob', 'Novanm', 'Desanm'],
+        monthNamesShort: [ 'Janv', 'Fevr', 'Mas', 'Avr', 'Me', 'Jwen', 
+        'Jiye', 'Out', 'Sept', 'Okt', 'Nov', 'Des'],
+        dayNames: [ "dimanche", "lundi", "mardi", "mercredi", "jeudi", "vendredi", "samedi" ],
+        dayNamesShort: [ "dim.", "lun.", "mar.", "mer.", "jeu.", "ven.", "sam." ],
+        dayNamesMin: [ "D","L","M","M","J","V","S" ],
+        weekHeader: "Sem.",
+        dateFormat: "dd-MM-yy",
+        firstDay: 1,
+        isRTL: false,
+        showMonthAfterYear: false,
+        yearSuffix: "" 
+    };
+    $.datepicker.setDefaults( $.datepicker.regional['ht']);
 });
