@@ -43,8 +43,8 @@ $(document).ready(function () {
   * 
   */
   $('.toggle-wrapper').each(function(){ 
-      $(this).hover(function(event){
-        event.preventDefault();
+      $(this).click(function(event){
+        //event.preventDefault();
         $(this).children('.toggle').each(function(event){
           var toggle = $(this);
           if (toggle.hasClass("height-transition-hidden"))
@@ -56,24 +56,4 @@ $(document).ready(function () {
           })
       })
   });
-/*
-  * Set the side bar toggles
-  * 
-  */
-  /*
-  $('.toggle-trigger').each(function(){ 
-      $(this).hover(function(event){
-        event.preventDefault();
-        $(this).siblings('.toggle').each(function(event){
-          var toggle = $(this);
-          if (toggle.hasClass("height-transition-hidden"))
-            toggle.slideDownTransition();
-          else
-            toggle.slideUpTransition();
-          },function(event) {
-            toggle.slideUpTransition();
-          })
-      })
-  });
-  */
 });
