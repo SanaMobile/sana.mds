@@ -1,15 +1,17 @@
 {% extends 'web/base.html' %}
 {% load static %}
 {% load i18n %}
-{% block header %}Update {{ model|title }}{% endblock %}
 {% block extrastyle %}
 <link rel="stylesheet" href="{{ STATIC_PREFIX }}web/css/formstyle.css">
 {% endblock %}
+
+{% block title %}{% trans 'Update' %} {% trans model|title %}{% endblock %}
+{% block header %}{% trans 'Update' %} {% trans model|title %}{% endblock %}
 {% block content %}
 <form enctype="multipart/form-data" action="." method="POST">
 {{ csrftoken }}
-<div>
-{% include "web/form_snippet.html" %}
+<div class="form">
+{% include "web/includes/form_snippet.html" %}
 </div>
 <script>
     // Displays Date picker pop up

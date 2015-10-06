@@ -1,7 +1,7 @@
 {% extends 'web/base.html' %}
 {% load static %}
 {% load i18n %}
-{% block header %}Create {{ model|title }}{% endblock %}
+{% block title %}{% trans 'New' %} {% trans model|title %}{% endblock %}
 {% block extrastyle %}
 <link rel="stylesheet" href="{{ STATIC_PREFIX }}web/css/formstyle.css">
 {% endblock %}
@@ -14,10 +14,11 @@
     });
     */
 {% endblock %}
+{% block header %}{% trans 'New' %} {% trans model|title %}{% endblock %}
 {% block content %}
 <form enctype="multipart/form-data" action="{% url 'web:'|add:model|add:'-create' %}" method="post">
     {{ csrftoken }}
-    {% include "web/form_snippet.html" %}
+    {% include "web/includes/form_snippet.html" %}
     <div id="inlines">
     {% if inlines %}
         {% for inline in inlines %}

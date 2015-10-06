@@ -1,0 +1,24 @@
+{% load i18n %}
+<div class="form">
+{% for hidden in form.hidden_fields %}
+    {{ hidden }}
+{% endfor %}
+{# Include the visible fields #}
+{% for field in form.visible_fields %}
+<div class="formrow {% cycle 'evenrow' 'oddrow' %}">
+    <div class="fieldWrapper">
+        {{ field.errors }}{% trans field.label_tag|title %}
+        {{ field }}
+    </div>
+</div>
+{% endfor %}
+<div class="formrow">
+    <p align="center" style="font-size:larger">
+        {% if object %}
+            <input type="submit" id="id_submit" value="{% trans 'Update' %}" />
+        {% else %}
+            <input type="submit" id="id_submit" value="{% trans 'Add' %}" />
+        {% endif %}
+    </p>
+</div>
+</div>
