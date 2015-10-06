@@ -186,37 +186,39 @@ a.listfooter {
     
 }
 .main-content > .main-content-body {
+    width: 0;
+    width: 100%;
     text-align: left;
     margin-right: 196px;
     margin-top: 3px;
     margin-left: 3px;
     margin-bottom: 64px;
     width: 100%;
-    @media screen and (max-width: 800px) {
-        clear: both; 
+    text-decoration: underline;
+}
+@media screen and (max-width: 800px)
+    .main-content > .main-content-body {
         margin-left: 3px;
         margin-right: 3px;
-    }
 }
 .main-content > .main-content-body a {
-    text-decoration: underline;
 }
 .main-content > .main-content-body a:hover {
     text-decoration: underline;
     
 }
+@media screen and (min-width: 800px)
 .main-content > .main-content-body > .main-content-body-inner {
+    margin: 0 auto;
     text-align: left;
-     margin-right: 196px;
+    margin-right: 196px;
     margin-top: 3px;
     margin-left: 3px;
-    margin-right: 3px;
-    @media screen and (max-width: 800px) {
-        clear: both;
+}
+@media screen and (max-width: 800px)
+    .main-content > .main-content-body > .main-content-body-inner {
         margin-left: 3px;
         margin-right: 3px;
-    }
-
 }
 
 .main-content > .main-content-body > .main-content-body-inner > h2 {
