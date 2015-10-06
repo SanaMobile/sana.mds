@@ -3,11 +3,6 @@
 }
 
 
-select {
-    padding: 3px;
-    max-width; 192px !important;
-    overflow: hidden;
-}
 .content-form tr.headerrow {
     padding:0px;
     margin:0px;
@@ -101,7 +96,7 @@ select {
 }
 .fieldWrapper select{
     padding: 3px;
-    max-width; 192px;
+    max-width; 384px;
 }
 .formrow {
     padding: 5px;
@@ -133,10 +128,6 @@ select {
 }
 .formrow > .fieldWrapper input{
     padding: 3px;
-}
-.formrow > .fieldWrapper select{
-    padding: 3px;
-    max-width: 192px;
 }
 .form div.instruction{
     border: 1px solid rgba(64,64,64,0.8);
