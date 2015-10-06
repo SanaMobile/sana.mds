@@ -20,7 +20,8 @@
                 // Set change listener to reload the page
                 $('#id_language').change(function() {
                     var lang = $(this).val();
-                    $.cookie('language', lang);
+                    $.cookie('language', lang, { path: '/' });
+                    $.cookie('_language', lang, { path: '/' });
                     location.reload();
                 });
             </script>
