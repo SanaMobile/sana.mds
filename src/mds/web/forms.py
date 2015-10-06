@@ -187,7 +187,7 @@ class SurgicalSubjectForm(forms.ModelForm):
             'contact_four',
         ]
         widgets = {
-            'dob': DateTimeSelectorInput(),
+            'dob': DateSelectorInput(),
             'label': _('Date of Birth'),
         }
 
