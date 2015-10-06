@@ -194,7 +194,7 @@ a.listfooter {
     margin-left: 3px;
     margin-bottom: 64px;
     width: 100%;
-    text-decoration: underline;
+    text-decoration: none;
 }
 @media screen and (max-width: 800px)
     .main-content > .main-content-body {
