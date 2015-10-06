@@ -38,13 +38,19 @@ function submitSubjectWeb(){
     var family_name = $('#id_family_name').val();
     var use_age  = $('#id_use_age').val();
     var age  = $('#id__age').val();
-    var dob  = $('#id_dob').val();
+    var dobDate  = $('#id_dob').datepicker("getDate");
+    var year = dobDate.getFullYear();
+    var month = dobDate.getMonth() + 1;
+    var day = dobDate.getDate();
+    dob = ''+year+'-'+month+'-'+day; 
     var gender = $('#id_gender').val();
     var image = $('#id_image').val();
     var location = $('#id_location').val();
     {% url 'mds.core:surgical-subject-list' as posturl %}
     var posturl = '{{ posturl }}';
+    posturl = '/mds/core/subject/';
     var url = '/mds/core/surgicalsubject/';
+    url = '/mds/core/subject/';
     var data = {
         system_id: system_id,
         given_name: given_name,
@@ -89,16 +95,17 @@ function submitSubjectWeb(){
     // Displays Date picker pop up
     $(function(){
         $('input[type="date"]').datepicker({ 
-            dateFormat: 'yy-mm-dd', 
+            //dateFormat: 'yy-mm-dd', 
             changeYear: true , 
             yearRange : "c-100:c+05"
             }).prop('type','text');
         $('input[type="date"]').prop('type','text');
+        $('.hasDatepicker').attr('readonly','true');
      });
     // Displays DateTime picker pop up
     $(function(){
         $('input[type="datetime"]').datetimepicker({ 
-            dateFormat: 'yy-mm-dd', 
+            //dateFormat: 'yy-mm-dd', 
             changeYear: true , 
             yearRange : "c-100:c+05",
             timeformat: "HH:mm",

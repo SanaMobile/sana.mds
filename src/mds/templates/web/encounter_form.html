@@ -189,13 +189,14 @@
     // Input handlers
     $(function(){
       //$( "input[type='date']" ).datepicker({ dateFormat: 'mm/dd/yy', changeYear: true });
-        $('input[type="date"]').datepicker({ dateFormat: 'yy-mm-dd', changeYear: true , yearRange : "c-100:c+05"}).prop('type','text');
+      //$('input[type="date"]').datepicker({ dateFormat: 'yy-mm-dd', changeYear: true , yearRange : "c-100:c+05"}).prop('type','text');
+      //$( "input[type='date']" ).datepicker({ dateFormat: 'mm/dd/yy', changeYear: true });
         $('input[type="date"]').prop('type','text');
     });
     // Displays DateTime picker pop up
     $(function(){
         $('input[type="datetime"]').datetimepicker({ 
-            dateFormat: 'yy-mm-dd', 
+            //dateFormat: 'yy-mm-dd', 
             changeYear: true , 
             yearRange : "c-100:c+05",
             timeformat: "HH:mm",
