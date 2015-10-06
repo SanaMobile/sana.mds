@@ -67,15 +67,13 @@ def login(request,*args,**kwargs):
     next_page = redirect_to if redirect_to else reverse("web:portal")
     
     # set the language
-    lang = get_request_language(request)
+    lang = get_and_activate(request)
 
     if request.method == "POST":
         username = request.POST['username']
         password = request.POST['password']
         
         #lang = request.POST.get('language')
-        
-        activate(lang)
         user = authenticate(username=username, password=password)
         if user is None:
             response = TemplateResponse(request,
@@ -106,12 +104,10 @@ def login(request,*args,**kwargs):
     return response
 
 def logout(request, *args, **kwargs):
-	# set the language
-    lang =  get_request_language(request)
-    #lang = request.session.get(settings.LANGUAGE_SESSION_KEY, "en")
+    # set the language
+    lang = get_and_activate(request)
     auth_logout(request)
     url = reverse('web:login')
-    activate(lang)
     response = redirect(url)
     #response.set_cookie(settings.LANGUAGE_SESSION_KEY, lang)
     return response
@@ -193,7 +189,7 @@ class _metadata(object):
 def web_root(request, **kwargs):
     from mds.core import models as objects
     metadata = _metadata(request)
-    lang = kwargs.get('lang','en')
+    lang = get_and_activate(request)
     return render_to_response(
         "web/index.html".format(lang=lang), 
         context_instance=RequestContext(
@@ -208,15 +204,20 @@ def web_root(request, **kwargs):
               'available_languages': get_available_languages(),
             }))
 
+
+@login_required(login_url='/mds/web/login/')
 def registration(request, **kwargs):
     metadata = _metadata(request)
     lang = get_and_activate(request)
+    
+    extra_forms = [InitialTaskSetForm(),]
     return render_to_response(
-        "web/registration.html".format(lang=lang), 
+        "web/registration.html",
         context_instance=RequestContext(
             request,
             {
               'form':  SurgicalSubjectForm(),
+              'extra_forms' : extra_forms,
               'flavor': metadata.flavor,
               'errors': metadata.errors,
               'messages' : metadata.messages,
@@ -380,8 +381,7 @@ def web_encounter(request, **kwargs):
         errors.append(u"%s" % form_klazz)
         for k,v in data.items():
             errors.append(u"%s : %s" % (k,v))
-    
-    extra_forms = [InitialTaskSetForm(),]
+    extra_forms = None
 
 
     return render_to_response("web/encounter_form.html".format(lang=lang), 
@@ -466,6 +466,7 @@ def _list(request,*args,**kwargs):
             "version": settings.API_VERSION }
     return data
 
+@login_required(login_url='/mds/web/login/')
 def logs(request,*args,**kwargs):
     lang = get_and_activate(request)
     data = _list(request)
