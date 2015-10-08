@@ -58,7 +58,7 @@ def rest_reader(response, reader=None, all_unicode=False):
         return error_reader(msg)
     elif SESSION_CONTENT in msg.keys():
         return session_reader(response)
-    else LIST_CONTENT in msg.keys():
+    else:
         if reader:
             return [reader(x) for x in msg[LIST_CONTENT]]
         else:
@@ -114,7 +114,7 @@ def subject_reader(instance):
     result.uuid = instance["uuid"]
     return result
 
-def subject_writer(subject)
+def subject_writer(subject):
     """OpenMRS Short patient form for creating a new patient.  
     
             Parameters    OpenMRS form field            Note
@@ -438,6 +438,6 @@ class OpenMRSHandler(openers.OpenMRSOpener):
             instance.given_name,
             instance.family_name, 
             instance.gender, 
-            instance.dob, auth=auth):
+            instance.dob, auth=auth)
         result = rest_reader(response, reader=subject_reader)
         return result
