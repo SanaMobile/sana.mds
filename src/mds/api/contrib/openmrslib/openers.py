@@ -12,7 +12,7 @@ import base64
 import logging
 
 from mds.api.responses import succeed, fail
-from mds.api.contrib import handlers
+from mds.api.contrib.backends.handlers import AbstractHandler
 
 __all__ = ['OpenMRSOpener', 'response_reader']
 
@@ -23,7 +23,7 @@ def response_reader(response):
     return succeed(message)
 
 
-class OpenMRSOpener(object):
+class OpenMRSOpener(AbstractHandler):
     """
     
     """
@@ -32,7 +32,7 @@ class OpenMRSOpener(object):
     formatters = {}
     session = {}
     
-    def __init__(self, host, auth=None):
+    def __init__(self, host=host, auth=None):
         """Called when a new OpenMRS object is initialized.
             
         Parameters:
