@@ -5,6 +5,7 @@ Target backends must be configured in the settings by adding
 the desired backend to the value of the TARGET variable.
 '''
 import logging
+import importlib
 
 from django.conf import settings
 from django.db import models
