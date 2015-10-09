@@ -8,7 +8,7 @@ import logging
 import importlib
 
 from django.conf import settings
-from django.db import models
+from django.db import models as _models
 
 from .handlers import AbstractHandler, FakeHandler
 """
@@ -62,7 +62,11 @@ def register_handler(model, target):
     if isinstance(target, AbstractHandler):
         handler = target
     else:
-        handler = importlib.import_module(target)
+        handler_module = importlib.import_module(target)
+        if hasattr(handler_module, 'get_handler'):
+            handler = handler_module.get_handler(model)
+        else:
+            handler = FakeHandler()
     handler_list = _handlers.get(model,[])
     if not handler in handler_list:
         handler_list.append(handler)
@@ -77,24 +81,24 @@ def remove_handler(model, target):
 
 def get_handler_method(handler_instance, method, model):
         method_str = '{method}_{model}'
-        handler_instance = handler_getter(auth=auth)
-        handler_callable = handler_instance.getattr(
-            method_str.format(method=method, model=model.lower()), None)
+        #handler_instance = handler_getter(auth=auth)
+        method = method_str.format(method=method, model=model.lower())
+        handler_callable = getattr(handler_instance, method, None)
         return handler_callable
         
-def get_handler_instance(handler_module, **initkwargs):
-        handler_mod = importlib.import_module(handler_str)
-        handler_klazz = getattr(handler_mod, 'get_handler', FakeHandler) 
-        return handler_klazz(initkwargs)
+
+def get_handler_instance(handler_klass, **initkwargs):
+        #handler_klazz = _handlers.get(handler_module)
+        return handler_klass(initkwargs)
 
 def get_handlers(model, method, **initkwargs):
     ''' Returns the callable for sending the instance 
         to the target.
     '''
-    if isinstance(model, models.Model):
+    if isinstance(model, _models.Model):
         model = model.__name__
-    handlers = [ get_handler_instance(x, initkwargs) for x in _handlers.get(model, [])]
-    handler_callers = [ get_handler_method(x(initkwargs)) for x in handlers]
+    handlers = _handlers.get(model, [])
+    handler_callers = [ get_handler_method(x, method, model) for x in handlers]
     return handler_callers
 
 def dispatch(handlers, instance, auth=None, **methodkwargs):
@@ -103,7 +107,7 @@ def dispatch(handlers, instance, auth=None, **methodkwargs):
     '''
     result = None
     for handler in handlers:
-        _result = caller(instance, auth=auth, **methodkwargs)
+        _result = handler(instance, auth=auth, **methodkwargs)
         result = _result if not result else result
     return result
 
