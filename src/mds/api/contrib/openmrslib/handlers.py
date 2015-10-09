@@ -14,7 +14,8 @@ import datetime
 
 from django.conf import settings
 
-from . import openers
+from .openers import OpenMRSOpener
+from .models import *
 from mds.api.responses import succeed, fail
 from mds.core.models import Subject
 
@@ -52,17 +53,26 @@ def resultlist_reader(response, all_unicode=False):
 def item_reader(response, reader=None, all_unicode=False):
     pass
 
-def rest_reader(response, reader=None, all_unicode=False):
-    msg = cjson.decode(response.read(), all_unicode=all_unicode)
-    if ERROR_CONTENT in msg.keys():
+def rest_reader(response, reader=None, decoder=None, all_unicode=True):
+    msg = cjson.decode(response, all_unicode=all_unicode)
+    if ERROR_CONTENT in msg:
         return error_reader(msg)
-    elif SESSION_CONTENT in msg.keys():
+    elif SESSION_CONTENT in msg:
         return session_reader(response)
-    else:
-        if reader:
-            return [reader(x) for x in msg[LIST_CONTENT]]
+    elif LIST_CONTENT in msg:
+        content = msg[LIST_CONTENT]
+        if decoder:
+            return [decoder.decode(x) for x in content]
+        elif reader:
+            return [reader(x) for x in content]
         else:
-            return resultlist_reader(msg[LIST_CONTENT])
+            return resultlist_reader(content)
+    else:
+        # Just get a single object back on a post
+        if decoder:
+            return decoder.decode(msg)
+        elif reader:
+            return reader(msg)
 
 def session_reader(response, all_unicode=False):
     """ Returns a succeed or fail response dict with the message content set to 
@@ -103,38 +113,6 @@ def patient_form(first_name, last_name, patient_id, gender, birthdate):
             "patient.birthdate": birthdate,}
     return data
 
-
-def subject_reader(instance):
-    name = instance["preferredName"]
-    result = Subject()
-    result.given_name = name["givenName"]
-    result.family_name = name["familyName"]
-    result.gender = instance["gender"]
-    result.dob = datetime.strptime(instance["birthdate"], settings.OPENMRS_DATE_FMT)
-    result.uuid = instance["uuid"]
-    return result
-
-def subject_writer(subject):
-    """OpenMRS Short patient form for creating a new patient.  
-    
-            Parameters    OpenMRS form field            Note
-            first_name    personName.givenName          N/A
-            last_name     personName.familyName         N/A
-            patient_id    identifiers[0].identifier     N/A
-            gender        patient.gender                M or F
-            birthdate     patient.birthdate             single digits must be padded            
-            N/A           identifiers[0].identifierType use "2"
-            N/A           identifiers[0].location       use "1"
-    """
-    data = {"personName.givenName": subject.given_name,
-            "personName.familyName": subject.family_name,
-            "identifiers[0].identifier": subject.system_id,
-            "identifiers[0].identifierType": 2,
-            "identifiers[0].location": 1,
-            "patient.gender": subject.gender,
-            "patient.birthdate": datetime.strftime(settings.OPENMRS_DATE_FMT)}
-    return data
-    
 def person_form(**data):
     pass
 
@@ -153,7 +131,7 @@ def queue_form(encounter):
     pass
     
 
-class OpenMRSHandler(openers.OpenMRSOpener):
+class OpenMRSHandler(OpenMRSOpener):
     """ Utility class for remote communication with OpenMRS version 1.9
         
         Notes for the OpenMRS Webservices.REST API;
@@ -212,23 +190,27 @@ class OpenMRSHandler(openers.OpenMRSOpener):
     
     paths = {"sessions": "ws/rest/v1/session/",
              "session": "ws/rest/v1/session/{uuid}",
-             "concept" : "ws/rest/v1/concept/(<?Puuid>)",
+             "concept" : "ws/rest/v1/concept/{uuid}",
              "concepts" : "ws/rest/v1/concept/",
-             "subject" : "ws/rest/v1/patient/(<?Puuid>)",
-             "subjects-create" : "ws/rest/v1/patient/",
+             "person" : "ws/rest/v1/person/{uuid}",
+             "person-create" : "ws/rest/v1/person/",
+             "persons" : "ws/rest/v1/person/",
+             "subject" : "ws/rest/v1/patient/{uuid}",
+             "subject-create" : "ws/rest/v1/patient/",
              "subjects" : "ws/rest/v1/patient/",
              "sana-encounters" : "moduleServlet/sana/uploadServlet",
              "encounters" : "ws/rest/v1/encounter/",
-             "encounter" : "ws/rest/v1/encounter/(<?Puuid>)",
-             "encounter_observations": "ws/rest/v1/encounter/(<?Puuid>)/observation/",
+             "encounter" : "ws/rest/v1/encounter/{uuid}",
+             "encounter_observations": "ws/rest/v1/encounter/{uuid}/observation/",
              "patient": "admin/patients/shortPatientForm.form",
+             "users": "ws/rest/v1/user/",
+             "user": "ws/rest/v1/user/{uuid}",
              "login": "loginServlet"}
-    
+
     forms = {"patient": patient_form,
                "login": login_form }
-    
+
     def open(self, url, username=None, password=None, **kwargs):
-        #session_path = self.build_url("sessions",query=auth)
         opener, session = self.open_session(username, password)
         if not session["authenticated"]:
             raise Exception(u"username and password combination incorrect!")
@@ -236,13 +218,17 @@ class OpenMRSHandler(openers.OpenMRSOpener):
         # short circuit here
         if url ==  self.build_url("sessions"):
             return u"username and password validated!"
-        
         jsessionid = session.get("sessionId")
         req = urllib2.Request(url)
         req.add_header("jsessionid", jsessionid)
         if kwargs:
-            req.add_data(kwargs)
-        logging.debug("Request: %s" % req.get_full_url())
+            data = kwargs.get('data',kwargs)
+            postdata = cjson.encode(data)
+            req.add_header('Accept','application/json')
+            req.add_header('Content-type','application/json')
+            req.add_data(postdata)
+        logging.debug("Dispatching request")
+        logging.debug("...url: %s" % req.get_full_url())
         logging.debug("...headers: %s" % req.header_items())
         logging.debug("...method: %s" % req.get_method())
         return opener.open(req)
@@ -260,7 +246,6 @@ class OpenMRSHandler(openers.OpenMRSOpener):
         urllib2.install_opener(opener)
         req = urllib2.Request(url)
         basic64 = lambda x,y: base64.encodestring('%s:%s' % (x, y))[:-1]
-        print basic64(username, password), username, password
         if username and password:
             req.add_header("Authorization", "Basic %s" % basic64(username, password))
         #session = urllib2.urlopen(req)
@@ -299,11 +284,11 @@ class OpenMRSHandler(openers.OpenMRSOpener):
         content = []
         for uri in response:
             person = cjson.decode(self.open(uri+"?v=full", username, password).read())
-            print person
+
             patient = {}
             name = person["names"]
             patient['first_name'] = name["givenName"]
-            patient['family_name'] = name["family_name"]
+            patient['family_name'] = name["familyName"]
             patient['gender'] = person["gender"]
             patient['birthdate'] = person["birthdate"]
             patient['uuid'] = person["uuid"]
@@ -319,13 +304,14 @@ class OpenMRSHandler(openers.OpenMRSOpener):
             data = patient_form(patient_id, first_name, last_name, gender, 
                        birthdate)
             pargs={"uuid":"" }
-            self.wsdispatch("login", pargs, data=auth)
-            response = self.wsdispatch("patient", pargs, auth=auth, data=data)
+            #r = self.wsdispatch("login", pargs, data=auth)
+            response = self.wsdispatch("patient", pargs=pargs, auth=auth, data=data)
             content = response.read()
             return content
         except Exception, e:
             logging.info("Exception trying to create patient: %s" % str(e))
-
+            return ''
+            
     def _login(self, username=None, password=None):
         data = login_form(self.host, username, password)
         try:
@@ -433,11 +419,33 @@ class OpenMRSHandler(openers.OpenMRSOpener):
         return result, message, encounter
     
     def create_subject(self, instance, auth=None):
-        response =  self.create_patient(
+        '''
+        content =  self.create_patient(
             instance.system_id, 
             instance.given_name,
             instance.family_name, 
             instance.gender, 
-            instance.dob, auth=auth)
-        result = rest_reader(response, reader=subject_reader)
+            instance.dob, 
+            auth=auth)
+        '''
+        data = m_subject.encode(instance)
+        wsname = 'subject-create'
+        response = self.wsdispatch(wsname, data=data, auth=auth)
+        result = rest_reader(response, decoder=m_subject)
         return result
+
+    def read_subject(self, instance, auth=None):
+        wsname = 'subjects'
+        query = { 'q' : instance.system_id }
+        response = self.wsdispatch(wsname, query=query, auth=auth)
+        result = rest_reader(response, decoder=m_subject)
+        return result
+
+    def create_session(self, auth):
+        username = auth.get('username')
+        pargs = {'q':username, 'v': 'default' }
+        response = self.wsdispatch('users', query=pargs, auth=auth)
+        result = rest_reader(response, decoder=m_user)
+        if len(result) > 1:
+            raise Exception('Should only get one user back')
+        return result[0]
