@@ -174,6 +174,19 @@ class AbstractHandler(object):
     def delete_subject(self, instance, auth=None):
         return None
 
+    # Session handler methods
+    def create_session(self, auth):
+        return None
+    
+    def read_session(self, auth):
+        return None
+        
+    def update_session(self, auth):
+        return None
+    
+    def delete_session(self, token):
+        return None
+
 class FakeHandler(AbstractHandler):
     ''' Fake backend handler. All methods return the instance.
     '''
