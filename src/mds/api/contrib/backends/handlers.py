@@ -12,7 +12,7 @@ class AbstractHandler(object):
     '''
     opts = {}
     
-    def __init__(self, model, **kwargs):
+    def __init__(self, **kwargs):
         self.opts = kwargs if kwargs else self.opts
 
     def create_concept(self, instance, auth=None):
