@@ -17,7 +17,12 @@ from .decorators import validate
 from .responses import succeed, error
 from .utils import logstack, printstack, exception_value
 
+
 __all__ = ['DispatchingHandler', ]
+
+# Intialize the backend system
+from mds.api.contrib import backends
+backends.autocreate()
 
 class UnsupportedCRUDException(Exception):
     def __init__(self, value):
