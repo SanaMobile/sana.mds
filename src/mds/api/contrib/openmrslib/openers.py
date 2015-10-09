@@ -32,7 +32,7 @@ class OpenMRSOpener(AbstractHandler):
     formatters = {}
     session = {}
     
-    def __init__(self, host=host, auth=None):
+    def __init__(self, host=None, auth=None):
         """Called when a new OpenMRS object is initialized.
             
         Parameters:
@@ -61,30 +61,37 @@ class OpenMRSOpener(AbstractHandler):
         """
         paths = getattr(self.__class__,"paths")
         pstring = paths.get(wsname)
+        path = None
         if kwargs:
-            return pstring.format(**kwargs)
+            path = pstring.format(**kwargs)
         else:
-            return pstring
+            path = pstring
         
-    def build_url(self,wsname,pargs={},query=None):
+        return path
+        
+    def build_url(self,wsname,pargs={},query={}):
         """ Builds the full url to the web service with the path keyed to the
             web service name
         """
         path = self.build_path(wsname, **pargs)
-        if query:    
-            qstring = urllib.urlencode(query)
-            return '{0}{1}?{2}'.format(self.host, path, qstring)
-        else:
-            return '{0}{1}'.format(self.host, path)
-    
-    def open(self, url, username=None, password=None, **kwargs):
+        # always append full rep here
+        query = query if query else {}
+        rep = query.get('v ', None)
+        if not rep:
+            query['v'] = 'full'
+        qstring = urllib.urlencode(query)
+        url = '{0}{1}?{2}'.format(self.host, path, qstring)
+        return url
+        
+    def open(self, url, username=None, password=None, data=None):
         """ Opens a web service url resource """
         opener, session_key = self.open_session(username, password)
         req = urllib2.Request(url)
         if session_key:
             req.add_header("jsessionid", session_key)
-        if kwargs:
-            req.add_data(kwargs)
+        if data:
+            postdata = urllib.urlencode(data)
+            req.add_data(postdata)
         return opener.open(req)
     
     def open_session(self, wsname, username=None, password=None, scheme='basic'):
@@ -96,7 +103,7 @@ class OpenMRSOpener(AbstractHandler):
         # if class has no "sessions" attr bail
         skeys = getattr(self.__class__, "sessions". None)
         if not skeys:
-            return None
+            return None, None
         
         # if not given for the ws or the class has no default
         spath = skeys.get(wsname, None) if wsname in skeys.keys() else skeys.get("default", None)
@@ -122,14 +129,16 @@ class OpenMRSOpener(AbstractHandler):
         session = opener.open(req)
         return opener, session
         
-    def create(self, path, response_handler=None,auth=None, **data):
+    def create(self, path, response_handler=None,auth=None, data=None):
         """ Sends an Http POST for object creation. Returns the response object
             for post processing.
         """
         username=auth.get("username","") if auth else ""
         password=auth.get("password","") if auth else ""
-        response = self.open(self.buildurl(path), data, username=username, 
-                         password=password)
+        response = self.open(path, 
+            username=username, 
+            password=password,
+            data=data)
         if response_handler:
             return response_handler(response)
         else:
@@ -159,8 +168,8 @@ class OpenMRSOpener(AbstractHandler):
         #TODO
         pass
     
-    def wsdispatch(self, wsname, pargs={}, query=None, data=None, auth=None, 
-                   response_handler=None):
+    def wsdispatch(self, wsname, pargs={}, query=None, data=None, 
+        auth=None, response_handler=None):
         """Dispatches a request to an upstream web service.
         
         """
@@ -171,7 +180,7 @@ class OpenMRSOpener(AbstractHandler):
         if wsname == "sessions":
             return self.open(url, auth["username"], auth["password"])
         if data:
-            return self.create(url, response_handler=response_handler, auth=auth, **data)
+            return self.create(url, response_handler=response_handler, auth=auth, data=data)
         else:
             query = query if query else {}
             return self.read(url, response_handler=response_handler, auth=auth, **query)
