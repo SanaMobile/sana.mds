@@ -1,17 +1,21 @@
 """Django Project configuration variables for Sana.
 
-Default values available in settings.py.tmpl should be copied to settings.py
-prior to filling in local values. Once updated, enter the following from the
+Default values available in settings.py.tmpl should be copied to settings.py 
+prior to filling in local values. Once updated, enter the following from the 
 mds installation directory:
-
+    
     $> ./manage.py syncdb
-
-This will require root privileges.
-
+    
+This will require root privileges. 
+    
 :Authors: Sana Development Team
 :Version: 2.0
 """
+import os
+from django.utils.translation import ugettext_lazy as _
+
 SITE_ROOT = '/opt/sana/sana.mds/'
+BASE_DIR = SITE_ROOT + 'mds/'
 CACHE_ROOT = SITE_ROOT + 'cache/'
 
 DEBUG = True
@@ -39,11 +43,11 @@ DATABASES = {
         'PORT': '',
     },
 }
+
 '''
-# SQLite configuration
 DATABASES = {
     'default': {
-        'NAME': '/var/local/www/databases/sqlite.db',
+        'NAME': '/opt/sana/cache/db/mds.db',
         'ENGINE': 'django.db.backends.sqlite3',
         'USER': '',
         'PASSWORD': '',
@@ -62,18 +66,32 @@ If running in a Windows environment this must be set to the same as your
 system time zone.
 """
 
+#LANGUAGES = ()
+''' If translating uncomment and add supported languages to line above '''
+
 LANGUAGE_CODE = 'en-us'
 """Language code for this installation. All choices can be found here:
 
     http://www.i18nguy.com/unicode/language-identifiers.html
 """
+LANGUAGE_SESSION_KEY = '_language'
+''' Forward compatibility inclusion of explicit key. '''
+
+LANGUAGE_COOKIE_NAME = 'language'
+''' Setting required to make translation work in the portal '''
+
+LOCALE_PATHS = (
+    os.path.join(BASE_DIR, 'locale'),
+)
 
 SITE_ID = 1
 """Don't touch this unless you know what you are doing."""
 
+
 USE_I18N = True
-"""If you set this to False, Django will make some optimizations so as not to
+"""If you set this to False, Django will make some optimizations so as not to 
 load the internationalization machinery."""
+
 
 STATIC_URL = "/mds/static/"
 """URL that handles the media served from STATIC_ROOT. Make sure to use a
@@ -110,11 +128,23 @@ TEMPLATE_LOADERS = (
     )),
 )
 
+TEMPLATE_CONTEXT_PROCESSORS = (
+    'django.contrib.auth.context_processors.auth',
+    'django.core.context_processors.debug',
+    'django.core.context_processors.i18n',
+    'django.core.context_processors.media',
+    'django.core.context_processors.static',
+    'django.core.context_processors.tz',
+    'django.contrib.messages.context_processors.messages',
+    'django.core.context_processors.request',
+)
+
 """List of callables that know how to import templates from various sources."""
 
 MIDDLEWARE_CLASSES = (
-    'django.middleware.common.CommonMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
+    'django.middleware.locale.LocaleMiddleware',
+    'django.middleware.common.CommonMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'mds.api.contrib.middleware.LoggingMiddleware',
@@ -127,9 +157,9 @@ ROOT_URLCONF = 'mds.urls'
 TEMPLATE_DIRS = (
     SITE_ROOT+'mds/templates',
 )
-"""Put strings here, like "/home/html/django_templates" or
-"C:/www/django/templates". Always use forward slashes, even on Windows. Don't
-forget to use absolute paths, not relative paths.For a typical Sana
+"""Put strings here, like "/home/html/django_templates" or 
+"C:/www/django/templates". Always use forward slashes, even on Windows. Don't 
+forget to use absolute paths, not relative paths.For a typical Sana 
 deployment use: "/opt/sana/templates/"."""
 
 INSTALLED_APPS = (
@@ -145,7 +175,21 @@ INSTALLED_APPS = (
     'mds.core',
     'mds.tasks',
 )
-"""Don't touch this unless you know what you are doing."""
+"""To run in standalone mode, add
+
+    'mds.web',
+    'mds.clients',
+    
+    When updating, add
+    
+    'south;
+    
+    and read the django south documentation. Note: south is integrated
+    into django for >= 1.8
+"""
+
+FIXTURE_DIRS = (
+)
 
 ALLOWED_INCLUDE_ROOTS = (
     SITE_ROOT+'mds/templates/web/includes',
@@ -153,7 +197,6 @@ ALLOWED_INCLUDE_ROOTS = (
 )
 
 LOGIN_URL = '/mds/login/'
-
 try:
     from local_settings import *
 except ImportError, exp:
