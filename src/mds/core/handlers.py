@@ -7,17 +7,22 @@ Created on Feb 29, 2012
 import logging
 import cjson
 
+from django.conf import settings
 from django.contrib.auth import authenticate
+from django.contrib.auth.models import User
 
 from piston.handler import BaseHandler
 from piston.resource import Resource
 
 from mds.api import do_authenticate, LOGGER
+from mds.api.contrib import backends
+
 from mds.api.handlers import DispatchingHandler
 from mds.api.decorators import logged, validate
 from mds.api.docs.utils import handler_uri_templates
 from mds.api.responses import succeed, fail, error
 from mds.api.signals import EventSignal, EventSignalHandler
+from mds.api.utils import logtb
 
 from .forms import *
 from .models import *
@@ -38,7 +43,13 @@ __all__ = ['ConceptHandler',
            'SubjectHandler',
            'LocationHandler',]
 
-   
+class Session(object):
+    username = None
+    password = None
+    def __init__(self,username,password):
+        self.username = username
+        self.password = password
+
 @logged     
 class SessionHandler(DispatchingHandler):
     """ Handles session auth requests. """
@@ -48,42 +59,52 @@ class SessionHandler(DispatchingHandler):
     #model = None
     
     def create(self,request):
-        #data = self.flatten_dict(request.POST)
-        '''
-        is_json = request.META.get('CONTENT_TYPE', False)
-        if is_json and is_json == 'application/json':
-            #data = cjson.decode(request.body)
-            username = data.get('username', None)
-            password = data.get('password', None)
-        else:
-            username = request.REQUEST.get('username', 'empty')
-            password = request.REQUEST.get('password','empty')
-        '''
-        #data = self.flatten_dict(request.POST)
         try:
             content_type = request.META.get('CONTENT_TYPE', None)
             logging.debug(content_type)
             is_json = 'json' in content_type
             logging.debug("is_json: %s" % is_json)
             if is_json:
-                logging.debug("is_json = True")
                 raw_data = request.read()
                 data = cjson.decode(raw_data)
             else:
                 data = self.flatten_dict(request.POST)
+            
             username = data.get('username', 'empty')
             password = data.get('password','empty')
-            user = authenticate(username=username, password=password)
-            if user is not None:
-                observer = Observer.objects.get(user=user)
+            if not settings.TARGET == 'SELF':
+                instance = Session(username,password)
+                auth = {'username':username, 'password':password }
+                result = backends.create('Session', auth, instance)
+                uuid = result['uuid']
+                observers = Observer.objects.filter(uuid=uuid)
+                if observers.count() == 0:
+                    user = User(username=username)
+                    user.set_password(password)
+                    user.save()
+                    observer = Observer()
+                    observer.user = user
+                    observer.uuid = uuid
+                    observer.save()
+                else:
+                    observer = observers[0]
+                    user = observer.user
+                    user.set_password(password)
+                    user.save()
                 return succeed(observer.uuid)
             else:
-                msg = "Invalid credentials"
-                logging.warn(msg)
-                return fail(msg)
+                user = authenticate(username=username, password=password)
+                if user is not None:
+                    observer = Observer.objects.get(user=user)
+                    return succeed(observer.uuid)
+                else:
+                    msg = "Invalid credentials"
+                    logging.warn(msg)
+                    return fail(msg)
         except Exception as e:
             msg = "Internal Server Error"
             logging.error(unicode(e))
+            logtb()
             return error(msg)
         
     def read(self,request):

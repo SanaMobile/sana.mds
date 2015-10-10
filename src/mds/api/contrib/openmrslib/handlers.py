@@ -439,11 +439,15 @@ class OpenMRSHandler(OpenMRSOpener):
         result = rest_reader(response, decoder=m_subject)
         return result
 
-    def create_session(self, auth):
-        username = auth.get('username')
+    def create_session(self, instance, auth=None):
+        logging.info('create_session')
+        username = auth.get('username') if auth else None
         pargs = {'q':username, 'v': 'default' }
         response = self.wsdispatch('users', query=pargs, auth=auth)
         result = rest_reader(response, decoder=m_user)
+        logging.debug("openmrslib.Result: %s" % repr(result))
+        if isinstance(result, dict):
+            return result
         if len(result) > 1:
             raise Exception('Should only get one user back')
         return result[0]
