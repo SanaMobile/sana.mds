@@ -57,6 +57,8 @@ Everything as root(sudo)
     a. ln -s /home/<user>/git/sana.mds/src/mds /opt/sana/sana.mds/mds
     or
     b. cp -r /home/<user>/git/sana.mds/src/mds /opt/sana/sana.mds
+    c. cp /home/<user>/git/sana.mds/src/manage.py /opt/sana/sana.mds  
+    Note: Linking is preferable to keep any files cached at runtime out of the source directories.
     
 6. Install and set up the mds code
     a. cp /opt/sana/sana.mds/mds/settings.py.tmpl /opt/sana/sana.mds/mds/settings.py
@@ -69,7 +71,7 @@ Everything as root(sudo)
     d. Copy or link the contents of /opt/sana/sana.mds/mds/ to your apache document root. The default for 
         Ubuntu is /var/www/html, e.g.
         
-            ln -sf /var/www/html/mds /opt/sana/sana.mds/mds
+            ln -sf /opt/sana/sana.mds/mds /var/www/html/mds
         
    Update the apache configuration
 
