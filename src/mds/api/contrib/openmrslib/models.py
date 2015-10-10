@@ -162,13 +162,21 @@ class SubjectTransform(ModelTransform):
         super(SubjectTransform,self).__init__(Subject)
 
     def decode(self, instance):
-        result = self.model()
+        result = Subject()
         result.uuid = instance["uuid"]
         person = instance['person']
-        
-        identifier = instance['identifiers'][0]
-        # Note the REST API does not return these on a POST
+        # Hacked way of doing this
+        # We can parse the id and name from 'display'
+        display =  instance.get('display', "NULLID - NULL NAME")
+        system_id, name = display.split('-')
+        result.system_id = system_id.strip()
+        # have to split and strip name as well
+        given_name, family_name = name.strip().split(' ')
+        result.given_name = given_name.strip()
+        result.family_name = family_name.strip()
         try:
+            # Note the REST API does not return these on a POST
+            identifier = instance['identifiers'][0]
             result.dob = person["birthdate"]
             name = person.get("preferredName")
             result.system_id = identifier.get('identifier',None)
@@ -180,18 +188,22 @@ class SubjectTransform(ModelTransform):
         return result
 
     def encode(self, instance):
+        ''' Encode to OpenMRS patient representation
         
-        data = {}
-        name = {}
+            Requires
+                person
+                identifiers
+        '''
+        # construct person
         person = {}
+        name = {}
         name['givenName'] = get_field_value('given_name',instance)
         name['familyName'] = get_field_value('family_name',instance)
         person['names'] = [name]
         person['gender'] = get_field_value('gender',instance)
         dob = get_field_value('dob', instance)
         person['birthdate'] = dob.isoformat()
-        data ['person'] = person
-        
+        # Identifiers
         identifiers = [ {
             "identifier": instance.system_id,
             "identifierType": {
@@ -201,9 +213,12 @@ class SubjectTransform(ModelTransform):
                         "uuid": "8d6c993e-c2cc-11de-8d13-0010c6dffd0f"
             }
             }]
+        # Construct the OpenMRS representation
+        data = {}
+        data ['person'] = person
         data['identifiers'] = identifiers
         return data
-
+        
 m_subject = SubjectTransform()
 
 class EncounterTransform(ModelTransform):

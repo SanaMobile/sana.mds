@@ -55,8 +55,12 @@ def item_reader(response, reader=None, all_unicode=False):
 
 def rest_reader(response, reader=None, decoder=None, all_unicode=True):
     msg = cjson.decode(response, all_unicode=all_unicode)
+    logging.debug('Response object type: %s' % type(msg))
+    logging.debug('Response object type is dict: %s' % isinstance(msg,dict))
+    result = None
     if ERROR_CONTENT in msg:
         return error_reader(msg)
+    # POST calls and session opens return a dict
     elif SESSION_CONTENT in msg:
         return session_reader(response)
     elif LIST_CONTENT in msg:
@@ -69,8 +73,10 @@ def rest_reader(response, reader=None, decoder=None, all_unicode=True):
             return resultlist_reader(content)
     else:
         # Just get a single object back on a post
+        logging.debug("REST API returned single object")
         if decoder:
-            return decoder.decode(msg)
+            result = decoder.decode(msg)
+            return result
         elif reader:
             return reader(msg)
 
@@ -229,14 +235,12 @@ class OpenMRSHandler(OpenMRSOpener):
             req.add_data(postdata)
         logging.debug("Dispatching request")
         logging.debug("...url: %s" % req.get_full_url())
-        logging.debug("...headers: %s" % req.header_items())
         logging.debug("...method: %s" % req.get_method())
         return opener.open(req)
     
     def open_session(self, username=None, password=None):
         logging.debug("Opening session")
         url = self.build_url("sessions")
-        #opener = self.build_opener(url, username, password)
         cookies = cookielib.CookieJar()
         password_mgr = urllib2.HTTPPasswordMgrWithDefaultRealm()
         password_mgr.add_password(None, url, username, password)
@@ -248,7 +252,6 @@ class OpenMRSHandler(OpenMRSOpener):
         basic64 = lambda x,y: base64.encodestring('%s:%s' % (x, y))[:-1]
         if username and password:
             req.add_header("Authorization", "Basic %s" % basic64(username, password))
-        #session = urllib2.urlopen(req)
         session = cjson.decode(opener.open(req).read())
         return opener, session
     
@@ -297,21 +300,15 @@ class OpenMRSHandler(OpenMRSOpener):
     
     def create_patient(self, patient_id, first_name, last_name, gender, 
                        birthdate, auth=None):
-        """Sends a post request to OpenMRS patient service to create patient.
-                
+        """ (Deprecated)Sends a post request to OpenMRS patient service to 
+            create patient.
         """
-        try:
-            data = patient_form(patient_id, first_name, last_name, gender, 
+        data = patient_form(patient_id, first_name, last_name, gender, 
                        birthdate)
-            pargs={"uuid":"" }
-            #r = self.wsdispatch("login", pargs, data=auth)
-            response = self.wsdispatch("patient", pargs=pargs, auth=auth, data=data)
-            content = response.read()
-            return content
-        except Exception, e:
-            logging.info("Exception trying to create patient: %s" % str(e))
-            return ''
-            
+        pargs={"uuid":"" }
+        response = self.wsdispatch("patient", pargs=pargs, auth=auth, data=data)
+        return response
+
     def _login(self, username=None, password=None):
         data = login_form(self.host, username, password)
         try:
@@ -432,6 +429,7 @@ class OpenMRSHandler(OpenMRSOpener):
         wsname = 'subject-create'
         response = self.wsdispatch(wsname, data=data, auth=auth)
         result = rest_reader(response, decoder=m_subject)
+        logging.info("POST success to OpenMRS %s" % result)
         return result
 
     def read_subject(self, instance, auth=None):
