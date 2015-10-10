@@ -49,10 +49,11 @@ class ObservationAdmin(admin.ModelAdmin):
     actions=[mark_voided,]
 
 class EncounterAdmin(admin.ModelAdmin):
-    exclude = ['concept',]
-    list_display = ['subject','voided','procedure', 'created','uuid',"observer",]
+    #exclude = ['concept',]
+    list_display = ['subject','voided','concept', 'procedure', 'created','uuid',"observer",]
     #actions = [mark_encounter_voided,]
     actions=[mark_voided,]
+    readonly_fields = ['uuid',]
 
 class EncounterInline(admin.StackedInline):
     model = Encounter
