@@ -6,6 +6,7 @@ the desired backend to the value of the TARGET variable.
 '''
 import logging
 import importlib
+import sys, traceback
 
 from django.conf import settings
 from django.db import models as _models
@@ -107,8 +108,13 @@ def dispatch(handlers, instance, auth=None, **methodkwargs):
     '''
     result = None
     for handler in handlers:
-        _result = handler(instance, auth=auth, **methodkwargs)
-        result = _result if not result else result
+        try:
+            _result = handler(instance, auth=auth, **methodkwargs)
+            result = _result if not result else result
+        except:
+            for tb in traceback.format_exc():
+                logging.warn(tb)
+            logging.exception("Dispatch to backend failed",exc_info=True)
     return result
 
 def create(instance, auth=None, methodkwargs={}, **initkwargs):
