@@ -51,6 +51,16 @@ def logstack(handler, e=None):
         logger.error(unicode(tbm))
     return et, val, tb
 
+def logtb(logger=None):
+    if not logger:
+        logger = logging
+    et, val, tb = sys.exc_info()
+    logger.info('Got an Error. Stack trace follows..')
+    logger.error('...Exception type: %s' % repr(et))
+    logger.error('...Exception value: %s' %repr(val))
+    for tbm in traceback.format_tb(tb):
+        logger.error(unicode(tbm))
+
 def dictzip(keys,values):
     """ zips to lists into a dictionary """
     #if not keys or not values:
