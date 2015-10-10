@@ -13,6 +13,9 @@ from django.contrib import admin
 
 admin.autodiscover()
 
+from mds.api.contrib import backends
+backends.autocreate()
+
 urlpatterns = patterns(
     '',
     url(r'^$', 'mds.views.home', name="home"),
