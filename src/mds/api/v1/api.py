@@ -16,6 +16,7 @@ from mds.core import models as v2
 from mds.mrs.models import SavedProcedure, Client, BinaryResource, ClientEventLog
 from mds.api.contrib.smtplib import sender
 from mds.api import targets
+from mds.api.utils import logtb
 from ..contrib import openmrslib
 from ..contrib.openmrslib import openmrs16 as openmrs
 from ..encoders.ffmpeg import FFmpeg
@@ -261,60 +262,74 @@ def maybe_upload_procedure(saved_procedure):
             else:
                 attr['id'] = eid
                 cleaned_responses.append(attr)
-    patient_birthdate = '%s/%s/%s' % (months_dict[patient_month], patient_day,
-                                      patient_year)
-
-    if patient_id is None:
-        patient_id = DEFAULT_PATIENT_ID
-
-    if patient_gender in ['Male', 'male', 'M', 'm']:
-        patient_gender = 'M'
-    elif patient_gender in ['Female', 'female', 'F', 'f']:
-        patient_gender = 'F'
-
+                
+    # create a v2 encounter object here
+    encounter = v2.Encounter.objects.get(uuid=saved_procedure.guid)
     # Save to self or upstream
 
     if settings.TARGET == targets.OPENMRS:
+        subject = encounter.subject
+        patient_birthdate = subject.dob.strftime(settings.OPENMRS_DATE_FMT)
+        patient_id = subject.system_id
+        patient_gender = subject.gender
+        patient_first = subject.given_name
+        patient_last = subject.family_name
+        # Leaving this for now for reference
+        '''
+        patient_birthdate = '%s/%s/%s' % (months_dict[patient_month], patient_day,
+                                      patient_year)
+
+        if patient_id is None:
+            patient_id = DEFAULT_PATIENT_ID
+
+        if patient_gender in ['Male', 'male', 'M', 'm']:
+            patient_gender = 'M'
+        elif patient_gender in ['Female', 'female', 'F', 'f']:
+            patient_gender = 'F'
+        '''
+        
         # Begin upload to the emr
         if openmrslib.OPENMRS_VERSION < 1.8:
-            omrs = openmrs.OpenMRS(saved_procedure.upload_username,
-                              saved_procedure.upload_password,
-                              settings.OPENMRS_SERVER_URL)
-        else:
-                omrs = openmrslib.build_opener(host=settings.OPENMRS_SERVER_URL)
+            raise Exception("OpenMRS versions < 1.8 not supported")
+
+        omrs = openmrslib.build_opener(host=settings.OPENMRS_SERVER_URL)
 
         # creates the patient upstream if it does not exist
         new_patient = True if enrolled == "No" else False
         logging.debug("patient enrolled: %s" % new_patient)
+        # Newer clients won't send "enrolled" value in the responses dict
         if new_patient:
             logging.debug("Creating new patient: patient_id -> %s" % patient_id)
-        if openmrslib.OPENMRS_VERSION < 1.8:
-            omrs.create_patient(patient_id,
-                            patient_first,
-                            patient_last,
-                            patient_gender,
-                            patient_birthdate)
-        else:
+
             auth = {"username": saved_procedure.username,
                     "password": saved_procedure.password}
-            omrs.create_patient(patient_id,
+            try:
+                omrs.create_patient(patient_id,
                             patient_first,
                             patient_last,
                             patient_gender,
                             patient_birthdate,
                             auth = auth)
-
+            except Exception, e:
+                logging
 
         # execute upload
-        logging.debug("Uploading to OpenMRS: %s %s %s %s %s "
+        logging.debug("Uploading to OpenMRS: %s %s %s %s "
                       % (patient_id, client_name,
-                         savedprocedure_guid, files, cleaned_responses))
+                         savedprocedure_guid, len(files)))
+        
+        patient_id = encounter.subject.system_id
+        client_name = encounter.device.name
+        procedure_title = encounter.procedure.title
         result, msg, _ = omrs.upload_procedure(patient_id,
                                                 client_name,
                                                 procedure_title,
                                                 savedprocedure_guid,
                                                 cleaned_responses,
-                                                files)
+                                                files,
+                                                username=saved_procedure.upload_username,
+                                                password=saved_procedure.upload_password
+                                                )
         message = 'sp.pk -> %s, %s ' % (saved_procedure.pk, msg)
         # mark encounter and binaries as uploaded
         result = True
