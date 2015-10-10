@@ -12,6 +12,7 @@ from django.conf import settings
 from django.db import models as _models
 
 from .handlers import AbstractHandler, FakeHandler
+from mds.api.utils import logtb
 """
 __all__ = [
     'autocreate',
@@ -40,6 +41,7 @@ _handlers = {
     'Observer': [],
     'Procedure': [],
     'Subject':[],
+    'Session': [],
 }
 
 _handler_registry = {}
@@ -81,11 +83,11 @@ def remove_handler(model, target):
 
 
 def get_handler_method(handler_instance, method, model):
-        method_str = '{method}_{model}'
-        #handler_instance = handler_getter(auth=auth)
-        method = method_str.format(method=method, model=model.lower())
-        handler_callable = getattr(handler_instance, method, None)
-        return handler_callable
+    method_str = '{method}_{model}'
+    model = model.lower()
+    method = method_str.format(method=method, model=model)
+    handler_callable = getattr(handler_instance, method, None)
+    return handler_callable
         
 
 def get_handler_instance(handler_klass, **initkwargs):
@@ -96,28 +98,30 @@ def get_handlers(model, method, **initkwargs):
     ''' Returns the callable for sending the instance 
         to the target.
     '''
+    logging.info("get_handlers %s_%s" %(method,model))
+    if isinstance(model, str):
+        model = model
     if isinstance(model, _models.Model):
         model = model.__name__
     handlers = _handlers.get(model, [])
     handler_callers = [ get_handler_method(x, method, model) for x in handlers]
     return handler_callers
 
-def dispatch(handlers, instance, auth=None, **methodkwargs):
+def dispatch(handlers, instance, auth=None,methodkwargs={}):
     ''' Invokes the callable handler for each handlers provided in the
         'handlers" iterable. The first item in the handler
     '''
     result = None
     for handler in handlers:
         try:
-            _result = handler(instance, auth=auth, **methodkwargs)
+            _result = handler(instance, auth=auth)
             result = _result if not result else result
         except:
-            for tb in traceback.format_exc():
-                logging.warn(tb)
-            logging.exception("Dispatch to backend failed",exc_info=True)
+            logging.exception("Dispatch to backend failed")
+            logtb()
     return result
 
-def create(instance, auth=None, methodkwargs={}, **initkwargs):
+def create(instance, auth=None, methodkwargs={}):
     ''' Handles the instance creation in the backend and returns a list
         of objects created.
         
@@ -125,12 +129,15 @@ def create(instance, auth=None, methodkwargs={}, **initkwargs):
         forwards it to the frontend. The first handler registered will
         be used as the primary 
     '''
-    model = instance.__class__.__name__
-    handlers = get_handlers(model,'create', **initkwargs)
-    result = dispatch(handlers, instance, auth=auth, **methodkwargs)
+    if isinstance(instance, _models.Model):
+        model = instance.__class__.__name__
+    else:
+        model = instance
+    handlers = get_handlers(model,'create')
+    result = dispatch(handlers, instance, auth=auth, methodkwargs=methodkwargs)
     return result
 
-def read(instance, auth=None, methodkwargs={},**initkwargs):
+def read(instance, auth=None, methodkwargs={}):
     ''' Handles the instance fetch in the backend and returns a list
         of objects created.
         
@@ -138,12 +145,15 @@ def read(instance, auth=None, methodkwargs={},**initkwargs):
         forwards it to the frontend. The first handler registered will
         be used as the primary 
     '''
-    model = instance.__class__.__name__
-    handlers = get_handlers(model,'read', **initkwargs)
-    result = dispatch(handlers, instance, auth=auth, **methodkwargs)
+    if isinstance(instance, _models.Model):
+        model = instance.__class__.__name__
+    else:
+        model = instance
+    handlers = get_handlers(model)
+    result = dispatch(handlers, instance, auth=auth,methodkwargs=methodkwargs)
     return result
 
-def update(model, obj, auth=None, methodkwargs={}, **initkwargs):
+def update(model, obj, auth=None, methodkwargs={}):
     ''' Handles the instance fetch in the backend and returns a list
         of objects created.
         
@@ -151,12 +161,15 @@ def update(model, obj, auth=None, methodkwargs={}, **initkwargs):
         forwards it to the frontend. The first handler registered will
         be used as the primary 
     '''
-    model = instance.__class__.__name__
-    handlers = get_handlers(model,'update', **initkwargs)
-    result = dispatch(handlers, instance, auth=auth, **methodkwargs)
+    if isinstance(instance, _models.Model):
+        model = instance.__class__.__name__
+    else:
+        model = instance
+    handlers = get_handlers(model,'update')
+    result = dispatch(handlers, instance, auth=auth, methodkwargs=methodkwargs)
     return result
 
-def delete(instance, auth=None, methodkwargs={}, **initkwargs):
+def delete(instance, auth=None, methodkwargs={}):
     ''' Handles the instance delete in the backend and returns a list
         of objects created.
         
@@ -164,7 +177,10 @@ def delete(instance, auth=None, methodkwargs={}, **initkwargs):
         forwards it to the frontend. The first handler registered will
         be used as the primary 
     '''
-    model = instance.__class__.__name__
-    handlers = get_handlers(model,'delete', **initkwargs)
-    result = dispatch(handlers, instance, auth=auth, **methodkwargs)
+    if isinstance(instance, _models.Model):
+        model = instance.__class__.__name__
+    else:
+        model = instance
+    handlers = get_handlers(model,'delete')
+    result = dispatch(handlers, instance, auth=auth, methodkwargs=methodkwargs)
     return result
