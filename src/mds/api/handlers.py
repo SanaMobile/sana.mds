@@ -16,7 +16,7 @@ from piston.utils import rc
 from .decorators import validate
 from .responses import succeed, error
 from .utils import logstack, printstack, exception_value
-
+from mds.utils import auth
 
 __all__ = ['DispatchingHandler', ]
 
@@ -100,8 +100,24 @@ class DispatchingHandler(BaseHandler,HandlerMixin):
         if uuid:
             return self.update(request,uuid=uuid)
         try:
-            instance = self._create(request, args, kwargs)  
-            logging.info('POST')
+            # Always cache the object
+            instance = self._create(request, args, kwargs)
+            logging.info('created object uuid=%s' % instance.uuid)
+            _instance = backends.create(instance,auth=auth.parse_auth(request))
+            # If a remote is listed as the target we 
+            # assume uuuid is set by the remote
+            if not settings.TARGET == 'SELF':
+                if _instance:
+                    if  _instance.uuid != instance.uuid:
+                        logging.info('updating object uuid=%s' % _instance.uuid)
+                        instance.uuid = _instance.uuid
+                    else:
+                        logging.info('remote uuid is equal')
+                else:
+                    logging.info('NoneType instance returned')
+            # Persist object here
+            instance.save()
+            logging.info('POST success object.uuid=%s' % instance.uuid)
             return succeed(instance)
         except Exception, e:
             logging.error('ERROR')
@@ -177,7 +193,8 @@ class DispatchingHandler(BaseHandler,HandlerMixin):
                 return self._update(request,uuid=uuid)
             
         instance = klazz(**data)
-        instance.save()
+        # don't commit until we return and check backends
+        #instance.save(commit=False)
         return instance
     
     
