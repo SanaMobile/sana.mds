@@ -67,6 +67,7 @@ class ProcedureSubmitForm(forms.Form):
     savedproc_guid = forms.CharField(required=True, max_length=512)
     procedure_guid = forms.CharField(required=True, max_length=512)
     responses = forms.CharField(required=True)
+    subject = forms.CharField(required=False)
     phone = forms.CharField(max_length=255, required=False, initial='')
 
 class BinarySubmitForm(forms.Form):

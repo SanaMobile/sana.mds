@@ -302,7 +302,12 @@ def get_or_create_v2(klazz,v,field, data={}):
         obj = klazz.objects.get(uuid=v)
     else:
         data[field] = v
-        obj,_  = klazz.objects.get_or_create(**data)
+        q = { field: v}
+        qs = klazz.objects.filter(**q)
+        if len(qs) >= 1:
+            obj = qs[0]
+        else:
+            obj,_  = klazz.objects.get_or_create(**data)
     return obj
 
 
@@ -334,13 +339,27 @@ def spform_to_encounter(form):
 
     subject = get_v2(v2.Subject, patientId, "system_id")
     concept = get_v2(v2.Concept,"ENCOUNTER","name")
-    
+    created = True
+    try:
+        encounter = v2.Encounter.objects.get(uuid=savedproc_guid)
+        created = False
+    except:
+        encounter = v2.Encounter(
+            uuid=savedproc_guid,
+            procedure=procedure,
+            observer=observer,
+            device=device,
+            subject=subject,
+            concept=concept)
+        encounter.save()
+    '''
     encounter,created = v2.Encounter.objects.get_or_create(uuid=savedproc_guid,
 		    procedure=procedure,
 		    observer=observer,
 		    device=device,
 		    subject=subject,
 		    concept=concept)
+    '''
     data = strip_deprecated_observations(_json.decode(responses))
     return encounter, data,created
                                                             

@@ -97,7 +97,8 @@ class SavedProcedureHandler(BaseHandler):
         try:
             form.full_clean()
             if not form.is_valid():
-                raise ValidationError(form._get_errors())
+                raise ValidationError(form.errors)
+            encounter, data, created = spform_to_encounter(form.cleaned_data)
             savedproc_guid  = form.cleaned_data['savedproc_guid']
             procedure_guid = form.cleaned_data['procedure_guid']
             responses = form.cleaned_data['responses']
@@ -112,7 +113,6 @@ class SavedProcedureHandler(BaseHandler):
                                                        password)
             
             
-            encounter, data, created = spform_to_encounter(form.cleaned_data)
             encounter.save()
             logging.debug("Saved encounter: " + encounter.uuid)
 	    observations = responses_to_observations(encounter, data,sort=True)
@@ -132,10 +132,12 @@ class SavedProcedureHandler(BaseHandler):
                 response = fail(message)
                 logging.error("Failed to register procedure: %s" % message)
         except ValidationError, e:
-            for k,v in form._get_errors().items():
-                logging.error("SavedProcedure argument %s:%s" % (k,v))
+            #for k,v in form._get_errors().items():
+            #    logging.error("SavedProcedure argument %s:%s" % (k,v))
+            for err in form.errors:
+                logging.error('Field error...%s' % err)
             response = fail("Invalid ProcedureSubmitForm data")
-            raise Exception('Saved procedure submission was invalid')
+            #raise Exception('Saved procedure submission was invalid')
     
         except Exception, e:
             et, val, tb = sys.exc_info()
