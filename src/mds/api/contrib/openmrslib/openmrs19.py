@@ -221,7 +221,7 @@ class OpenMRS(openers.OpenMRSOpener):
     forms = {"patient": patient_form,
                "login": login_form }
     
-    def open(self, url, username=None, password=None, **kwargs):
+    def open(self, url, username=None, password=None, use_json=False, **kwargs):
         #session_path = self.build_url("sessions",query=auth)
         opener, session = self.open_session(username, password)
         if not session["authenticated"]:
@@ -235,7 +235,8 @@ class OpenMRS(openers.OpenMRSOpener):
         req = urllib2.Request(url)
         req.add_header("jsessionid", jsessionid)
         if kwargs:
-            req.add_data(kwargs)
+            data = cjson.encode(kwargs) if use_json else urllib.urlencode(kwargs)
+            req.add_data(data)
         logging.debug("Request: %s" % req.get_full_url())
         logging.debug("...headers: %s" % req.header_items())
         logging.debug("...method: %s" % req.get_method())
@@ -333,7 +334,7 @@ class OpenMRS(openers.OpenMRSOpener):
     
     def upload_procedure(self, patient_id, phone_id,
                          procedure_title, saved_procedure_id,
-                         responses, files):
+                         responses, files, username=None, password=None):
         """Posts an encounter to the OPenMRS encounter service through the Sana
         module
         
@@ -375,13 +376,16 @@ class OpenMRS(openers.OpenMRSOpener):
         encounter = None
         response = None
         try:
-            if len(self.cookies) == 0:
-                self._login()
-    
+            #if len(self.cookies) == 0:
+            #self._login()
+            # opener, logged_in = self._login()
             logging.debug("Validating permissions to manage sana queue")
+            opener, session = self.open_session(username, password)
+            if not session["authenticated"]:
+                raise Exception(u"username and password combination incorrect!")
 
-            url = "%smoduleServlet/sana/permissionsServlet" % self.url
-            response = self.opener.open(url).read()
+            url = "%smoduleServlet/sana/permissionsServlet" % self.host
+            response = opener.open(url).read()
             logging.debug("Got result %s" % response)
             resp_msg = cjson.decode(response,True)
             message = resp_msg['message']
@@ -409,9 +413,12 @@ class OpenMRS(openers.OpenMRSOpener):
                                      % (eid, i, path))
                         post['medImageFile-%s-%d' % (eid, i)] = open(path, "rb")
 
-            url = "%smoduleServlet/sana/uploadServlet" % self.url
+            url = "%smoduleServlet/sana/uploadServlet" % self.host
             logging.debug("About to post to " + url)
-            response = self.opener.open(url, post).read()
+            response = self.open(url, 
+                username=username,
+                password=password,
+                use_json=False, **post).read()
             logging.debug("Got result %s" % response)
                 
             resp_msg = cjson.decode(response,True)
@@ -421,6 +428,7 @@ class OpenMRS(openers.OpenMRSOpener):
             logging.debug("Done with upload")
             
         except Exception as e:
+            print e
             logging.error("Exception in uploading procedure: %s" 
                           % saved_procedure_id)
             raise e
