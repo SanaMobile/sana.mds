@@ -43,13 +43,6 @@ __all__ = ['ConceptHandler',
            'SubjectHandler',
            'LocationHandler',]
 
-class Session(object):
-    username = None
-    password = None
-    def __init__(self,username,password):
-        self.username = username
-        self.password = password
-
 @logged     
 class SessionHandler(DispatchingHandler):
     """ Handles session auth requests. """
@@ -73,24 +66,28 @@ class SessionHandler(DispatchingHandler):
             username = data.get('username', 'empty')
             password = data.get('password','empty')
             if not settings.TARGET == 'SELF':
-                instance = Session(username,password)
+                instance = User(username=username)
                 auth = {'username':username, 'password':password }
                 result = backends.create('Session', auth, instance)
-                uuid = result['uuid']
-                observers = Observer.objects.filter(uuid=uuid)
+                if not result:
+                    return fail([],errors=["Observer does not exist",],code=404)
+                # Create a user or fetch existin and update password
+                user,created = User.objects.get_or_create(username=result.user.username)
+                user.set_password(password)
+                user.save()
+                
+                # should have returned an Observer instance here
+                observers = Observer.objects.filter(user__username=user.username)
+                # If none were returned we need to create the Observer
                 if observers.count() == 0:
-                    user = User(username=username)
-                    user.set_password(password)
-                    user.save()
-                    observer = Observer()
-                    observer.user = user
-                    observer.uuid = uuid
+                    observer = Observer(
+                        user=user,
+                        uuid = result.uuid)
                     observer.save()
                 else:
+                    # Observer already exists so we don't have to do 
+                    # anything since password cache is updated
                     observer = observers[0]
-                    user = observer.user
-                    user.set_password(password)
-                    user.save()
                 return succeed(observer.uuid)
             else:
                 user = authenticate(username=username, password=password)
