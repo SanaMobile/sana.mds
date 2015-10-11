@@ -451,8 +451,6 @@ class OpenMRSHandler(OpenMRSOpener):
         pargs = {'q':username, 'v': 'default' }
         response = self.wsdispatch('users', query=pargs, auth=auth)
         rest_response = rest_api.decode(response, result_decoder=m_observer)
-        if rest_response.error:
-            raise Exception("OpenMRS error: %s" % rest_result.error.message)
         if len(rest_response.results) > 1:
             raise Exception('Should only get one user back')
         else:
