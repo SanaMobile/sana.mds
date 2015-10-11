@@ -451,15 +451,15 @@ class OpenMRSHandler(OpenMRSOpener):
         pargs = {'q':username, 'v': 'default' }
         response = self.wsdispatch('users', query=pargs, auth=auth)
         rest_response = rest_api.decode(response, result_decoder=m_observer)
-        if len(rest_response.results) > 1:
-            raise Exception('Should only get one user back')
-        else:
-            return rest_response.results[0]
-        #result = rest_reader(response, decoder=m_observer)
-        #logging.debug("openmrslib.Result: %s" % repr(result))
-        #if isinstance(result, dict):
-        #    return result
-        #elif isinstance(result, list):
-        #else:
-        #    return result
-        
+        # REST api will return if person name or username match here
+        # so we have to iterate
+        result = None
+        for obj in rest_response.results:
+            result = obj if obj.user.username == username else None
+            if result:
+                break
+        # Shouldn't happen but just in case we get
+        if not result:
+            raise Exception('No precise username match')
+        return result
+
