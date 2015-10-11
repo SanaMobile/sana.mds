@@ -86,7 +86,7 @@ def succeed(data, code=200):
 def error(exception):
     errors = traceback.format_exception_only(*sys.exc_info()[:2])
     response = {'status': 'FAILURE',
-                'code' : 500,
+                'code' : code,
                 'message': None,
                 'errors': errors, }
     return response
