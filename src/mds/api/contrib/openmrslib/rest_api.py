@@ -15,7 +15,7 @@ class RESTResult(object):
             results = response
         else:
             results = response.pop('results', [])
-        self.results = [decoder.decode(x) for x in results] if decode else results
+        self.results = [decoder.decode(x) for x in results] if decoder else results
 
 class RESTSession(object):
     def __init__(self,response):
