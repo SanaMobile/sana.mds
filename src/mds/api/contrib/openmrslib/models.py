@@ -71,6 +71,7 @@ from mds.core.models import *
 __all__ = [
     'm_encounter',
     'm_name',
+    'm_observer',
     'm_person',
     'm_subject',
     'm_user',
@@ -256,5 +257,18 @@ class UserTransform(TransformBase):
             username = instance.get('systemId')
         obj['user'] = { 'username': username }
         return obj
-
 m_user = UserTransform()
+
+class ObserverTransform(ModelTransform):
+
+    def __init__(self):
+        super(ObserverTransform,self).__init__(Observer)
+
+    def decode(self, instance):
+        obj = Observer()
+        obj.uuid = instance.get('uuid')
+        username = instance.get('username', None)
+        user = User(username=username)
+        obj.user = user
+        return obj
+m_observer = ObserverTransform()
