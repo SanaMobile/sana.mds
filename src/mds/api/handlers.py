@@ -101,6 +101,8 @@ class DispatchingHandler(BaseHandler,HandlerMixin):
             # Always cache the object
             instance = self._create(request, args, kwargs)
             logging.info('created object uuid=%s' % instance.uuid)
+            
+            # Send to any linked backends
             _instance = backends.create(instance,auth=auth.parse_auth(request))
             # If a remote is listed as the target we 
             # assume uuuid is set by the remote
@@ -132,7 +134,6 @@ class DispatchingHandler(BaseHandler,HandlerMixin):
             else:
                 q = request.REQUEST
                 if q:
-                    logging.info("q = %s" % q)
                     response = BaseHandler.read(self,request, **q)
                 else:
                     logging.info("No querystring")
