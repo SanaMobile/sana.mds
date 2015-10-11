@@ -16,6 +16,7 @@ from django.conf import settings
 
 from .openers import OpenMRSOpener
 from .models import *
+from . import rest_api
 from mds.api.responses import succeed, fail
 from mds.core.models import Subject
 
@@ -440,14 +441,27 @@ class OpenMRSHandler(OpenMRSOpener):
         return result
 
     def create_session(self, instance, auth=None):
+        ''' Assumes openmrs is credential authority. Checks for
+            presence of OpenMRS user and returns an instnace of 
+            Observer object with the new auth.User. This method does
+            not persist new user or observer.
+        '''
         logging.info('create_session')
         username = auth.get('username') if auth else None
         pargs = {'q':username, 'v': 'default' }
         response = self.wsdispatch('users', query=pargs, auth=auth)
-        result = rest_reader(response, decoder=m_user)
-        logging.debug("openmrslib.Result: %s" % repr(result))
-        if isinstance(result, dict):
-            return result
-        if len(result) > 1:
+        rest_response = rest_api.decode(response, result_decoder=m_observer)
+        if rest_response.error:
+            raise Exception("OpenMRS error: %s" % rest_result.error.message)
+        if len(rest_response.results) > 1:
             raise Exception('Should only get one user back')
-        return result[0]
+        else:
+            return rest_response.results[0]
+        #result = rest_reader(response, decoder=m_observer)
+        #logging.debug("openmrslib.Result: %s" % repr(result))
+        #if isinstance(result, dict):
+        #    return result
+        #elif isinstance(result, list):
+        #else:
+        #    return result
+        
