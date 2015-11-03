@@ -1,0 +1,26 @@
+{% extends 'web/base.html' %}
+{% load i18n %}
+{% block title %}{% trans 'Merge Subject' %}{% endblock %}
+{% block extrascript %}{% endblock %}
+{% block extrastyle %}{% endblock %}
+{% block header %}{% endblock %}
+{% block content %}
+{% if data %}
+<form id="id_merge_form" name="merge_form">
+    <div class="full-width merge-from">
+        {{ data.merge_from }}
+        <input type="hidden" value={{ merge_from.uuid }}/>
+    </div>
+    <div class="merge-to">
+        <ul>
+            {% for object in data.merge_to %}
+            <li class="{% cycle 'even' 'odd' %}"><input type="checkbox" value="{{ object.uuid }}"/>{{ object }}</li>
+            {% endfor %}
+        </ul>
+    </div>
+    <div class="full-width text-centered">
+        <input type="submit" id="id_submit">{% trans 'Submit' %}</input>
+    </div>
+</form>
+{% endif %}
+{% endblock content %}

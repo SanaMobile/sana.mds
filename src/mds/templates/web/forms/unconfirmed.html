@@ -1,0 +1,24 @@
+{% extends 'web/base.html' %}
+{% load i18n %}
+{% load static %}
+{% block title %}{% trans 'Unconfirmed Patients' %}{% endblock %}
+{% block extrascript %}
+{% endblock %}
+{% block extrastyle %}
+<link rel="stylesheet" href="{{ STATIC_PREFIX }}web/css/reports.css">
+{% endblock %}
+{% block header %}{% trans 'Unconfirmed Patients' %}{% endblock %}
+{% block content %}
+<div class="content-list">
+<form>
+<ul>
+{% for select in form.mark_confirmed %}
+    <li class="{% cycle 'even-row' 'odd-row' %}"><a href="./#" class="action-link">{% trans 'Merge' %}</a> {{ select }}</li>
+{% endfor %}
+</ul>
+<div>
+<input type="submit" value="{% trans 'Submit' %}"/>
+</div>
+</form>
+</div>
+{% endblock content %}

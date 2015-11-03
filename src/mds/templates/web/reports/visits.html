@@ -1,0 +1,57 @@
+{% extends 'web/base.html' %}
+{% load i18n %}
+{% block title %}{% trans 'Patient Visits' %}{% endblock %}
+{% block extrascript %}{% endblock %}
+{% block extrastyle %}
+<style>
+.ui-datepicker-calendar {
+    display: none;
+    }
+</style>
+{% endblock %}
+{% block header %}{% trans 'Patient Visits' %}{% endblock %}
+{% block content %}
+<!-- select observer -->
+<div>
+    <h2>{% trans 'Select worker' %}</h2>
+    <table>
+    <tr>
+        <td>
+            <select id="id_worker">
+            {% for object in observers %}
+                <option value="{{ object.uuid }}">{{ object }}</option>
+            {% endfor %}
+            </select>
+        </td>
+        <td>{% trans 'Month' %} <input type="date"/></td>
+    <tr>
+    </table>
+    <hr/>
+</div>
+<script>
+    // Displays Date picker pop up
+    $(function(){
+        $('input[type="date"]').datepicker({
+            changeMonth: true,
+            changeYear: true,
+            showButtonPanel: true, 
+            dateFormat: 'mm-yy', 
+            yearRange : "c-100:c+05",
+            onClose: function(dateText, inst) { 
+                var month = $("#ui-datepicker-div .ui-datepicker-month :selected").val();
+                var year = $("#ui-datepicker-div .ui-datepicker-year :selected").val();
+                $(this).datepicker('setDate', new Date(year, month, 1));
+            }
+        }).prop('type','text');
+        $('input[type="date"]').prop('type','text');
+     });
+</script>
+<!-- load summary of assigned visits -->
+<div>
+<h2>{% trans 'Summary' %}</h2>
+</div>
+<div>
+<h2>{% trans 'Patient Visits' %}</h2>
+</div>
+
+{% endblock content %}

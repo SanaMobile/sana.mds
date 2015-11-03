@@ -1,0 +1,33 @@
+{% extends 'web/base.html' %}
+{% load i18n %}
+{% block title %}{% trans 'Reviewed Encounters' %}{% endblock %}
+{% block extrascript %}{% endblock %}
+{% block extrastyle %}{% endblock %}
+{% block title %}{% trans 'Reviewed Encounters' %}{% endblock %}
+{% block header %}{% trans 'Reviewed Encounters' %}{% endblock %}
+{% block content %}
+<!-- select observer -->
+<div>
+<h2>{% trans 'Select worker' %}</h2>
+    <ul>
+        <li>
+            <select id="id_worker">
+            {% for object in observers %}
+                <option value="">{{ object }}</option>
+            {% endfor %}
+            </select>
+        </li>
+        <li></li>
+    </ul>
+</div>
+<script>
+$
+</script>
+<!-- load summary of assigned visits -->
+<div>
+<h2>{% trans 'Assigned Visits' %}</h2>
+</div>
+<div>
+<h2>{% trans 'Visit Summary' %}</h2>
+</div>
+{% endblock content %}
