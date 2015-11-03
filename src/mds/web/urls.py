@@ -92,12 +92,18 @@ urlpatterns = patterns(
 
     # Forms
     url(r'^forms/surgeon/review/(?P<uuid>[^/]+)/$', 'mds.web.views.encounter_review', name='surgeon-review'),
+    url(r'^forms/subject/merge/$', 'mds.web.views.form_subject_merge', name='form-subject-merge'),
+    url(r'^forms/subject/confirm/$', 'mds.web.views.form_subject_confirm', name='form-subject-confirm'),
     url(r'^forms/surgeon/clinic/$', 'mds.web.views.surgeon_clinic_form', name='clinic-form'),
 
     # Internationalization
     url(r'^lang/$', 'mds.web.views.setlang', name='setlang'),
     # Client downloads
     url(r'^downloads/$', ClientDownloadsView.as_view(), name='download-client'),
+    
+    # Reports
+    url(r'^report/visits/$', 'mds.web.views.report_visits', name='report-visits'),
+    url(r'^report/encounter/reviews/$', 'mds.web.views.report_encounter_reviews', name='repport-reviewed-encounters'),
 
 )
 

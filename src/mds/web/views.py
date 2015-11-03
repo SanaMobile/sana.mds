@@ -1,5 +1,6 @@
 import cjson
 import logging
+import datetime
 
 from django.http import HttpResponse, HttpResponseRedirect
 from django.conf import settings
@@ -786,7 +787,7 @@ class ModelFormMixin(TranslationMixin, LoginRequiredMixin):
             context['objects'] = [self.get_object_dict(context['object']),]
         if context.has_key('object_list'):
             context['objects'] = [ self.get_object_dict(x) for x in context['object_list']]
-        context['portal'] = portal.nav(getattr(self,'role',None))
+        context['portal'] = portal.nav(self.request)
 
         context['lang'] = self.kwargs.get('lang','en')
         return context
@@ -1238,3 +1239,130 @@ class ClientDownloadsView(TemplateView):
         context['lang'] = self.kwargs.get('lang','en')
         context['available_languages'] = get_available_languages()
         return context
+
+
+def report_visits(request, **kwargs):
+    ''' Renders a summary of subject encounters and assigned tasks
+    '''
+    tmpl = 'web/reports/visits.html'
+    now = datetime.datetime.now()
+    # Default params set to None
+    # month to read report from
+    month = now.month
+    # read to read report from
+    year = now.year
+    # uuid of observer object
+    selected = None
+    
+    # If no kwargs we just return the list of 
+    if kwargs:
+        selected = kwargs.get('selected', None)
+        if selected:
+            # get the observer from selected
+            
+            # if selected we want to check the month and year
+            month = kwargs.get('month', now.month)
+            year = kwargs.get('year', now.year)
+
+    messages = None
+    lang = get_and_activate(request)
+    return render_to_response(
+        tmpl, 
+        context_instance=RequestContext(
+            request,
+            { 
+                'observers': Observer.objects.all(),
+                'portal': portal.nav(request),
+                'messages': messages,
+                'lang' :  lang,
+                'after': after,
+                'before': before,
+                'selected': selected,
+                'available_languages': get_available_languages(),
+            }))
+
+
+def report_encounter_reviews(request,uuid=None, **kwargs):
+    ''' Renders a summary of reviewed encounters
+    '''
+    tmpl = 'web/reports/encounter_reviews.html'
+    obj = None
+    messages = None
+    lang = get_and_activate(request)
+    return render_to_response(
+        tmpl, 
+        context_instance=RequestContext(
+            request,
+            { 
+                'observers': Observer.objects.all(),
+                'portal': portal.nav(request),
+                'messages': messages,
+                'lang' :  lang,
+                'available_languages': get_available_languages(),
+            }))
+
+
+def form_subject_merge(request,uuid, **kwargs):
+    ''' Renders a view for merging subject record.
+    '''
+    merge_from = Subject.objects.get(uuid=uuid)
+    merge_to = None
+    tmpl = 'web/forms/merge_subject.html'
+    obj = None
+    messages = None
+    data = {}
+    # On GET, return from object and list of objects to merge to
+    if request.method == 'GET':
+        data['merge_from'] = merge_from
+        data['merge_to'] = SurgicalSubject.objects.all().filter(confirmed=True, voided=False).exclude(uuid=uuid)
+    elif request.method == 'POST':
+        merge_to_uuid = request.POST.get('merge_to')
+        # Get the 'to' object
+        merge_to = SurgicalSubject.objects.get(uuid=merge_to_uuid)
+        # Get the 'from' encounters and update
+        encounter_qs = Encounter.objects.filter(subject=uuid)
+        encounter_qs.update(subject=merge_to.uuid)
+        # mark from as voided
+        
+    lang = get_and_activate(request)
+    return render_to_response(
+        tmpl, 
+        context_instance=RequestContext(
+            request,
+            {
+                'data': data,
+                'portal': portal.nav(request),
+                'messages': messages,
+                'lang' :  lang,
+                'available_languages': get_available_languages(),
+            }))
+
+
+def form_subject_confirm(request, **kwargs):
+    ''' Renders a view for merging subject record.
+    '''
+    tmpl = 'web/forms/unconfirmed.html'
+    messages = []
+    # GET we return a list of unconfirmed
+    if request.method == 'POST':
+        to_confirm = request.POST.get('mark_confirmed')
+        form = SubjectMarkConfirmedForm(mark_confirmed=to_confirm)
+        # If user selected any subjects to confirm
+        if form.is_valid():
+            form.full_clean()
+            subject_qs = Subject.objects.filter(uuid__in=form.cleand_data.get('mark_confirmed',[]))
+            subject_qs.update(confirmed=True)
+            messages = [ "%s %s" % _('Successfully updated Patient', x.system_id) for x in subject_qs ]
+    data = SurgicalSubject.objects.filter(confirmed=False, voided=False)
+    lang = get_and_activate(request)
+    return render_to_response(
+        tmpl, 
+        context_instance=RequestContext(
+            request,
+            { 
+                'form': SubjectMarkConfirmedForm(),
+                'portal': portal.nav(request),
+                'messages': messages,
+                'lang' :  lang,
+                'available_languages': get_available_languages(),
+            }))
