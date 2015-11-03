@@ -62,6 +62,9 @@ class Observation(models.Model):
     
     voided = models.BooleanField(default=False)
     
+    observer = models.ForeignKey('Observer', to_field='uuid', blank=True)
+    ''' Who collected the data. '''
+    
     @property
     def subject(self):
         """ Convenience wrapper around Encounter.subject """
@@ -100,7 +103,10 @@ class Observation(models.Model):
         """ Convenience property for matching the object to the procedure
             instruction-i.e. the question on a form.
         """
-        return self.node
+        if self.concept:
+            return self.concept.description
+        else:
+            return None
     
     def open(self, mode="w"):
         if not self.is_complex:
