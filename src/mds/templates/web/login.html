@@ -8,7 +8,7 @@
 {% endblock %}
 {% block content %}
 {% if form.errors %}
-<p>{% trans 'Your username and password didn't match. Please try again.' %}</p>
+<p>{% trans "Your username and password didn't match. Please try again." %}</p>
 {% endif %}
 <form method="post" action=".">
 <div class="ui-widget userform">
@@ -22,7 +22,7 @@
         {{ form.username }}
     </div>
     <div class="fieldWrapper">
-        <span>{{ form.password.errors }}{% form.password.label_tag %}</span><br/>
+        <span>{{ form.password.errors }}{% trans form.password.label_tag %}</span><br/>
         {{ form.password }}
     </div>
     <div class="form-button">
