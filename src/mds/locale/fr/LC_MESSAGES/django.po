@@ -8,24 +8,24 @@ msgstr ""
 "Project-Id-Version: 2.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2015-10-05 17:40-0500\n"
-"PO-Revision-Date: 2015-10-05 14:03-0500\n"
-"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"PO-Revision-Date: 2015-10-23 11:21-0500\n"
 "Language-Team: Sana Mobile <dev@sanamobile.org>\n"
 "Language: fr\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n > 1);\n"
-"X-Generator: Poedit 1.5.4\n"
+"X-Generator: Poedit 1.8.5\n"
 "X-Poedit-SourceCharset: UTF-8\n"
+"Last-Translator: \n"
 
 #: settings.py:69
 msgid "English"
-msgstr "Angle"
+msgstr "Anglais"
 
 #: settings.py:70
 msgid "French"
-msgstr "Franse"
+msgstr "Français"
 
 #: settings.py:71
 msgid "Kreyol"
@@ -33,28 +33,27 @@ msgstr "Créole Haïtien"
 
 #: core/extensions/models.py:34
 msgid "email"
-msgstr "email"
+msgstr "Email"
 
 #: core/extensions/models.py:70
-#, fuzzy
 msgid "house number"
-msgstr "Téléphone # 1"
+msgstr "Numéro de maison"
 
 #: core/extensions/models.py:71
 msgid "family number"
-msgstr "numéro de famille"
+msgstr "Numéro de famille"
 
 #: core/extensions/models.py:72
 msgid "national id"
-msgstr "numéro national d'identité"
+msgstr "Numéro d’identification national"
 
 #: core/extensions/models.py:73
 msgid "conctact one"
-msgstr "Contactez un"
+msgstr "Contact un"
 
 #: core/extensions/models.py:74
 msgid "contact two"
-msgstr "contact deux"
+msgstr "Contact deux"
 
 #: core/extensions/models.py:75
 #, fuzzy
@@ -68,19 +67,19 @@ msgstr "Téléphone # 4"
 
 #: core/extensions/models.py:77
 msgid "confirmed"
-msgstr "confirmé"
+msgstr "Confirmé"
 
 #: core/extensions/models.py:91 tasks/models.py:98 tasks/models.py:110
 msgid "encounter"
-msgstr "rencontre"
+msgstr "Rencontre"
 
 #: core/extensions/models.py:96
 msgid "reviewed by"
-msgstr "revisé par"
+msgstr "Revisé par"
 
 #: core/extensions/models.py:99
 msgid "viewed on"
-msgstr "date consulté"
+msgstr "Date consulté"
 
 #: core/extensions/models.py:103 tasks/models.py:63
 #, fuzzy
@@ -89,11 +88,11 @@ msgstr "Terminé"
 
 #: core/models/concept.py:18
 msgid "concept"
-msgstr "concept"
+msgstr "Concept"
 
 #: core/models/concept.py:26 tasks/models.py:54
 msgid "created"
-msgstr "créé"
+msgstr "Créé"
 
 #: core/models/concept.py:29 tasks/models.py:57
 msgid "modified"
@@ -150,7 +149,7 @@ msgstr "nom de famille"
 
 #: core/models/subject.py:43
 msgid "date of birth"
-msgstr "date d'anniversaire"
+msgstr "date de naissance"
 
 #: core/models/subject.py:45
 msgid "gender"
@@ -162,7 +161,7 @@ msgstr "image"
 
 #: core/models/subject.py:51
 msgid "system id"
-msgstr "id patients"
+msgstr "identification système"
 
 #: tasks/models.py:39
 msgid "Task"
@@ -218,7 +217,7 @@ msgstr "Modifier"
 
 #: templates/web/download.html:11
 msgid "Download latest"
-msgstr "Téléchargez la dernière"
+msgstr "Téléchargez la plus récente"
 
 #: templates/web/download.html:15
 msgid "Available versions:"
@@ -230,7 +229,7 @@ msgstr "Observations"
 
 #: templates/web/form_snippet.html:15
 msgid "Update"
-msgstr "Soumettre"
+msgstr "Réactualiser"
 
 #: templates/web/form_snippet.html:17
 msgid "Add"
@@ -267,12 +266,11 @@ msgstr "%(label|title)s"
 
 #: templates/web/list_subjects.html:35
 msgid "All"
-msgstr ""
+msgstr "Toutes"
 
 #: templates/web/list_subjects.html:36
-#, fuzzy
 msgid "Unconfirmed"
-msgstr "confirmé"
+msgstr "Non confirmée"
 
 #: templates/web/login.html:29
 msgid "Login"
@@ -285,11 +283,11 @@ msgstr "Langue"
 
 #: templates/web/setlang.html:4
 msgid "Set Language"
-msgstr "Définir la langue"
+msgstr "Choisir la langue"
 
 #: templates/web/setlang.html:20 templates/web/surgical_clinic_form.html:153
 msgid "Submit"
-msgstr "Soumettre"
+msgstr "Envoyer"
 
 #: templates/web/surgical_clinic_form.html:12 web/portal.py:339
 msgid "Clinic Form"
@@ -326,7 +324,7 @@ msgstr "Post-op de routine"
 
 #: templates/web/surgical_clinic_form.html:38
 msgid "Referral for symptoms"
-msgstr "Renvoi des symptômes"
+msgstr "Renvoi pour des symptômes"
 
 #: templates/web/surgical_clinic_form.html:47
 msgid "Please use the following definition of surgical site infection (SSI)"
@@ -339,7 +337,8 @@ msgid ""
 "Infection occurs within 30 days after any operative procedure \n"
 "    <strong>AND</strong> the patient has at least one of the following"
 msgstr ""
-"L'infection se produit dans les 30 jours après toute procédure opératoire \n"
+"L'infection se produit dans les 30 jours après n’importe quel procédure "
+"opératoire \n"
 "     <strong> </ strong> le patient a au moins un des éléments suivants"
 
 #: templates/web/surgical_clinic_form.html:52
@@ -350,24 +349,24 @@ msgstr "a.  Écoulement purulent de l'incision."
 msgid ""
 "b. Organisms isolated from a culture of fluid or tissue from the incision."
 msgstr ""
-"b. Les organismes isolés à partir d'une culture de tissu ou de fluide à "
-"partir de l'incision."
+"b. Les organismes isolés à partir d'une culture de tissu ou de fluide qui "
+"sortent de l'incision."
 
 #: templates/web/surgical_clinic_form.html:54
 msgid ""
 "c. Incision that spontaneously dehisces or is deliberately opened by a "
 "surgeon."
 msgstr ""
-"Incision que déhiscence spontanément ou est délibérément ouvert par un "
+"c. Incision qui déhiscence spontanément ou est délibérément ouvert par un "
 "chirurgien."
 
 #: templates/web/surgical_clinic_form.html:55
 msgid "d. Diagnosis of an SSI by the surgeon."
-msgstr "d. Le diagnostic d'un SSI par le chirurgien."
+msgstr "d. Le diagnostic d'un ISO par le chirurgien."
 
 #: templates/web/surgical_clinic_form.html:57
 msgid "<strong>DO NOT</strong> report SSI if:"
-msgstr "<strong> ne pas </ strong> Rapport SSI si:"
+msgstr "<strong> ne pas </ strong> rapporter ISO si:"
 
 #: templates/web/surgical_clinic_form.html:59
 msgid ""
@@ -387,7 +386,7 @@ msgstr ""
 
 #: templates/web/surgical_clinic_form.html:70
 msgid "Is there an SSI?"
-msgstr "Y at-il un SSI?"
+msgstr "Y at-il un ISO?"
 
 #: templates/web/surgical_clinic_form.html:73
 #: templates/web/surgical_clinic_form.html:83
@@ -429,11 +428,11 @@ msgstr "Drainage dans la salle d'opération - anesthésie locale"
 #: templates/web/surgical_clinic_form.html:104
 msgid "Drainage in the operating room -general or spinal anesthesia"
 msgstr ""
-"Drainage dans la Directrice générale de salle d'opération ou rachianesthésie"
+"Drainage dans la salle d'opération - anesthésie générale ou rachianesthésie"
 
 #: templates/web/surgical_clinic_form.html:111
 msgid "Readmission"
-msgstr "réadmission"
+msgstr "Réadmission"
 
 #: templates/web/surgical_clinic_form.html:120
 msgid ""
@@ -445,11 +444,11 @@ msgstr ""
 
 #: templates/web/surgical_clinic_form.html:123
 msgid "Was the referral appropriate?"
-msgstr "La saisine était appropriée?"
+msgstr "La référence était appropriée?"
 
 #: templates/web/surgical_clinic_form.html:126
 msgid "Yes, the symptoms warranted evaluation"
-msgstr "L'évaluation Oui, les symptômes garantis"
+msgstr "Oui, les symptômes méritaient une évaluation."
 
 #: templates/web/surgical_clinic_form.html:127
 msgid "No, evaluation was not necessary"
@@ -497,7 +496,7 @@ msgstr "Type"
 
 #: web/forms.py:134 web/extensions/forms.py:25
 msgid "Due On"
-msgstr "Sur due"
+msgstr "Date d’échéance"
 
 #: web/forms.py:138
 msgid "Started"
@@ -517,11 +516,11 @@ msgstr "Un suivi régulier"
 
 #: web/forms.py:154
 msgid "30 day follow up"
-msgstr "30 jours de suivi"
+msgstr "Visite 30 jours"
 
 #: web/forms.py:163
 msgid "HAS Number"
-msgstr "Nombre HAS"
+msgstr "Numéro HAS"
 
 #: web/forms.py:165
 msgid "Telephone number one"
@@ -541,7 +540,7 @@ msgstr "Téléphone # 4"
 
 #: web/forms.py:191
 msgid "Date of Birth"
-msgstr "Date d'anniversaire"
+msgstr "Date de Naissance"
 
 #: web/forms.py:195
 msgid "Inguinal Hernia"
@@ -561,7 +560,7 @@ msgstr "Autres masse"
 
 #: web/forms.py:199
 msgid "Other"
-msgstr "Other"
+msgstr "Autres"
 
 #: web/forms.py:215
 msgid "Inguinal Hernia Repair"
@@ -569,7 +568,7 @@ msgstr "Réparation hernie inguinale"
 
 #: web/forms.py:216
 msgid "Other Hernia Repair"
-msgstr "Autres hernie"
+msgstr "Réparation des autres hernies"
 
 #: web/forms.py:217
 msgid "Breat Biopsy"
@@ -593,40 +592,35 @@ msgstr "Biopsie, d'autres"
 
 #: web/forms.py:222
 msgid "Excision of Mass other than breast"
-msgstr "L'excision de masse"
+msgstr "L'excision de masse (autre qu’une masse du sein)"
 
 #: web/forms.py:223
 msgid "Other Operation"
 msgstr "Autre opération"
 
 #: web/forms.py:253
-#, fuzzy
 msgid "subject"
-msgstr "Objet"
+msgstr "Sujet"
 
 #: web/forms.py:255
 msgid "diagnosis"
-msgstr "diagnostic"
+msgstr "Diagnostic"
 
 #: web/forms.py:258 web/forms.py:264
-#, fuzzy
 msgid "other"
-msgstr "Other"
+msgstr "Autres"
 
 #: web/forms.py:261
-#, fuzzy
 msgid "operation"
-msgstr "observations"
+msgstr "Opérations"
 
 #: web/forms.py:268
-#, fuzzy
 msgid "date of operation"
-msgstr "Autre opération"
+msgstr "Date d’opération"
 
 #: web/forms.py:271
-#, fuzzy
 msgid "date of discharge"
-msgstr "Date d'anniversaire"
+msgstr "Date de Sortie"
 
 #: web/portal.py:244 web/portal.py:270
 msgid "MDS2 Web Portal"
@@ -638,15 +632,15 @@ msgstr "Utilisateurs"
 
 #: web/portal.py:254
 msgid "View all users"
-msgstr "Voir tout"
+msgstr "Voir tous les utilisateurs"
 
 #: web/portal.py:259
 msgid "All Observers"
-msgstr "Voir tout"
+msgstr "Tous utilisateurs"
 
 #: web/portal.py:263
 msgid "New Observer"
-msgstr "Nouveau"
+msgstr "Nouveau Utilisateur"
 
 #: web/portal.py:274
 msgid "Data"
