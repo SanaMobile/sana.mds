@@ -367,6 +367,69 @@ site = {
         ]
     }
 
+SUPERVISOR = {
+        'name' : _('MDS2 Web Portal'),
+        'app' : 'web',
+        'sites' : [
+            {
+                'label':_('Forms'),
+                'requires': None,
+                'views':[
+                    { 
+                        'label': _('Patient Registration'),
+                        'context_name':'web:register-patient',
+                    },
+                    { 
+                        'label': _('Intake Form'),
+                        'context_name':'web:intake',
+                    },
+                    { 
+                        'label': _('New Visit'),
+                        'context_name':'web:encountertask-create',
+                    },
+                    { 
+                        'label': _('Clinic Form'),
+                        'context_name':'web:clinic-form',
+                    },
+                ]
+            },
+            {
+                'label':_('Reports'),
+                'views':[
+                    { 
+                        'label': _('Patient Visits'),
+                        'context_name':'web:report-visits',
+                    },
+                    { 
+                        'label': _('Unconfirmed Patients'),
+                        'context_name':'web:form-subject-confirm',
+                    }
+                
+                ]
+            },
+        ]
+    }
+
+SURGEON = {
+        'name' : _('MDS2 Web Portal'),
+        'app' : 'web',
+        'sites' : [
+            {
+                'label':_('Reports'),
+                'views':[
+                    { 
+                        'label': _('Patient Visits'),
+                        'context_name':'web:report-visits',
+                    },
+                    { 
+                        'label': _('Unconfirmed Patients'),
+                        'context_name':'web:form-subject-confirm',
+                    }
+                ]
+            },
+        ]
+    }
+
 _portal = None
 
 def detailview_factory(model, form_class=None, fields=None):
@@ -390,11 +453,36 @@ def get_or_create_portal(portal_site=None):
 def generate(request, *args, **kwargs):
     pass
 
+def is_in_group(group,user):
+    if not user or not group:
+        return False
+    return user.groups.filter(name=group).exists()
+
+def is_admin(user):
+    return is_in_group("admin", user)
+
+def is_supervisor(user):
+    return is_in_group("supervisor", user)
+
+def is_surgeon(user):
+    return is_in_group("surgeon", user)
+    
+def is_developer(user):
+    return is_in_group("developer", user)
+
 def nav(request, *args, **kwargs):
     if request and not request.user:
         return _empty
-    else:
+    user = request.user
+    if is_surgeon(user):
+        return SURGEON
+    elif is_supervisor(user):
+        return SUPERVISOR
+    elif is_admin(user):
         return site
+    else:
+        return EMPTY
+
 
 def NavMixin(object):
 
