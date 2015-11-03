@@ -35,6 +35,7 @@ __all__ = [
     "UserForm",
     "ObserverForm",
     "LoginForm",
+    "SubjectMarkConfirmedForm",
     ]
 
 
@@ -164,11 +165,14 @@ class SurgicalSubjectForm(forms.ModelForm):
     contact_one = forms.CharField(required=False,
         label=_("Telephone number one"))
     contact_two = forms.CharField(required=False,
-        label=_("Telephone number two"))
+        label=_("Telephone number two"),
+        widget=forms.HiddenInput())
     contact_three = forms.CharField(required=False,
-        label=_("Telephone number three"))
+        label=_("Telephone number three"),
+        widget=forms.HiddenInput())
     contact_four = forms.CharField(required=False,
-        label=_("Telephone number four"))
+        label=_("Telephone number four"),
+        widget=forms.HiddenInput())
     class Meta:
         model = SurgicalSubject
         fields = [
@@ -192,12 +196,17 @@ class SurgicalSubjectForm(forms.ModelForm):
         }
 
 def diagnosis_choices():
-    choice_list = ( _("Inguinal Hernia"),
+    choice_list = ( "Inguinal Hernia",
+                    "Other Hernia",
+                    "Breat Mass", 
+                    "Other Mass", 
+                    "Other")
+    label_list = ( _("Inguinal Hernia"),
                     _("Other Hernia"),
                     _("Breat Mass"), 
                     _("Other Mass"), 
                     _("Other"))
-    return ((x,x) for x in choice_list )
+    return zip(choice_list, label_list)
 
 def operation_choices():
     choice_list = ( 
@@ -222,7 +231,7 @@ def operation_choices():
         _("Excision of Mass other than breast"),
         _("Other Operation"),
     )
-    return ((_(x),x) for x in choice_list)
+    return zip(choice_list, label_list)
     
 def advocate_choices():
     choice_list = None
@@ -389,3 +398,13 @@ class ObserverForm(forms.ModelForm):
     class Meta:
         model =User
 
+def get_unconfirmed():
+    qs = SurgicalSubject.objects.filter(confirmed=False, voided=False)
+    return [(x.uuid, x) for x in qs]
+
+class SubjectMarkConfirmedForm(forms.Form):
+    mark_confirmed = forms.ModelChoiceField(
+        queryset=SurgicalSubject.objects.filter(confirmed=False, voided=False),
+        widget=forms.CheckboxSelectMultiple(),
+        empty_label=None,
+        )
