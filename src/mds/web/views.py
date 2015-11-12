@@ -1235,7 +1235,7 @@ class ClientDownloadsView(TemplateView):
         context = super(ClientDownloadsView, self).get_context_data(**kwargs)
         context['title'] = _("Mobile Client Downloads")
         context['objects'] = Client.objects.order_by("-version")
-        context['portal'] = portal.nav(getattr(self,'role',None))
+        context['portal'] = portal.nav(self.request)
         context['lang'] = self.kwargs.get('lang','en')
         context['available_languages'] = get_available_languages()
         return context
@@ -1275,8 +1275,8 @@ def report_visits(request, **kwargs):
                 'portal': portal.nav(request),
                 'messages': messages,
                 'lang' :  lang,
-                'after': after,
-                'before': before,
+                'month': month,
+                'year': year,
                 'selected': selected,
                 'available_languages': get_available_languages(),
             }))
