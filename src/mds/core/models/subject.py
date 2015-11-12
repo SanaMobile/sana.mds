@@ -96,4 +96,4 @@ class Subject(AbstractSubject):
         self._generate_thumb()
 
     def __unicode__(self):
-        return u'%s, %s - %s' % (self.family_name, self.given_name, self.system_id)
+        return u'%s-%s, %s' % (self.system_id, self.family_name, self.given_name, )
