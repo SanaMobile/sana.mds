@@ -24,6 +24,7 @@ __all__ = [
     "ProcedureForm",
     "EmptyEncounterForm",
     "EncounterTaskForm",
+    "NewEncounterTaskForm",
     "InitialTaskSetForm",
     "SurgicalSubjectForm",
     "IntakeForm",
@@ -134,14 +135,46 @@ class EncounterTaskForm(forms.ModelForm):
         widget=DateTimeSelectorInput(format='%Y-%m-%d %H:%M'),
         label=_("Due On"))
     started = forms.DateTimeField(
-        widget=DateTimeSelectorInput(format='%Y-%m-%d %H:%M'),
+        widget = forms.HiddenInput(),
+        #widget=DateTimeSelectorInput(format='%Y-%m-%d %H:%M'),
         required=False,
         label=_("Started"))
     completed = forms.DateTimeField(
         widget=DateTimeSelectorInput(format='%Y-%m-%d %H:%M'),
         required=False,
         label=_("Completed"))
-    
+
+class NewEncounterTaskForm(forms.ModelForm):
+    """ Visits assigned to surgical advocate post S/P
+    """
+    class Meta:
+        model = EncounterTask
+        widgets = {
+            #'status': forms.HiddenInput(initial=1),
+            'voided': forms.HiddenInput(),
+            'encounter': forms.HiddenInput(),
+            'started': forms.HiddenInput(),
+            'completed':forms.HiddenInput(),
+            'concept': forms.HiddenInput(),
+        }
+    subject = forms.ModelChoiceField(
+        queryset=task_subjects(), 
+        label=_("Patient"),
+        to_field_name='uuid')
+    procedure = forms.ModelChoiceField(
+        queryset=task_procedures(),
+        label = _('Procedure'),
+        to_field_name='uuid')
+    assigned_to = forms.ModelChoiceField(
+        queryset=Observer.objects.all(),
+        label = _('Assigned To'),
+        to_field_name='uuid')
+    due_on = forms.DateTimeField(
+        widget=DateTimeSelectorInput(format='%Y-%m-%d %H:%M'),
+        label=_("Due On"))
+    status = forms.IntegerField(
+        widget=forms.HiddenInput(),
+        initial=1)
 class InitialTaskSetForm(forms.Form):
     #subject = forms.ChoiceField(subject_choice_list(), label=_("Patient"))
     #procedure = forms.ChoiceField(((x.uuid,x.title) for x in Procedure.objects.exclude(uuid__iexact="303a113c-6345-413f-88cb-aa6c4be3a07d")))

@@ -1066,7 +1066,7 @@ class EncounterTaskListView(ModelListMixin, ListView):
 class EncounterTaskCreateView(ModelFormMixin,ModelSuccessMixin,CreateView):
     model = EncounterTask
     template_name = "web/form_new.html"
-    form_class = EncounterTaskForm
+    form_class = NewEncounterTaskForm
     
     #def form_valid(self, form):
     #    concept = Concept.objects.get(uuid=form.instance.concept.uuid)
