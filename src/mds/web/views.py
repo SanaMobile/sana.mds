@@ -654,7 +654,7 @@ class ModelListMixin(TranslationMixin, LoginRequiredMixin,  SortMixin ):
         context['objects'] = [self.get_object_dict(x) for x in context['object_list']]
         #sort_by, order = self.get_sort_params()
         #context.update({'sort_by': sort_by, 'order': order})
-        context['portal'] = portal.nav(getattr(self,'role',None))
+        context['portal'] = portal.nav(self.request)
         return context
 
 class ModelMixin(object):
@@ -827,7 +827,7 @@ class UserCreateView(SuccessMessageMixin,CreateView):
     def get_context_data(self, **kwargs):
         context = super(UserCreateView, self).get_context_data(**kwargs)
         context['model'] = self.model.__name__.lower()
-        context['portal'] = portal.nav(getattr(self,'role',None))
+        context['portal'] = portal.nav(self.request)
         return context
 
 class UserUpdateView(ModelFormMixin, SuccessMessageMixin, UpdateView):
