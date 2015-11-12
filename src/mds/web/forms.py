@@ -225,7 +225,9 @@ class SurgicalSubjectForm(forms.ModelForm):
         ]
         widgets = {
             'dob': DateSelectorInput(),
-            'label': _('Date of Birth'),
+            #'label': _('Date of Birth'),
+            'image': forms.HiddenInput(),
+            'family_number': forms.HiddenInput(),
         }
 
 def diagnosis_choices():
