@@ -14,9 +14,17 @@
 <ul>
 {% for object in data %}
     <li class="{% cycle 'even-row' 'odd-row' %}">
+        <ul>
+        <li>
+        <label><input type="checkbox" name="mark_confirmed" value="{{ object.uuid }}"/> {{ object }}</label>
+        </li>
+        <li class="text-right">
+        <div>
         <a href="{% url 'web:form-subject-merge' uuid=object.uuid %}" class="action-link">{% trans 'Merge' %}</a>
         <a href="{% url 'web:subject-edit' pk=object.id %}" class="action-link">{% trans 'Edit' %}</a>
-        <label><input type="checkbox" name="mark_confirmed" value="{{ object.uuid }}"/> {{ object }}</label>
+        </div>
+        </li>
+        </ul>
     </li>
 {% endfor %}
 </ul>
