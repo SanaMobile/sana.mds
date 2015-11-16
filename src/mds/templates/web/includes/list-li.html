@@ -1,0 +1,14 @@
+{% load i18n %}
+<div>
+    <ul>
+    {% for object in object_list %}
+        <li>
+            <div>
+                {{ object }}
+                <a href="{% url 'web:'|add:model|add:'-edit' pk=object.id %}">{% trans "Edit" %}</a>
+                <input type="button" value="Edit" />
+            </div>
+        </li>
+    {% endfor %}
+    </ul>
+</div>
