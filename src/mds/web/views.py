@@ -11,7 +11,7 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
 from django.contrib.messages.views import SuccessMessageMixin
 from django.core.paginator import Paginator, InvalidPage, EmptyPage
-from django.core.urlresolvers import reverse
+from django.core.urlresolvers import reverse, reverse_lazy
 
 from django import forms
 from django.forms.models import modelformset_factory, modelform_factory
@@ -554,6 +554,13 @@ _tasks = [
     EncounterTask,
 ]
 
+class SuccessToListMixin(object):
+    ''' 
+    '''
+    def get_success_url(self):
+        name = self.model.__name__.lower()
+        url = reverse_lazy('web:%s-list' % name)
+        return url
 
 class TranslationMixin(object):
     lang = 'en'
@@ -1063,11 +1070,12 @@ class EncounterTaskListView(ModelListMixin, ListView):
                 obj['late'] = 'today'
         return context
 
-class EncounterTaskCreateView(ModelFormMixin,ModelSuccessMixin,CreateView):
+
+class EncounterTaskCreateView(SuccessToListMixin, ModelFormMixin,ModelSuccessMixin, CreateView):
     model = EncounterTask
     template_name = "web/form_new.html"
     form_class = NewEncounterTaskForm
-    
+    #success_url = reverse_lazy('encountertask-list')
     #def form_valid(self, form):
     #    concept = Concept.objects.get(uuid=form.instance.concept.uuid)
     #    form.instance.concept = concept
@@ -1245,26 +1253,77 @@ def report_visits(request, **kwargs):
     ''' Renders a summary of subject encounters and assigned tasks
     '''
     tmpl = 'web/reports/visits.html'
-    now = datetime.datetime.now()
-    # Default params set to None
-    # month to read report from
-    month = now.month
-    # read to read report from
-    year = now.year
     # uuid of observer object
     selected = None
-    
-    # If no kwargs we just return the list of 
-    if kwargs:
-        selected = kwargs.get('selected', None)
-        if selected:
-            # get the observer from selected
-            
-            # if selected we want to check the month and year
-            month = kwargs.get('month', now.month)
-            year = kwargs.get('year', now.year)
+    encounters = None
+    tasks = None
+    completed_tasks = None
+    late_tasks = None
+    # check any period params
+    now = datetime.datetime.now()
+    # month to read report from
+    month = int(request.REQUEST.get('month', now.month))
+    # read to read report from
+    year = int(request.REQUEST.get('year', now.year))
+    selected_month = datetime.datetime(year, month, 1)
 
-    messages = None
+    # set the actual start end
+    day_delta = datetime.timedelta(days=1)
+    start_date = selected_month - datetime.timedelta(days=1)
+    end_date = selected_month + datetime.timedelta(days=32)
+    end_date = end_date.replace(day=1)
+
+    # If no kwargs we just return the all observers     
+    if kwargs:        
+        selected = kwargs.get('selected', "pppp")     
+    else:         
+        selected = request.REQUEST.get('selected',None)
+    
+    if selected:
+        # get the observer from selected
+        selected = Observer.objects.get(uuid=selected)
+        # if selected we want to check the month and year
+        tasks = EncounterTask.objects.filter(
+                assigned_to=selected.uuid,
+                due_on__month=month,
+            ).count()
+        late_tasks = EncounterTask.objects.filter(
+                assigned_to=selected.uuid,
+                due_on__lt=now,
+        ).exclude(status=2).count()
+        completed_tasks = EncounterTask.objects.filter(
+                assigned_to=selected.uuid,
+                completed__month=int(month)
+        ).count()
+        encounters = Encounter.objects.filter(
+            observer=selected.uuid,
+            created__gt=start_date,
+            created__lt=end_date
+        )
+    else:
+        tasks = EncounterTask.objects.filter(
+                due_on__lt=end_date,
+                due_on__gt=start_date
+            ).count()
+        late_tasks = EncounterTask.objects.filter(
+                due_on__lt=end_date,
+                due_on__gt=start_date
+        ).exclude(status=2).count()
+        completed_tasks = EncounterTask.objects.filter(
+                status=2,
+                completed__lt=end_date,
+                completed__gt=start_date
+        ).count()
+        encounters = Encounter.objects.filter(
+            created__gt=start_date,
+            created__lt=end_date
+        )
+        
+    messages = [
+        selected
+    ]
+    
+    
     lang = get_and_activate(request)
     return render_to_response(
         tmpl, 
@@ -1278,6 +1337,10 @@ def report_visits(request, **kwargs):
                 'month': month,
                 'year': year,
                 'selected': selected,
+                'encounters':encounters,
+                'tasks': tasks,
+                'completed_tasks': completed_tasks,
+                'late_tasks': late_tasks,
                 'available_languages': get_available_languages(),
             }))
 
@@ -1350,9 +1413,12 @@ def form_subject_confirm(request, **kwargs):
         # If user selected any subjects to confirm
         if form.is_valid():
             form.full_clean()
-            subject_qs = Subject.objects.filter(uuid__in=form.cleand_data.get('mark_confirmed',[]))
+            subject_qs = Subject.objects.filter(uuid__in=form.cleaned_data.get('mark_confirmed',[]))
+            raise Exception("POST")
             subject_qs.update(confirmed=True)
             messages = [ "%s %s" % _('Successfully updated Patient', x.system_id) for x in subject_qs ]
+        else:
+            raise Exception("Oops")
     data = SurgicalSubject.objects.filter(confirmed=False, voided=False)
     lang = get_and_activate(request)
     return render_to_response(
@@ -1361,6 +1427,7 @@ def form_subject_confirm(request, **kwargs):
             request,
             { 
                 'form': SubjectMarkConfirmedForm(),
+                'data': data,
                 'portal': portal.nav(request),
                 'messages': messages,
                 'lang' :  lang,
