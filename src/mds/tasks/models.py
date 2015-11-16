@@ -67,6 +67,9 @@ class Task(models.Model):
 
     voided = models.BooleanField(_('voided'),default=False)
 
+    def __unicode__(self):
+        return u'%s - %s' % (self.due_on, self.assigned_to)
+
     def is_late(self):
         now = datetime.datetime.now()
         if now > self.due_on and self.status.pk == 1:
