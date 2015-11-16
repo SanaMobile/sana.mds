@@ -65,7 +65,7 @@ class SurgicalSubject(Subject):
         verbose_name = 'surgical subject'
 
     def __unicode__(self):
-        return u'%s, %s - %s' % (self.family_name, self.given_name, self.system_id)
+        return u'%s-%s, %s' % (self.system_id, self.family_name, self.given_name )
 
     house_number = models.CharField(_('house number'), max_length=64, blank=True)
     family_number = models.IntegerField(_('family number'),max_length=5, null=True, blank=True)
