@@ -32,7 +32,13 @@
   {% block srcscript %}
   <script src="{{ STATIC_PREFIX }}web/js/jquery.js"></script>
   <script src="{{ STATIC_PREFIX }}web/js/jquery-ui.custom.js"></script>
-  <script src="{{ STATIC_PREFIX }}web/js/jquery-ui-i18n.js"></script>
+  {% if lang %}
+    {% if lang == "ht" %}
+        <script src="{{ STATIC_PREFIX }}web/js/jquery-ui-i18n-ht.js"></script>
+    {% elif lang == "fr" %}
+        <script src="{{ STATIC_PREFIX }}web/js/jquery-ui-i18n-fr.js"></script>
+    {% endif %}
+  {% endif %}
   <script src="{{ STATIC_PREFIX }}web/js/jquery-ui-sliderAccess.js"></script>
   <script src="{{ STATIC_PREFIX }}web/js/jquery-ui-timepicker-addon.js"></script>
   <script src="{{ STATIC_PREFIX }}web/js/jquery.cookie.js"></script>
