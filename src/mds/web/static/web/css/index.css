@@ -122,9 +122,10 @@ a.listfooter {
     margin-right: 196px;
 }
 
-@media screen and (max-width: 800px)
+@media screen and (max-width: 800px){
 .main-content {
     margin-right: 0px;
+}
 }
 .main-content > .main-content-footer {
     padding:0px;
@@ -224,6 +225,7 @@ a.listfooter {
     margin-top: 3px;
     margin-left: 3px;
 }
+
 @media screen and (max-width: 800px)
     .main-content > .main-content-body > .main-content-body-inner {
         margin-left: 3px;
