@@ -15,12 +15,13 @@
 {% for object in data %}
     <li class="{% cycle 'even-row' 'odd-row' %}">
         <a href="{% url 'web:form-subject-merge' uuid=object.uuid %}" class="action-link">{% trans 'Merge' %}</a>
+        <a href="{% url 'web:subject-edit' pk=object.id %}" class="action-link">{% trans 'Edit' %}</a>
         <label><input type="checkbox" name="mark_confirmed" value="{{ object.uuid }}"/> {{ object }}</label>
     </li>
 {% endfor %}
 </ul>
 <div >
-    <p class="content-submit"><input type="submit" id="id_submit" value="{% trans 'Submit' %}"/></p>
+    <p class="content-submit"><input type="submit" id="id_submit" value="{% trans 'Mark Confirmed' %}"/></p>
 </div>
 <script>
 $('#id_submit').on('click', function(){
