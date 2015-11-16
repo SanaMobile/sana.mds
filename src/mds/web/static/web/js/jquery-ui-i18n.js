@@ -1798,14 +1798,14 @@ jQuery(function($){
  */
 jQuery(function($){
     $.datepicker.regional['ht'] = {
-        closeText: "Fermer",
-        prevText: "Précédent",
-        nextText: "Suivant",
-        currentText: "Aujourd'hui",
+        closeText: "Sòti",
+        prevText: "Anvan",
+        nextText: "Pwochen",
+        currentText: "Jodi a",
         monthNames: [ 'Janvye', 'Fevriye', 'Mas', 'Avril', 'Me', 'Jwen', 
         'Jiye', 'Out', 'Septanm', 'Oktob', 'Novanm', 'Desanm'],
-        monthNamesShort: [ 'Janv', 'Fevr', 'Mas', 'Avr', 'Me', 'Jwen', 
-        'Jiye', 'Out', 'Sept', 'Okt', 'Nov', 'Des'],
+        monthNamesShort: [ 'Janv', 'Fevr', 'Mas ', 'Avr ', 'Mas ', 'Jwen', 
+        'Jiye', 'Out ', 'Sept', 'Okt ', 'Nov ', 'Des '],
         dayNames: [ "dimanche", "lundi", "mardi", "mercredi", "jeudi", "vendredi", "samedi" ],
         dayNamesShort: [ "dim.", "lun.", "mar.", "mer.", "jeu.", "ven.", "sam." ],
         dayNamesMin: [ "D","L","M","M","J","V","S" ],
@@ -1818,3 +1818,4 @@ jQuery(function($){
     };
     $.datepicker.setDefaults( $.datepicker.regional['ht']);
 });
+$.datepicker.setDefaults( $.datepicker.regional['']);
