@@ -343,8 +343,17 @@ site = {
             },
             {
                 'label':_('Reports'),
-                'requires': ['admin',],
-                'views':[]
+                'views':[
+                    { 
+                        'label': _('Patient Visits'),
+                        'context_name':'web:report-visits',
+                    },
+                    { 
+                        'label': _('Unconfirmed Patients'),
+                        'context_name':'web:form-subject-confirm',
+                    }
+                
+                ]
             },
             {
                 'label':_('Admin'),
