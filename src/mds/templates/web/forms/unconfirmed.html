@@ -10,15 +10,23 @@
 {% block header %}{% trans 'Unconfirmed Patients' %}{% endblock %}
 {% block content %}
 <div class="content-list">
-<form>
+<form method="post"  enctype="multipart/form-data">
 <ul>
-{% for select in form.mark_confirmed %}
-    <li class="{% cycle 'even-row' 'odd-row' %}"><a href="./#" class="action-link">{% trans 'Merge' %}</a> {{ select }}</li>
+{% for object in data %}
+    <li class="{% cycle 'even-row' 'odd-row' %}">
+        <a href="{% url 'web:form-subject-merge' uuid=object.uuid %}" class="action-link">{% trans 'Merge' %}</a>
+        <label><input type="checkbox" name="mark_confirmed" value="{{ object.uuid }}"/> {{ object }}</label>
+    </li>
 {% endfor %}
 </ul>
-<div>
-<input type="submit" value="{% trans 'Submit' %}"/>
+<div >
+    <p class="content-submit"><input type="submit" id="id_submit" value="{% trans 'Submit' %}"/></p>
 </div>
+<script>
+$('#id_submit').on('click', function(){
+    var values = $(':input:checkbox:checked').map(function(){ return this.value; }).get();
+});
+</script>
 </form>
 </div>
 {% endblock content %}
