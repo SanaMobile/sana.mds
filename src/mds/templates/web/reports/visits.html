@@ -11,6 +11,7 @@
 {% endblock %}
 {% block header %}{% trans 'Patient Visits' %}{% endblock %}
 {% block content %}
+{{ selected }}
 <!-- select observer -->
 <div>
     <h2>{% trans 'Select worker' %}</h2>
@@ -18,16 +19,34 @@
     <tr>
         <td>
             <select id="id_worker">
+                
+                <option value="" selected="selected">------------</option>
             {% for object in observers %}
-                <option value="{{ object.uuid }}">{{ object }}</option>
+                {% if object.uuid == selected.uuid %}
+                    <option value="{{ object.uuid }}" selected>{{ object }}</option>
+                {% else %}
+                    <option value="{{ object.uuid }}">{{ object }}</option>
+                {% endif %}
             {% endfor %}
             </select>
         </td>
-        <td>{% trans 'Month' %} <input type="date"/></td>
+        <td>{% trans 'Month' %} <input id="id_date" type="date" value="{{ year }}-{{ month }}" /></td>
     <tr>
     </table>
     <hr/>
 </div>
+<script>
+$('#id_worker').change(function() {
+    var dt = $('#id_date').val().split('-');
+    var q = { 
+        "selected" : $(this).val() ,
+        "month" : dt[1] ,
+        "year" : dt[0] 
+    };
+    var qs = $.param(q);
+    window.location = "/mds/web/report/visits/?" + qs;
+});
+</script>
 <script>
     // Displays Date picker pop up
     $(function(){
@@ -35,7 +54,7 @@
             changeMonth: true,
             changeYear: true,
             showButtonPanel: true, 
-            dateFormat: 'mm-yy', 
+            dateFormat: 'yy-mm', 
             yearRange : "c-100:c+05",
             onClose: function(dateText, inst) { 
                 var month = $("#ui-datepicker-div .ui-datepicker-month :selected").val();
@@ -48,10 +67,24 @@
 </script>
 <!-- load summary of assigned visits -->
 <div>
-<h2>{% trans 'Summary' %}</h2>
+<h3>{% trans 'Summary' %} {% if selected %}{{ selected }}{% else %}{% trans 'All' %}{% endif %}</h3>
+<h4>{% trans 'Month' %} {{ month }} {% trans 'Year' %} {{ year }}</h4>
+<ul>
+<li>{% trans 'Tasks Due' %} {{ tasks }}</li>
+<li>{% trans 'Completed' %} {{ completed_tasks }}</li>
+<li>{% trans 'Late' %} {{ late_tasks }}</li>
+</ul>
 </div>
 <div>
-<h2>{% trans 'Patient Visits' %}</h2>
+<h3>{% trans 'Patient Visits' %}</h3>
+<div>
+{% trans 'Number of visits' %}:{{ encounters|length }} 
+</div>
+<ul>
+{% for encounter in encounters %}
+    <li>{{ encounter }}
+{% endfor %}
+</ul>
 </div>
 
 {% endblock content %}
