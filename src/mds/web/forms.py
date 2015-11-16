@@ -172,9 +172,11 @@ class NewEncounterTaskForm(forms.ModelForm):
     due_on = forms.DateTimeField(
         widget=DateTimeSelectorInput(format='%Y-%m-%d %H:%M'),
         label=_("Due On"))
-    status = forms.IntegerField(
+    status = forms.ModelChoiceField(
+        queryset=Status.objects.all(),
         widget=forms.HiddenInput(),
         initial=1)
+
 class InitialTaskSetForm(forms.Form):
     #subject = forms.ChoiceField(subject_choice_list(), label=_("Patient"))
     #procedure = forms.ChoiceField(((x.uuid,x.title) for x in Procedure.objects.exclude(uuid__iexact="303a113c-6345-413f-88cb-aa6c4be3a07d")))
