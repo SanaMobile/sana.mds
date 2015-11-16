@@ -82,7 +82,8 @@ urlpatterns = patterns(
     url(r'^subject/(?P<pk>\d+)/detail/$', SubjectDetailView.as_view(), name='subject-detail'),
     
     url(r'^encountertask/$', EncounterTaskListView.as_view(),name='encountertask-list'),
-    url(r'^encountertask/new/$', EncounterTaskCreateView.as_view(),name='encountertask-create'),
+    url(r'^encountertask/new/$', EncounterTaskCreateView.as_view(),
+        name='encountertask-create'),
     url(r'^encountertask/(?P<pk>[^/]+)/$', EncounterTaskUpdateView.as_view(),name='encountertask-edit'),
     url(r'^encountertask/(?P<pk>\d+)/detail/$', EncounterTaskDetailView.as_view(), name='encountertask-detail'),
     #url(r'^encountertask/$', EncounterTaskListView.as_view(),name='encountertask-list'),
@@ -92,7 +93,7 @@ urlpatterns = patterns(
 
     # Forms
     url(r'^forms/surgeon/review/(?P<uuid>[^/]+)/$', 'mds.web.views.encounter_review', name='surgeon-review'),
-    url(r'^forms/subject/merge/$', 'mds.web.views.form_subject_merge', name='form-subject-merge'),
+    url(r'^forms/subject/merge/(?P<uuid>[^/]+)/$', 'mds.web.views.form_subject_merge', name='form-subject-merge'),
     url(r'^forms/subject/confirm/$', 'mds.web.views.form_subject_confirm', name='form-subject-confirm'),
     url(r'^forms/surgeon/clinic/$', 'mds.web.views.surgeon_clinic_form', name='clinic-form'),
 
