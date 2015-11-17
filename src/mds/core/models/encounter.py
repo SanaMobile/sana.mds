@@ -57,12 +57,12 @@ class Encounter(models.Model):
     def flush(self):
         """ Removes the responses text and files for this Encounter """
         self.save()
-        for obs in self.observation_set.all():
+        for obs in self.observations.all():
                 obs.flush();
                 
     def complete(self):
         complete = True
-        for obs in self.observation_set.all():
+        for obs in self.observations.all():
             complete = complete and obs.complete()
             if not complete:
                 break
@@ -70,9 +70,20 @@ class Encounter(models.Model):
 
     @models.permalink
     def get_absolute_url(self):
-    	return ( 'core:encounter', { self.uuid : self.uuid } )
+        return ( 'core:encounter', { self.uuid : self.uuid } )
 
     def __unicode__(self):
         return u'{procedure} - {subject}'.format(
             procedure=self.procedure,
             subject=self.subject)
+
+    def _get_location(self):
+        gps = { 'latitude':0.0, 'longitude': 0.0 }
+        qs = self.observations.filter(concept__name__iexact="LOCATION GPS")
+        if qs.count() >= 1:
+            obs = qs[0].value_as_floats()
+            gps["latitude"] = obs[0]
+            gps["longitude"] = obs[1]
+        return gps
+
+    location = property(_get_location)
