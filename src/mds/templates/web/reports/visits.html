@@ -1,5 +1,6 @@
 {% extends 'web/base.html' %}
 {% load i18n %}
+{% load google %}
 {% block title %}{% trans 'Patient Visits' %}{% endblock %}
 {% block extrascript %}{% endblock %}
 {% block extrastyle %}
@@ -110,9 +111,36 @@ $('#id_date').change(function() {
 </div>
 <ul>
 {% for encounter in encounters %}
-    <li class="{% cycle 'even-row' 'odd-row' %}">{{ encounter }}</li>
+    {% with location=encounter.location %}
+    <li class="{% cycle 'even-row' 'odd-row' %}">
+    <h4>{{ encounter.created }}, {{ encounter.subject }}</h4>
+    {{ encounter.procedure }}
+    </li>
+    {% endwith %}
 {% endfor %}
 </ul>
 </div>
-
+<div id="map" style="width: 500px; height: 400px;"></div>
+<script>
+    function initMap() {
+    var myLatLng = { lat: {% GOOGLE_MAP_LAT %}, lng: {% GOOGLE_MAP_LNG %} };
+    var map = new google.maps.Map(document.getElementById('map'), {
+        zoom: 12,
+        center: myLatLng
+    });
+    var markers = [];
+    var marker;
+    {% for encounter in encounters %}
+    markers.push(new google.maps.Marker({
+        position: new google.maps.LatLng({{ encounter.location.latitude}}, {{ encounter.location.longitude }}),
+        map: map
+        }));
+    {% endfor %}
+    var markerCluster = new MarkerClusterer(map, markers);
+    };
+    </script>
+    <script async defer
+        src="https://maps.googleapis.com/maps/api/js?key={% GOOGLE_API_KEY %}&signed_in=true&callback=initMap">
+    </script>
+  
 {% endblock content %}
