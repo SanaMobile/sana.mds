@@ -9,11 +9,6 @@
 {% block extrascript %}{% endblock %}
 {% block extrastyle %}
   <link rel="stylesheet" href="{{ STATIC_PREFIX }}web/css/reports.css">
-<style>
-.ui-datepicker-calendar {
-    display: none;
-}
-</style>
 {% endblock %}
 {% block header %}{% trans 'Patient Visits' %}{% endblock %}
 {% block content %}
@@ -34,17 +29,18 @@
             {% endfor %}
             </select>
         </td>
-        <td>{% trans 'Month' %} <input id="id_date" type="date" /></td>
+        <td>{% trans 'Start date' %} <input id="id_start_date" type="date" /></td>
+        <td>{% trans 'End date' %} <input id="id_end_date" type="date" /></td>
     <tr>
     </table>
     <hr/>
 </div>
 <script>
-function reload(selected, date){
+function reload(selected, startdate, enddate){
     var q = { 
         "selected" : selected,
-        "month" : date.getUTCMonth() + 1,
-        "year" : date.getUTCFullYear() 
+        "start": startdate.toISOString(),
+        "end" : enddate.toISOString(),
     };
     var qs = $.param(q);
     window.location = "/mds/web/report/visits/?" + qs;
@@ -61,10 +57,10 @@ function changePeriod(selected, year,month){
 
 };
 $('#id_worker').change(function() {
-    reload($(this).val(), $('#id_date').datepicker('getDate'));
+    reload($(this).val(), $('#id_start_date').datepicker('getDate'),$('#id_end_date').datepicker('getDate'));
 });
 $('#id_date').change(function() {
-    reload($('#id_worker').val(),$(this).datepicker('getDate'));
+    reload($('#id_worker').val(), $('#id_start_date').datepicker('getDate'),$('#id_end_date').datepicker('getDate'));
 });
 
 </script>
@@ -72,37 +68,22 @@ $('#id_date').change(function() {
     // Displays Date picker pop up
     $(function(){
         $('input[type="date"]').datepicker({
-            buttonImageOnly: true,
             changeMonth: true,
             changeYear: true,
             showButtonPanel: true, 
-            dateFormat: 'yy-mm', 
+            dateFormat: 'yy-mm-dd', 
             altFormat: "yy-mm-dd",
             yearRange : "c-100:c+05",
-            onClose: function(dateText, inst) { 
-                var oldValue = $(this).data('oldValue') || "";
-                var oldValue = dateText+"-01";
-                var month = $("#ui-datepicker-div .ui-datepicker-month :selected").val();
-                var year = $("#ui-datepicker-div .ui-datepicker-year :selected").val();
-                var date = new Date(year, month, 1);
-                $(this).datepicker('setDate', new Date(year, month, 1));
-                var dateStr = $.datepicker.formatDate('yy-mm-dd', date);
-                if (dateStr !== oldValue) {
-                    changePeriod($('#id_worker').val(), year, parseInt(month) + 1);
-                }
-                $(this).data('oldValue',dateStr);
-            }
         }).prop('type','text');
-        var month = parseInt({{ month }}) -1;
-        $('#id_date').datepicker('setDate', new Date({{ year }}, month, 1));
-        //$('#id_date').val("{{ year }}-{{ month }}");
+        $('#id_start_date').datepicker('setDate', new Date('{{ start }}'));
+        $('#id_end_date').datepicker('setDate', new Date('{{ end }}'));
      }); 
 </script>
 <!-- load summary of assigned visits -->
 <div>
 <div class="" style="display:inline-block;">
   <h3>{% trans 'Summary' %} {% if selected %}{{ selected }}{% else %}{% trans 'All' %}{% endif %}</h3>
-  <h4>{% trans 'Month' %} {{ month }} {% trans 'Year' %} {{ year }}</h4>
+  <h4>{% trans 'From' %}: {{ start }} {% trans 'To' %}: {{ end }}</h4>
   <ul>
     <li>{% trans 'Tasks Due' %} {{ tasks }}</li>
     <li>{% trans 'Completed' %} {{ completed_tasks }}</li>
