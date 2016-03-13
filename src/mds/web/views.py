@@ -1252,6 +1252,7 @@ class ClientDownloadsView(TemplateView):
 def report_visits(request, **kwargs):
     ''' Renders a summary of subject encounters and assigned tasks
     '''
+    datefmt = '%Y-%m-%d'
     tmpl = 'web/reports/visits.html'
     # uuid of observer object
     selected = None
@@ -1261,31 +1262,38 @@ def report_visits(request, **kwargs):
     late_tasks = None
     # check any period params
     now = datetime.datetime.now()
-    # month to read report from
-    month = int(request.REQUEST.get('month', now.month))
-    # read to read report from
-    year = int(request.REQUEST.get('year', now.year))
-    selected_month = datetime.datetime(year, month, 1)
 
-    # set the actual start end
-    day_delta = datetime.timedelta(days=1)
-    start_date = selected_month - datetime.timedelta(days=1)
-    end_date = selected_month + datetime.timedelta(days=32)
-    end_date = end_date.replace(day=1)
+    # get start and end date strings
+    start_str = request.REQUEST.get('start', None)
+    end_str = request.REQUEST.get('end', None)
+    
+    # set the end datetime
+    if end_str:
+        end_date = datetime.datetime.strptime(end_str[:10],datefmt)
+    else:
+        end_date = now.replace(day=1) - datetime.timedelta(days=1)
+    
+    # set the start datetime
+    if start_str:
+        start_date = datetime.datetime.strptime(start_str[:10],datefmt )
+    elif end_str:
+        start_date = end_date - datetime.timedelta(days=30)
+    else:
+        start_date = end_date.replace(day=1)
 
     # If no kwargs we just return the all observers     
-    if kwargs:        
-        selected = kwargs.get('selected', "pppp")     
+    if kwargs:
+        selected = kwargs.get('selected', None)
     else:         
         selected = request.REQUEST.get('selected',None)
-    
+
     if selected:
         # get the observer from selected
         selected = Observer.objects.get(uuid=selected)
         # if selected we want to check the month and year
         tasks = EncounterTask.objects.filter(
                 assigned_to=selected.uuid,
-                due_on__month=month,
+                due_on__range=[start_date, end_date],
             ).count()
         late_tasks = EncounterTask.objects.filter(
                 assigned_to=selected.uuid,
@@ -1293,30 +1301,29 @@ def report_visits(request, **kwargs):
         ).exclude(status=2).count()
         completed_tasks = EncounterTask.objects.filter(
                 assigned_to=selected.uuid,
-                completed__month=int(month)
+                completed__range=[start_date, end_date]
         ).count()
         encounters = Encounter.objects.filter(
             observer=selected.uuid,
-            created__gt=start_date,
-            created__lt=end_date
+            created__range=[start_date, end_date]
         )
     else:
         tasks = EncounterTask.objects.filter(
-                due_on__lt=end_date,
-                due_on__gt=start_date
+                due_on__lte=end_date,
+                due_on__gte=start_date
             ).count()
         late_tasks = EncounterTask.objects.filter(
-                due_on__lt=end_date,
-                due_on__gt=start_date
+                due_on__lte=end_date,
+                due_on__gte=start_date
         ).exclude(status=2).count()
         completed_tasks = EncounterTask.objects.filter(
                 status=2,
-                completed__lt=end_date,
-                completed__gt=start_date
+                completed__lte=end_date,
+                completed__gte=start_date
         ).count()
         encounters = Encounter.objects.filter(
-            created__gt=start_date,
-            created__lt=end_date
+            created__gte=start_date,
+            created__lte=end_date
         )
         
     messages = [
@@ -1334,14 +1341,14 @@ def report_visits(request, **kwargs):
                 'portal': portal.nav(request),
                 'messages': messages,
                 'lang' :  lang,
-                'month': month,
-                'year': year,
                 'selected': selected,
                 'encounters':encounters,
                 'tasks': tasks,
                 'completed_tasks': completed_tasks,
                 'late_tasks': late_tasks,
                 'available_languages': get_available_languages(),
+                'start': start_date.strftime(datefmt),
+                'end': end_date.strftime(datefmt),
             }))
 
 
