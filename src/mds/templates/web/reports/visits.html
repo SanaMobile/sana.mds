@@ -2,9 +2,13 @@
 {% load i18n %}
 {% load google %}
 {% block title %}{% trans 'Patient Visits' %}{% endblock %}
+{% block srcscript %}
+  {{ block.super }} 
+  <script type="text/javascript" src="{{ STATIC_PREFIX }}web/js/maps.js"></script>
+{% endblock %}
 {% block extrascript %}{% endblock %}
 {% block extrastyle %}
-<link rel="stylesheet" href="{{ STATIC_PREFIX }}web/css/reports.css">
+  <link rel="stylesheet" href="{{ STATIC_PREFIX }}web/css/reports.css">
 <style>
 .ui-datepicker-calendar {
     display: none;
@@ -95,21 +99,21 @@ $('#id_date').change(function() {
      }); 
 </script>
 <!-- load summary of assigned visits -->
-<div class>
-<h3>{% trans 'Summary' %} {% if selected %}{{ selected }}{% else %}{% trans 'All' %}{% endif %}</h3>
-<h4>{% trans 'Month' %} {{ month }} {% trans 'Year' %} {{ year }}</h4>
-<ul>
-<li>{% trans 'Tasks Due' %} {{ tasks }}</li>
-<li>{% trans 'Completed' %} {{ completed_tasks }}</li>
-<li>{% trans 'Late' %} {{ late_tasks }}</li>
-</ul>
-</div>
 <div>
-<h3>{% trans 'Patient Visits' %}</h3>
-<div>
-{% trans 'Number of visits' %}:{{ encounters|length }} 
+<div class="" style="display:inline-block;">
+  <h3>{% trans 'Summary' %} {% if selected %}{{ selected }}{% else %}{% trans 'All' %}{% endif %}</h3>
+  <h4>{% trans 'Month' %} {{ month }} {% trans 'Year' %} {{ year }}</h4>
+  <ul>
+    <li>{% trans 'Tasks Due' %} {{ tasks }}</li>
+    <li>{% trans 'Completed' %} {{ completed_tasks }}</li>
+    <li>{% trans 'Late' %} {{ late_tasks }}</li>
+    <li>{% trans 'Number of visits' %}:{{ encounters|length }}</li>
+  </ul>
 </div>
-<div id="map" style="width: 500px; height: 400px;"></div>
+<div style="display:inline-block;">
+  <div id="map" class="toggle" style="height:684px;width:684px;zindex:-1"></div>
+</div>
+</div>
 <script>
     function initMap() {
     var myLatLng = { lat: {% GOOGLE_MAP_LAT %}, lng: {% GOOGLE_MAP_LNG %} };
@@ -117,26 +121,26 @@ $('#id_date').change(function() {
         zoom: 12,
         center: myLatLng
     });
-    var markers = [];
-    var marker;
     {% for encounter in encounters %}
-    markers.push(new google.maps.Marker({
-        position: new google.maps.LatLng({{ encounter.location.latitude}}, {{ encounter.location.longitude }}),
-        map: map
-        }));
+    addMarker("{{ encounter.observer.uuid }}",
+        map,{{ encounter.location.latitude}}, 
+        {{ encounter.location.longitude }});
     {% endfor %}
-    var markerCluster = new MarkerClusterer(map, markers);
     };
     </script>
     <script async defer
         src="https://maps.googleapis.com/maps/api/js?key={% GOOGLE_API_KEY %}&signed_in=true&callback=initMap">
     </script>
+<div>
+<h3>{% trans 'Patient Visits' %}</h3>
+</div>
 <ul>
 {% for encounter in encounters %}
     {% with location=encounter.location %}
     <li class="{% cycle 'even-row' 'odd-row' %}">
     <h4>{{ encounter.created }}, {{ encounter.subject }}</h4>
-    {{ encounter.procedure }}
+    {{ encounter.procedure }}<br/>
+    {{ encounter.observer }}
     </li>
     {% endwith %}
 {% endfor %}
