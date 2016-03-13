@@ -62,8 +62,8 @@ class Observation(models.Model):
     
     voided = models.BooleanField(default=False)
     
-    observer = models.ForeignKey('Observer', to_field='uuid', blank=True)
-    ''' Who collected the data. '''
+    #observer = models.ForeignKey('Observer', to_field='uuid', blank=True)
+    #''' Who collected the data. '''
     
     @property
     def subject(self):
