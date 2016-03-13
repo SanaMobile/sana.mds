@@ -33,4 +33,7 @@ class Observer(models.Model):
     voided = models.BooleanField(default=False)
 
     def __unicode__(self):
-        return unicode(self.user)
+        if self.user.first_name and self.user.last_name:
+            return u"{0}, {1}".format(self.user.last_name, self.user.first_name)
+        else:
+            return unicode(self.user)

@@ -56,8 +56,8 @@ class SurgicalAdvocate(Observer):
     def location_code(self):
         return self.location.code if self.location else "00000000"
 
-    def __unicode__(self):
-        return u'%s - %s' % (self.location_code,self.user)
+    #def __unicode__(self):
+    #    return u'%s - %s' % (self.location_code,self.user)
 
 class SurgicalSubject(Subject):
     class Meta:
