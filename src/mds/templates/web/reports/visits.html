@@ -77,7 +77,13 @@ function reload(selected, startdate, enddate){
         "selected" : selected,
         "start": startdate.toISOString(),
         "end" : enddate.toISOString(),
+        "gender": $('#id_gender').val(),
+        "min_age": $('#id_min_age').val(),
+        "max_age": $('#id_max_age').val(),
+        "operation": $('#id_operation').val(),
+        "location": $('#id_location').val()
     };
+    var gender = $('#id_gender').val(); 
     var qs = $.param(q);
     window.location = "/mds/web/report/visits/?" + qs;
 
