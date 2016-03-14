@@ -14,10 +14,10 @@
 {% block content %}
 <!-- select observer -->
 <div class="summary-selector">
-    <h2>{% trans 'Select worker' %}</h2>
     <table>
     <tr>
         <td>
+            <label>{% trans 'Select worker' %}</h2></label>
             <select id="id_worker">
                 <option value="" selected="selected">------------</option>
             {% for object in observers %}
@@ -31,6 +31,7 @@
         </td>
         <td>{% trans 'Start date' %} <input id="id_start_date" type="date" /></td>
         <td>{% trans 'End date' %} <input id="id_end_date" type="date" /></td>
+        <td><button id="id_submit">{% trans 'Update' %}</button></td>
     <tr>
     </table>
     <hr/>
@@ -59,7 +60,7 @@ function changePeriod(selected, year,month){
 $('#id_worker').change(function() {
     reload($(this).val(), $('#id_start_date').datepicker('getDate'),$('#id_end_date').datepicker('getDate'));
 });
-$('#id_date').change(function() {
+$('#id_submit').click(function() {
     reload($('#id_worker').val(), $('#id_start_date').datepicker('getDate'),$('#id_end_date').datepicker('getDate'));
 });
 
@@ -81,21 +82,13 @@ $('#id_date').change(function() {
 </script>
 <!-- load summary of assigned visits -->
 <div>
-<div class="" style="display:inline-block;">
-  <h3>{% trans 'Summary' %} {% if selected %}{{ selected }}{% else %}{% trans 'All' %}{% endif %}</h3>
-  <h4>{% trans 'From' %}: {{ start }} {% trans 'To' %}: {{ end }}</h4>
-  <ul>
-    <li>{% trans 'Tasks Due' %} {{ tasks }}</li>
-    <li>{% trans 'Completed' %} {{ completed_tasks }}</li>
-    <li>{% trans 'Late' %} {{ late_tasks }}</li>
-    <li>{% trans 'Number of visits' %}:{{ encounters|length }}</li>
-  </ul>
-</div>
-<div style="display:inline-block;">
-  <div id="map" class="toggle" style="height:684px;width:684px;zindex:-1"></div>
+<div style="display:block;">
+  <div id="map" class="toggle" style="height:684px;width:100%;zindex:-1"></div>
 </div>
 </div>
 <script>
+    var w = window.innerWidth - 32;
+    $('#map').width(w);
     function initMap() {
     var myLatLng = { lat: {% GOOGLE_MAP_LAT %}, lng: {% GOOGLE_MAP_LNG %} };
     var map = new google.maps.Map(document.getElementById('map'), {
@@ -112,6 +105,15 @@ $('#id_date').change(function() {
     <script async defer
         src="https://maps.googleapis.com/maps/api/js?key={% GOOGLE_API_KEY %}&signed_in=true&callback=initMap">
     </script>
+<div class="" style="display:inline-block;">
+  <h3>{% trans 'Summary' %}: {% if selected %}{{ selected }}{% else %}{% trans 'All' %}{% endif %} {% trans 'From' %}: {{ start }} {% trans 'To' %}: {{ end }}</h3>
+  <ul>
+    <li>{% trans 'Tasks Due' %}: {{ tasks }}</li>
+    <li>{% trans 'Completed' %}: {{ completed_tasks }}</li>
+    <li>{% trans 'Late' %}: {{ late_tasks }}</li>
+    <li>{% trans 'Number of visits' %}: {{ encounters|length }}</li>
+  </ul>
+</div>
 <div>
 <h3>{% trans 'Patient Visits' %}</h3>
 </div>
@@ -119,9 +121,16 @@ $('#id_date').change(function() {
 {% for encounter in encounters %}
     {% with location=encounter.location %}
     <li class="{% cycle 'even-row' 'odd-row' %}">
+    <div id="id_{{ encounter.uuid }}">
     <h4>{{ encounter.created }}, {{ encounter.subject }}</h4>
     {{ encounter.procedure }}<br/>
     {{ encounter.observer }}
+    </div>
+    <script>
+        $('#id_{{ encounter.uuid }}').click(function() {
+            window.open("{% url 'web:encounter-detail' encounter.id %}");
+        });
+    </script>
     </li>
     {% endwith %}
 {% endfor %}
