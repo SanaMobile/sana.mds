@@ -14,10 +14,10 @@
 {% block content %}
 <!-- select observer -->
 <div class="summary-selector">
-    <table>
-    <tr>
-        <td>
-            <label>{% trans 'Select worker' %}</h2></label>
+    <div>
+    <ul>
+        <li>
+            <label>{% trans 'Select worker' %}</label>
             <select id="id_worker">
                 <option value="" selected="selected">------------</option>
             {% for object in observers %}
@@ -28,12 +28,55 @@
                 {% endif %}
             {% endfor %}
             </select>
-        </td>
-        <td>{% trans 'Start date' %} <input id="id_start_date" type="date" /></td>
-        <td>{% trans 'End date' %} <input id="id_end_date" type="date" /></td>
-        <td><button id="id_submit">{% trans 'Update' %}</button></td>
-    <tr>
-    </table>
+        </li>
+        <li>{% trans 'Start date' %} <input id="id_start_date" type="date" /></li>
+        <li>{% trans 'End date' %} <input id="id_end_date" type="date" /></li>
+        <li>
+            {% trans 'Operation' %}
+            <select id="id_operation">
+                <option value="" selected="selected">------------</option>
+            {% for object in operations %}
+                {% if object == operation %}
+                    <option value="{{ object.0 }}" selected>{{ object.1 }}</option>
+                {% else %}
+                    <option value="{{ object.0 }}">{{ object.1 }}</option>
+                {% endif %}
+            {% endfor %}
+            </select>
+        </li>
+    </ul>
+    </div>
+    <hr/>
+    <div>
+    <ul>
+        <li>
+            <label>{% trans 'Location' %}</label>
+            <select id="id_location">
+                <option value="" selected="selected">------------</option>
+            {% for object in locations %}
+                {% if object.uuid == location.uuid %}
+                    <option value="{{ object.uuid }}" selected>{{ object }}</option>
+                {% else %}
+                    <option value="{{ object.uuid }}">{{ object }}</option>
+                {% endif %}
+            {% endfor %}
+            </select>
+        </li>
+        <li>
+            <label for="id_gender">{% trans 'Gender' %}</label>
+            <select id="id_gender">
+                <option value="" selected="selected">------------</option>
+                <option value="M">{% trans 'Male' %}</option>
+                <option value="F">{% trans 'Female' %}</option>
+            </select>
+        </li>
+        <li><label>{% trans 'Min age' %}</label><input id="id_min_age" type="number" /></li>
+        <li><label>{% trans 'Max age' %}</label><input id="id_max_age" type="number" /></li>
+        </ul>
+        </div>
+        <div>
+          <button id="id_submit">{% trans 'Update' %}</button>
+        </div>
     <hr/>
 </div>
 <script>

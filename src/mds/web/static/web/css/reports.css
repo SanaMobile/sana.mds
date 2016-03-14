@@ -91,4 +91,5 @@ li.odd-row{
 }
 .summary-selector ul li{
   display: inline-block;
+  margin: 3px;
 }
