@@ -21,11 +21,7 @@
             <select id="id_worker">
                 <option value="" selected="selected">------------</option>
             {% for object in observers %}
-                {% if object.uuid == selected.uuid %}
-                    <option value="{{ object.uuid }}" selected>{{ object }}</option>
-                {% else %}
-                    <option value="{{ object.uuid }}">{{ object }}</option>
-                {% endif %}
+                <option value="{{ object.uuid }}" {% if object.uuid == selected.uuid %}selected{% endif %}>{{ object }}</option>
             {% endfor %}
             </select>
         </li>
@@ -36,11 +32,7 @@
             <select id="id_operation">
                 <option value="" selected="selected">------------</option>
             {% for object in operations %}
-                {% if object == operation %}
-                    <option value="{{ object.0 }}" selected>{{ object.1 }}</option>
-                {% else %}
-                    <option value="{{ object.0 }}">{{ object.1 }}</option>
-                {% endif %}
+                <option value="{{ object.0 }}" {% if object.0 == operation %}selected{% endif %}>{{ object.1 }}</option>
             {% endfor %}
             </select>
         </li>
@@ -144,6 +136,10 @@ $('#id_submit').click(function() {
         {{ encounter.location.longitude }});
     {% endfor %}
     };
+    window.addEventListener("resize", function(){
+        var w = window.innerWidth - 32;
+        $('#map').width(w);
+    });
     </script>
     <script async defer
         src="https://maps.googleapis.com/maps/api/js?key={% GOOGLE_API_KEY %}&signed_in=true&callback=initMap">
