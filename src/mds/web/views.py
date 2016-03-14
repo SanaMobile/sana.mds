@@ -62,8 +62,8 @@ def set_lang(response, lang="en"):
     set_cookie(response, CK_LANGUAGE, lang, days_expire = 365)
 
 def login(request,*args,**kwargs):    
-	
-	# set the next page
+    
+    # set the next page
     redirect_to = request.REQUEST.get("next", None)
     next_page = redirect_to if redirect_to else reverse("web:portal")
     
@@ -1318,7 +1318,9 @@ def report_visits(request, **kwargs):
     locations = Location.objects.all()
 
     # Type of operation
+    # Want only Encounters where Intake form has 
     operation = request.REQUEST.get('operation',None)
+    operations = settings.ALLOWED_OPERATIONS
     if operation:
         pass
     
@@ -1330,6 +1332,7 @@ def report_visits(request, **kwargs):
 
     if selected:
         squery['observer__uuid']=selected
+        squery['created__range']=[start_date, end_date]
         # get the observer from selected
         selected = Observer.objects.get(uuid=selected)
         # if selected we want to check the month and year
@@ -1345,6 +1348,7 @@ def report_visits(request, **kwargs):
                 assigned_to=selected.uuid,
                 completed__range=[start_date, end_date]
         ).count()
+        encounters = Encounter.objects.filter(**squery)
         encounters = Encounter.objects.filter(
             observer=selected.uuid,
             created__range=[start_date, end_date]
@@ -1367,12 +1371,13 @@ def report_visits(request, **kwargs):
             created__gte=start_date,
             created__lte=end_date
         )
-        
+
+    encounters = Encounter.objects.filter(**squery).exclude(concept__uuid__in=settings.INTAKE_CONCEPTS)
+    
     messages = [
         selected
     ]
-    
-    
+
     lang = get_and_activate(request)
     return render_to_response(
         tmpl, 
@@ -1385,6 +1390,10 @@ def report_visits(request, **kwargs):
                 'lang' :  lang,
                 'selected': selected,
                 'encounters':encounters,
+                'location': location,
+                'locations': locations,
+                'operations': operations,
+                'operation': operation,
                 'tasks': tasks,
                 'completed_tasks': completed_tasks,
                 'late_tasks': late_tasks,
