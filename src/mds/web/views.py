@@ -1260,6 +1260,11 @@ def report_visits(request, **kwargs):
     tasks = None
     completed_tasks = None
     late_tasks = None
+    
+    # start building encounter and task query
+    squery = {'voided':False}
+    tquery = {'voided':False}
+    
     # check any period params
     now = datetime.datetime.now()
 
@@ -1280,42 +1285,49 @@ def report_visits(request, **kwargs):
         start_date = end_date - datetime.timedelta(days=30)
     else:
         start_date = end_date.replace(day=1)
-
-    # If no kwargs we just return the all observers     
-    if kwargs:
-        selected = kwargs.get('selected', None)
-    else:         
-        selected = request.REQUEST.get('selected',None)
+    # set encounter date range
+    squery['created__range']=[start_date, end_date]
 
     # Patient - this one is a bit more complicated because the 
     # list of patients will be long and just selecting off a 
     # dropdown will be too cumbersome.  
     # HAS number, first name, last name, gender, age range should be the input variables.
-    squery = {}
+
     system_id = request.REQUEST.get('system_id',None)
     if system_id:
         squery['subject__system_id__exact'] = system_id
     given_name = request.REQUEST.get('given_name',None)
     if given_name:
-        squery["subject__given_name__contains"] = given_name
+        squery["subject__given_name__istartswith"] = given_name
     family_name = request.REQUEST.get('',None)
     if family_name:
-        squery["subject__family_name__contains"] = family_name
+        squery["subject__family_name__istartwith"] = family_name
     gender = request.REQUEST.get('gender',None)
     if gender:
-        squery["subject__gender__exact"] = given_name
+        squery["subject__gender__exact"] = gender
+    
+    # get dob range
+    # This should be measured at time of encounter
     min_age = request.REQUEST.get('min_age', None)
     if min_age:
-        squery["subject__dob__gte"] = min_age
+        end_dob = now - datetime.timedelta(years=int(min_age))
+        squery["subject__dob__lte"] = end_dob   
     max_age = request.REQUEST.get('max_age', None)
     if max_age:
-        squery["subject__dob__lte"] = given_name
-
-    # Location - the list of locations with 5 digit codes we previously imported.
-    location = request.REQUEST.get('location',None)
-    if location:
+        begin_dob = now - datetime.timedelta(years=int(max_age))
+        squery["subject__dob__gte"] = begin_dob
+    
+    # If no kwargs we just return the all observers
+    if kwargs:
+        selected = kwargs.get('selected', None)
+    else:
         pass
-    locations = Location.objects.all()
+    selected = request.REQUEST.get('selected',None)
+    observers = Observer.objects.filter(user__groups__name__in=['observer',])
+    observer = Observer.objects.get(uuid=selected) if selected else None
+    if selected:
+        squery['observer__uuid']=selected
+        tquery['assigned_to__uuid']=selected
 
     # Type of operation
     # Want only Encounters where Intake form has 
@@ -1323,57 +1335,34 @@ def report_visits(request, **kwargs):
     operations = settings.ALLOWED_OPERATIONS
     if operation:
         pass
+        
+    # Locations
+    location = request.REQUEST.get('location',None)
+    if location:
+        saqs = SurgicalSubject.objects.filter(location__uuid=location).values_list('uuid', flat=True)
+        squery['subject__uuid__in'] = saqs
+    locations = Location.objects.all()
     
-    # If no kwargs we just return the all observers
-    if kwargs:
-        selected = kwargs.get('selected', None)
-    else:
-        selected = request.REQUEST.get('selected',None)
-
-    if selected:
-        squery['observer__uuid']=selected
-        squery['created__range']=[start_date, end_date]
-        # get the observer from selected
-        selected = Observer.objects.get(uuid=selected)
-        # if selected we want to check the month and year
-        tasks = EncounterTask.objects.filter(
-                assigned_to=selected.uuid,
-                due_on__range=[start_date, end_date],
-            ).count()
-        late_tasks = EncounterTask.objects.filter(
-                assigned_to=selected.uuid,
-                due_on__lt=now,
-        ).exclude(status=2).count()
-        completed_tasks = EncounterTask.objects.filter(
-                assigned_to=selected.uuid,
-                completed__range=[start_date, end_date]
-        ).count()
-        encounters = Encounter.objects.filter(**squery)
-        encounters = Encounter.objects.filter(
-            observer=selected.uuid,
-            created__range=[start_date, end_date]
-        )
-    else:
-        tasks = EncounterTask.objects.filter(
-                due_on__lte=end_date,
-                due_on__gte=start_date
-            ).count()
-        late_tasks = EncounterTask.objects.filter(
-                due_on__lte=end_date,
-                due_on__gte=start_date
-        ).exclude(status=2).count()
-        completed_tasks = EncounterTask.objects.filter(
-                status=2,
-                completed__lte=end_date,
-                completed__gte=start_date
-        ).count()
-        encounters = Encounter.objects.filter(
-            created__gte=start_date,
-            created__lte=end_date
-        )
-
+    # Set the encounter queryset
     encounters = Encounter.objects.filter(**squery).exclude(concept__uuid__in=settings.INTAKE_CONCEPTS)
     
+    # get task information
+    tquery_range = [start_date, end_date]
+    
+    # if selected we want to check the month and year
+    tasks = EncounterTask.objects.filter(
+                due_on__range=tquery_range,
+                **tquery
+            ).count()
+    late_tasks = EncounterTask.objects.filter(
+        due_on__lt=now,
+        **tquery 
+    ).exclude(status=2).count()
+    completed_tasks = EncounterTask.objects.filter(
+        completed__range=[start_date, end_date],
+        status=2,
+        **tquery 
+    ).count()
     messages = [
         selected
     ]
@@ -1384,11 +1373,11 @@ def report_visits(request, **kwargs):
         context_instance=RequestContext(
             request,
             { 
-                'observers': Observer.objects.all(),
+                'observers': observers,
                 'portal': portal.nav(request),
                 'messages': messages,
                 'lang' :  lang,
-                'selected': selected,
+                'selected': observer,
                 'encounters':encounters,
                 'location': location,
                 'locations': locations,
