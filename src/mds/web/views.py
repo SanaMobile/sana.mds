@@ -1287,7 +1287,49 @@ def report_visits(request, **kwargs):
     else:         
         selected = request.REQUEST.get('selected',None)
 
+    # Patient - this one is a bit more complicated because the 
+    # list of patients will be long and just selecting off a 
+    # dropdown will be too cumbersome.  
+    # HAS number, first name, last name, gender, age range should be the input variables.
+    squery = {}
+    system_id = request.REQUEST.get('system_id',None)
+    if system_id:
+        squery['subject__system_id__exact'] = system_id
+    given_name = request.REQUEST.get('given_name',None)
+    if given_name:
+        squery["subject__given_name__contains"] = given_name
+    family_name = request.REQUEST.get('',None)
+    if family_name:
+        squery["subject__family_name__contains"] = family_name
+    gender = request.REQUEST.get('gender',None)
+    if gender:
+        squery["subject__gender__exact"] = given_name
+    min_age = request.REQUEST.get('min_age', None)
+    if min_age:
+        squery["subject__dob__gte"] = min_age
+    max_age = request.REQUEST.get('max_age', None)
+    if max_age:
+        squery["subject__dob__lte"] = given_name
+
+    # Location - the list of locations with 5 digit codes we previously imported.
+    location = request.REQUEST.get('location',None)
+    if location:
+        pass
+    locations = Location.objects.all()
+
+    # Type of operation
+    operation = request.REQUEST.get('operation',None)
+    if operation:
+        pass
+    
+    # If no kwargs we just return the all observers
+    if kwargs:
+        selected = kwargs.get('selected', None)
+    else:
+        selected = request.REQUEST.get('selected',None)
+
     if selected:
+        squery['observer__uuid']=selected
         # get the observer from selected
         selected = Observer.objects.get(uuid=selected)
         # if selected we want to check the month and year
