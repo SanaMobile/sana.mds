@@ -84,3 +84,11 @@ li.odd-row{
  padding-bottom: 16px;
  padding-left: 10px;
 }
+.summary-selector ul{
+  display: block;
+  margin: 3px;
+
+}
+.summary-selector ul li{
+  display: inline-block;
+}

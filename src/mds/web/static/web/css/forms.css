@@ -47,7 +47,7 @@
     text-align: right;
     padding-right: 16px;
 }
-@media screen and (max-width: 800px) {
+@media screen and (max-width: 1920px) {
 .content-list li ul {
     display: block;
     padding: 0px;

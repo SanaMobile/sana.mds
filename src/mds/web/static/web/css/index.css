@@ -122,7 +122,7 @@ a.listfooter {
     margin-right: 196px;
 }
 
-@media screen and (max-width: 800px){
+@media screen and (max-width: 1920px){
 .main-content {
     margin-right: 0px;
 }
@@ -158,7 +158,7 @@ a.listfooter {
     min-height: 56px;
 }
 
-@media screen and (max-width: 800px)
+@media screen and (max-width: 1920px)
 .main-content > .main-content-header  {
     margin-right: 0px;
 }
@@ -207,7 +207,7 @@ a.listfooter {
     width: 100%;
     text-decoration: none;
 }
-@media screen and (max-width: 800px)
+@media screen and (max-width: 1920px)
     .main-content > .main-content-body {
         margin-left: 3px;
         margin-right: 3px;
@@ -226,7 +226,7 @@ a.listfooter {
     margin-left: 3px;
 }
 
-@media screen and (max-width: 800px)
+@media screen and (max-width: 1920px)
     .main-content > .main-content-body > .main-content-body-inner {
         margin-left: 3px;
         margin-right: 3px;
