@@ -46,11 +46,7 @@
             <select id="id_location">
                 <option value="" selected="selected">------------</option>
             {% for object in locations %}
-                {% if object.uuid == location.uuid %}
-                    <option value="{{ object.uuid }}" selected>{{ object }}</option>
-                {% else %}
-                    <option value="{{ object.uuid }}">{{ object }}</option>
-                {% endif %}
+                <option value="{{ object.uuid }}" {% if object.uuid == location %}selected{% endif %}>{{ object }}</option>
             {% endfor %}
             </select>
         </li>
@@ -58,8 +54,9 @@
             <label for="id_gender">{% trans 'Gender' %}</label>
             <select id="id_gender">
                 <option value="" selected="selected">------------</option>
-                <option value="M">{% trans 'Male' %}</option>
-                <option value="F">{% trans 'Female' %}</option>
+                {% for object in genders %}
+                <option value="{{ object.0 }}" {% if gender == object.0 %}selected{% endif %}>{% trans object.1 %}</option>
+                {% endfor %}
             </select>
         </li>
         <li><label>{% trans 'Min age' %}</label><input id="id_min_age" type="number" /></li>
@@ -68,10 +65,33 @@
         </div>
         <div>
           <button id="id_submit">{% trans 'Update' %}</button>
+          <button id="id_export">{% trans 'Download CSV' %}</button>
+          <button id="id_export_map">{% trans 'Export Map' %}</button>
         </div>
     <hr/>
 </div>
 <script>
+function export_csv(selected, startdate, enddate){
+    var q = { 
+        "selected" : selected,
+        "start": startdate.toISOString(),
+        "end" : enddate.toISOString(),
+        "gender": $('#id_gender').val(),
+        "min_age": $('#id_min_age').val(),
+        "max_age": $('#id_max_age').val(),
+        "operation": $('#id_operation').val(),
+        "location": $('#id_location').val(),
+        "export_csv": true 
+    };
+    var qs = $.param(q);
+    window.location = "/mds/web/report/visits/?" + qs;
+};
+function export_map(){
+    var content = window.document.getElementById("map"); // get you map details
+    var newWindow = window.open(); // open a new window
+    newWindow.document.write(content.innerHTML); // write the map into the new window
+    newWindow.print(); // print the new window
+};
 function reload(selected, startdate, enddate){
     var q = { 
         "selected" : selected,
@@ -105,6 +125,12 @@ $('#id_submit').click(function() {
     reload($('#id_worker').val(), $('#id_start_date').datepicker('getDate'),$('#id_end_date').datepicker('getDate'));
 });
 
+$('#id_export').click(function() {
+    reload($('#id_worker').val(), $('#id_start_date').datepicker('getDate'),$('#id_end_date').datepicker('getDate'));
+});
+$('#id_export_map').click(function() {
+    export_map();
+});
 </script>
 <script>
     // Displays Date picker pop up
@@ -123,9 +149,12 @@ $('#id_submit').click(function() {
 </script>
 <!-- load summary of assigned visits -->
 <div>
-<div style="display:block;">
-  <div id="map" class="toggle" style="height:684px;width:100%;zindex:-1"></div>
-</div>
+    <div>
+        <h3>{% trans 'Visit Summary' %}: {% trans 'From' %}: {{ start }} {% trans 'To' %}: {{ end }}</h3>
+    </div>
+    <div style="display:block;">
+        <div id="map" style="height:684px;width:100%;zindex:-1"></div>
+    </div>
 </div>
 <script>
     var w = window.innerWidth - 32;
@@ -150,9 +179,9 @@ $('#id_submit').click(function() {
     <script async defer
         src="https://maps.googleapis.com/maps/api/js?key={% GOOGLE_API_KEY %}&signed_in=true&callback=initMap">
     </script>
-<div class="" style="display:inline-block;">
-  <h3>{% trans 'Summary' %}: {% if selected %}{{ selected }}{% else %}{% trans 'All' %}{% endif %} {% trans 'From' %}: {{ start }} {% trans 'To' %}: {{ end }}</h3>
+<div class="summary" style="display:inline-block;">
   <ul>
+    <li></li>
     <li>{% trans 'Tasks Due' %}: {{ tasks }}</li>
     <li>{% trans 'Completed' %}: {{ completed_tasks }}</li>
     <li>{% trans 'Late' %}: {{ late_tasks }}</li>
