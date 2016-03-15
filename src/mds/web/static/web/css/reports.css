@@ -93,3 +93,12 @@ li.odd-row{
   display: inline-block;
   margin: 3px;
 }
+.summary ul{
+  display: block;
+  margin: 3px;
+
+}
+.summary ul li{
+  display: inline-block;
+  margin: 3px;
+}
