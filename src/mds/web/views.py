@@ -1264,6 +1264,7 @@ def report_visits(request, **kwargs):
     # start building encounter and task query
     squery = {'voided':False}
     tquery = {'voided':False}
+    encounters = Encounter.objects.all()
     
     # check any period params
     now = datetime.datetime.now()
@@ -1333,15 +1334,23 @@ def report_visits(request, **kwargs):
     # Want only Encounters where Intake form has 
     operation = request.REQUEST.get('operation',None)
     operations = settings.ALLOWED_OPERATIONS
+    sqs = []
     if operation:
-        pass
-        
+        sqs = Observation.objects.filter(value_text__exact=operation).select_related('encounter').select_related('subject').values_list('uuid', flat=True)
+        squery['subject__uuid__in'] = [x for x in sqs]
+
     # Locations
+    saqs = []
     location = request.REQUEST.get('location',None)
     if location:
         saqs = SurgicalSubject.objects.filter(location__uuid=location).values_list('uuid', flat=True)
-        squery['subject__uuid__in'] = saqs
-    locations = Location.objects.all()
+        if sqs:
+            ls = squery['subject__uuid__in']
+            for x in saqs:
+                if not x in ls:
+                    ls.append(x)
+            squery['subject__uuid__in'] = ls
+    locations = Location.objects.filter()
     
     # Set the encounter queryset
     encounters = Encounter.objects.filter(**squery).exclude(concept__uuid__in=settings.INTAKE_CONCEPTS)
@@ -1389,6 +1398,8 @@ def report_visits(request, **kwargs):
                 'available_languages': get_available_languages(),
                 'start': start_date.strftime(datefmt),
                 'end': end_date.strftime(datefmt),
+                'gender': gender,
+                'genders': settings.GENDER_CHOICES
             }))
 
 
