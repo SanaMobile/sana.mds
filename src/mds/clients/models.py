@@ -3,6 +3,11 @@ import mimetypes, os
 
 from django.db import models
 
+__all__ = [
+    "Client",
+    "Crashreport"
+]
+
 class Client(models.Model):
 
     version = models.CharField(max_length=255)
