@@ -8,7 +8,7 @@ from django.conf.urls import patterns, url, include
 
 from .resources import *
 # overrides the default rsources
-from mds.core.extensions.resources import rsrc_anm as rsrc_observer, rsrc_patient as rsrc_subject
+from mds.core.extensions.resources import rsrc_anm as rsrc_observer, rsrc_patient as rsrc_subject, rsrc_anmsession as rsrc_session
 
 # non-restful urls
 urlpatterns = patterns(    
