@@ -133,4 +133,7 @@ EXTENSIONS = (("text/plain", "txt"),
              ("application/xml", "xml"),
              ("application/octet-stream", "bin"))
              
-
+try:
+    from mds.clients.settings import *
+except ImportError, exp:
+    pass
