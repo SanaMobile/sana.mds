@@ -1,10 +1,88 @@
 """ Handler extensions
 """
+import logging
+import cjson
+
+from django.conf import settings
+from django.contrib.auth import authenticate
+from django.contrib.auth.models import User
+
+from mds.api import LOGGER
 from mds.api.handlers import DispatchingHandler
 from mds.api.decorators import logged
+from mds.api.responses import succeed, fail, error
+from mds.api.signals import EventSignal, EventSignalHandler
+from mds.core.forms import SessionForm
 
 from .forms import ANMForm, PatientForm
 from .models import ANM, Patient
+
+__all__ = [
+    "ANMSessionHandler",
+    "ANMHandler"
+    "PatientHandler"
+    ]
+
+@logged     
+class ANMSessionHandler(DispatchingHandler):
+    """ Handles session auth requests. """
+    allowed_methods = ('POST',)
+    signals = { LOGGER:( EventSignal(), EventSignalHandler(Event))}
+    form = SessionForm
+    #model = None
+    
+    def create(self,request):
+        try:
+            content_type = request.META.get('CONTENT_TYPE', None)
+            logging.debug(content_type)
+            is_json = 'json' in content_type
+            logging.debug("is_json: %s" % is_json)
+            if is_json:
+                raw_data = request.read()
+                data = cjson.decode(raw_data)
+            else:
+                data = self.flatten_dict(request.POST)
+            
+            username = data.get('username', 'empty')
+            password = data.get('password','empty')
+            if not settings.TARGET == 'SELF':
+                instance = User(username=username)
+                auth = {'username':username, 'password':password }
+                result = backends.create('Session', auth, instance)
+                if not result:
+                    return fail([],errors=["Observer does not exist",],code=404)
+                # Create a user or fetch existin and update password
+                user,created = User.objects.get_or_create(username=result.user.username)
+                user.set_password(password)
+                user.save()
+                
+                # should have returned an Observer instance here
+                observers = ANM.objects.filter(user__username=user.username)
+                # If none were returned we need to create the Observer
+                if observers.count() == 0:
+                    observer = Observer(
+                        user=user,
+                        uuid = result.uuid)
+                    observer.save()
+                else:
+                    # Observer already exists so we don't have to do 
+                    # anything since password cache is updated
+                    observer = observers[0]
+                return succeed(list(observer))
+            else:
+                user = authenticate(username=username, password=password)
+                if user is not None:
+                    #observer = Observer.objects.get(user=user)
+                    return succeed(ANM.objects.filter(user__username=user.username))
+                else:
+                    msg = "Invalid credentials"
+                    logging.warn(msg)
+                    return fail(msg)
+        except Exception as e:
+            msg = "Internal Server Error"
+            logging.error(unicode(e))
+            logtb()
+            return error(msg)
 
 @logged
 class ANMHandler(DispatchingHandler):
