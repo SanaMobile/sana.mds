@@ -9,7 +9,7 @@ from PIL import Image
 from django.db import models
 from mds.api.utils import make_uuid
 
-__all__ = ["AbstractSubject","Subject","SurgicalSubject"]
+__all__ = ["AbstractSubject","Subject"]
 
 class AbstractSubject(models.Model):
     """ The entity about whom data is collected. """
