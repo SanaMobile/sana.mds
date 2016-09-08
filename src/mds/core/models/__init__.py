@@ -30,4 +30,7 @@ __all__ = ['Concept', 'Relationship','RelationshipCategory',
            'Observer',
            'Procedure',
            'Subject',
+           # Extensions
+           "ANM",
+           "Patient"
            ]
