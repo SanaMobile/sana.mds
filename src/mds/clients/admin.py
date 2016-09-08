@@ -9,5 +9,9 @@ from .models import *
 
 class ClientAdmin(admin.ModelAdmin):
     pass
-
 admin.site.register(Client)
+
+class CrashReportAdmin(admin.ModelAdmin):
+    list_display = ['created', 'device']
+    list_filter = ['created', 'device']
+admin.site.register(CrashReport, CrashReportAdmin)
