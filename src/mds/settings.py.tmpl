@@ -147,6 +147,7 @@ MIDDLEWARE_CLASSES = (
     'django.middleware.common.CommonMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
+    'mds.clients.middleware.APIKeyAuthenticator',
     'mds.api.contrib.middleware.LoggingMiddleware',
 )
 """Don't touch this unless you know what you are doing."""
