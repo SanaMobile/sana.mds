@@ -7,6 +7,7 @@ Created on Aug 11, 2012
 from django.http import HttpResponse
 import sys,traceback
 import collections
+import cjson
 
 def render_json_response(data):
     return JSONResponse(data)
@@ -93,3 +94,17 @@ def error(exception):
 
 def unauthorized(message):
     return fail(message, Codes.UNAUTHORIZED)
+    
+def json_succeed(data, code=200):
+    return JSONResponse(cjson.encode(succeed(data, code=code)))
+    
+def json_fail(data, code=404, errors=[]):
+    return JSONResponse(cjson.encode(fail(data, code=code, erros=errors)))
+    
+def json_error(exception):
+    return JSONResponse(cjson.encode(error(exception)))
+    
+def json_unauthorized(message):
+    return JSONResponse(cjson.encode(unauthorized(exception)))
+    
+    
