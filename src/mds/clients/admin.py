@@ -8,7 +8,8 @@ from django.contrib import admin
 from .models import *
 
 class ClientAdmin(admin.ModelAdmin):
-    pass
+    list_display = ['version', 'version_code']
+    list_filter = ['version', 'version_code']
 admin.site.register(Client)
 
 class CrashReportAdmin(admin.ModelAdmin):
