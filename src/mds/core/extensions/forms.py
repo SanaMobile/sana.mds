@@ -9,7 +9,7 @@ from django import forms
 from .models import ANM, Patient
 
 __all__ = [
-    'ANMForm'
+    'ANMForm',
     'PatientForm'
     ]
 

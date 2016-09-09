@@ -13,13 +13,14 @@ from mds.api.decorators import logged
 from mds.api.responses import succeed, fail, error
 from mds.api.signals import EventSignal, EventSignalHandler
 from mds.core.forms import SessionForm
+from mds.core.models import Event
 
 from .forms import ANMForm, PatientForm
 from .models import ANM, Patient
 
 __all__ = [
     "ANMSessionHandler",
-    "ANMHandler"
+    "ANMHandler",
     "PatientHandler"
     ]
 
@@ -114,7 +115,7 @@ class PatientHandler(DispatchingHandler):
         "system_id",
         "secondary_id",
         "caregiver_name",
-        "secondary_caregiver_name"
+        "secondary_caregiver_name",
         ("location",("name","uuid")),
         "modified",
         "created",
