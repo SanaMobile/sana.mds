@@ -5,7 +5,7 @@ from django.db import models
 
 __all__ = [
     "Client",
-    "Crashreport"
+    "CrashReport"
 ]
 
 class Client(models.Model):
