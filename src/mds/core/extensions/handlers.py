@@ -78,7 +78,7 @@ class ANMSessionHandler(DispatchingHandler):
                 else:
                     msg = "Invalid credentials"
                     logging.warn(msg)
-                    return fail(msg)
+                    return fail([], code=404, errors=[msg,])
         except Exception as e:
             msg = "Internal Server Error"
             logging.error(unicode(e))
