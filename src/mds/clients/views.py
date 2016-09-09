@@ -14,14 +14,14 @@ def version(request):
     authenticated = getattr(request, "authenticated", False)
     if not authenticated:
         return json_unauthorized("")
-    obj = Client.objects.latest('created')
+    obj = Client.objects.order_by('-version_code').first()
     return json_succeed({ "version": obj.version_code })
         
 def download_latest(request):
     authenticated = getattr(request, "authenticated", False)
     if not authenticated:
         return json_unauthorized("")
-    obj = Client.objects.latest('created')
+    obj = Client.objects.order_by('-version_code').first()
     data = obj.app
     fname = data.name.split('/')[-1]
     response = HttpResponse(data,
