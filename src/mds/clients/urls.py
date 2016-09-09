@@ -8,7 +8,7 @@ admin.autodiscover()
 
 urlpatterns = patterns(
     '',
-    url(r'^$', 'clients.views.version', name="android"),
-    url(r'^download/$', 'clients.views.download_latest'),
-    url(r'^report/submit/$', 'clients.views.submit_crash'),
+    url(r'^$', 'mds.clients.views.version', name="android"),
+    url(r'^download/$', 'mds.clients.views.download_latest'),
+    url(r'^report/submit/$', 'mds.clients.views.submit_crash'),
     )
