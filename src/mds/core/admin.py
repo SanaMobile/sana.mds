@@ -96,4 +96,12 @@ admin.site.register(Procedure,ProcedureAdmin)
 admin.site.register(Subject,SubjectAdmin)
 admin.site.register(Event)
 
+#extension models
+class ANMAdmin(admin.ModelAdmin):
+    model = ANM
+admin.site.register(ANM, ANMAdmin)
+class PatientAdmin(admin.ModelAdmin):
+    model = Patient
+admin.site.register(Patient, PatientAdmin)
+
 #admin.site.register(ClientEventLog, ClientEventLogAdmin)
