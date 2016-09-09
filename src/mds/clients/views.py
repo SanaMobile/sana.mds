@@ -11,12 +11,14 @@ FPATH = "/media/clients/app-android.apk"
 VERSION = "2"
 
 def version(request):
+    authenticated = getattr(request, "authenticated", False)
     if not authenticated:
         return json_unauthorized("")
     obj = Client.objects.latest('created')
     return json_succeed({ "version": obj.version_code })
         
 def download_latest(request):
+    authenticated = getattr(request, "authenticated", False)
     if not authenticated:
         return json_unauthorized("")
     obj = Client.objects.latest('created')
@@ -30,6 +32,7 @@ def download_latest(request):
     return response
     
 def submit_crash(request):
+    authenticated = getattr(request, "authenticated", False)
     if not authenticated:
         return json_unauthorized("")
     if request.method == 'POST':
