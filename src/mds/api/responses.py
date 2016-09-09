@@ -99,12 +99,11 @@ def json_succeed(data, code=200):
     return JSONResponse(cjson.encode(succeed(data, code=code)))
     
 def json_fail(data, code=404, errors=[]):
-    return JSONResponse(cjson.encode(fail(data, code=code, erros=errors)))
+    return JSONResponse(cjson.encode(fail(data, code=code, errors=errors)))
     
 def json_error(exception):
     return JSONResponse(cjson.encode(error(exception)))
     
 def json_unauthorized(message):
-    return JSONResponse(cjson.encode(unauthorized(exception)))
-    
+    return JSONResponse(cjson.encode(unauthorized(message)))
     
