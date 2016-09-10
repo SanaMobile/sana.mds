@@ -77,7 +77,7 @@ class SurgicalSubjectAdmin(admin.ModelAdmin):
 
 class LocationAdmin(admin.ModelAdmin):
     model = Location
-    list_display = ('name',)
+    list_display = ('name','uuid','code')
     list_filter = ('name',)
     
 class EventAdmin(admin.ModelAdmin):
