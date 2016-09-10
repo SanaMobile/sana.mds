@@ -71,10 +71,6 @@ class SubjectAdmin(admin.ModelAdmin):
 class SubjectInline(admin.StackedInline):
     model = Subject
 
-class SurgicalSubjectAdmin(admin.ModelAdmin):
-    readonly_fields = ['uuid',]
-    list_display = ['system_id','given_name', 'family_name', 'uuid', "image"]
-
 class LocationAdmin(admin.ModelAdmin):
     model = Location
     list_display = ('name','uuid','code')
