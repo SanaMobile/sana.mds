@@ -349,10 +349,10 @@ def maybe_upload_procedure(saved_procedure):
         observations = v2compatlib.responses_to_observations(encounter, responses, sort=True)
         for obs in observations:
             obs.save()
-        if result:
-            #if obs.concept.is_complex:
-            notification_sent = sender.send_review_notification(encounter)
-            logging.info("Sent notification for Observation: %s" % encounter.uuid)
+        #if result:
+        #    #if obs.concept.is_complex:
+        #    notification_sent = sender.send_review_notification(encounter)
+        #    logging.info("Sent notification for Observation: %s" % encounter.uuid)
     return result, message
 
 def register_binary(procedure_guid, element_id, data):
