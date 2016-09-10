@@ -118,7 +118,8 @@ class DispatchingHandler(BaseHandler,HandlerMixin):
             # Persist object here
             instance.save()
             logging.info('POST success object.uuid=%s' % instance.uuid)
-            return succeed(instance)
+            model = getattr(self,'model')
+            return succeed(model.objects.filter(uuid=uuid))
         except Exception, e:
             logging.error('ERROR')
             return self.trace(request, e)
