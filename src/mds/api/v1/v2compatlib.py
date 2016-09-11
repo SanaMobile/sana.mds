@@ -339,6 +339,10 @@ def spform_to_encounter(form):
 
     subject = get_v2(v2.Subject, patientId, "system_id")
     concept = get_v2(v2.Concept,"ENCOUNTER","name")
+    try:
+        location = form['location__uuid']
+    except:
+        location = None
     created = True
     try:
         encounter = v2.Encounter.objects.get(uuid=savedproc_guid)
@@ -350,7 +354,8 @@ def spform_to_encounter(form):
             observer=observer,
             device=device,
             subject=subject,
-            concept=concept)
+            concept=concept
+            location=location)
         encounter.save()
     '''
     encounter,created = v2.Encounter.objects.get_or_create(uuid=savedproc_guid,
