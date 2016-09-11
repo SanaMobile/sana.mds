@@ -40,6 +40,9 @@ class Encounter(models.Model):
 
     concept = models.ForeignKey('Concept', to_field='uuid')
     """ A contextual term for the encounter."""
+    
+    location = models.ForeignKey('Location', to_field='uuid', blank=True)
+    """ The location of the encounter."""
 
     voided = models.BooleanField(default=False)
 
