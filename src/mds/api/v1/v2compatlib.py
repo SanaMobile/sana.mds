@@ -340,7 +340,8 @@ def spform_to_encounter(form):
     subject = get_v2(v2.Subject, patientId, "system_id")
     concept = get_v2(v2.Concept,"ENCOUNTER","name")
     try:
-        location = form['location__uuid']
+        location_uuid = form['location__uuid']
+        location = v2.Location.objects.get(uuid=location_uuid)
     except:
         location = None
     created = True
