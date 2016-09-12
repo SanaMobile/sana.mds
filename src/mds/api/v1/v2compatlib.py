@@ -354,7 +354,7 @@ def spform_to_encounter(form):
             observer=observer,
             device=device,
             subject=subject,
-            concept=concept
+            concept=concept,
             location=location)
         encounter.save()
     '''
