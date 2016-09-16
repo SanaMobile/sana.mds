@@ -56,6 +56,19 @@ DATABASES = {
     },
 }
 '''
+# PostGre config
+'''
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.postgresql_psycopg2',
+        'NAME': 'mds',
+        'USER': 'mds',
+        'PASSWORD': '********',
+        'HOST': 'localhost',
+        'PORT': '',
+    }
+}
+'''
 TIME_ZONE = 'America/Chicago'
 """Local time zone for this installation. Choices can be found here:
 
