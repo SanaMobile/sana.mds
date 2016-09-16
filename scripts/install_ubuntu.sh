@@ -15,7 +15,8 @@ apt-get install                 \
     sqlite3                     \
     javascript-common           \
     libjs-jquery-ui             \
-    libjs-jquery-timepicker
+    libjs-jquery-timepicker     \
+    python-unicodecsv
 echo 'export MDS_DIR=/opt/sana/sana.mds' >> /etc/apache2/envvars
 adduser django
 usermod -a -G django www-data
