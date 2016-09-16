@@ -25,7 +25,8 @@ Everything as root(sudo)
             sqlite3                     \
             javascript-common           \
             libjs-jquery-ui             \
-            libjs-jquery-timepicker
+            libjs-jquery-timepicker     \
+            python-unicodecsv
         If getting the mds code from source
         apt-get install git
 
