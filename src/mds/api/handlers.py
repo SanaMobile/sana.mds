@@ -119,7 +119,7 @@ class DispatchingHandler(BaseHandler,HandlerMixin):
             instance.save()
             logging.info('POST success object.uuid=%s' % instance.uuid)
             model = getattr(self,'model')
-            return succeed(model.objects.filter(uuid=uuid))
+            return succeed(model.objects.filter(uuid=instance.uuid))
         except Exception, e:
             logging.error('ERROR')
             return self.trace(request, e)
