@@ -93,7 +93,7 @@ def error(exception):
     return response
 
 def unauthorized(message):
-    return fail(message, Codes.UNAUTHORIZED)
+    return fail([], code=Codes.UNAUTHORIZED, errors=message)
     
 def json_succeed(data, code=200):
     return JSONResponse(cjson.encode(succeed(data, code=code)))
