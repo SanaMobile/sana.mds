@@ -191,9 +191,13 @@ class DispatchingHandler(BaseHandler,HandlerMixin):
             if qs.count() == 1:
                 return self._update(request,uuid=uuid)
             elif qs.count() > 1:
-                raise MultipleObjectsReturned("{0} '{1}'".format(model.__name__, uuid))
+                raise MultipleObjectsReturned("{0} '{1}'".format(klazz.__name__, uuid))
             else:
                 data['uuid'] = uuid
+        created = raw_data.get('created', None)
+        # override default created if present
+        if created:
+            data['created'] = created
         instance = klazz(**data)
         return instance
     
