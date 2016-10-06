@@ -155,7 +155,7 @@ class DispatchingHandler(BaseHandler,HandlerMixin):
             model = getattr(self,'model')
             logging.info("Success updating {klazz}:{uuid}".format(
                 klazz=model, uuid=uuid))
-            return succeed(model.objects.filter(uuid=uuid)
+            return succeed(model.objects.filter(uuid=uuid))
         except Exception, e:
             return self.trace(request, e)
     
