@@ -182,20 +182,19 @@ class DispatchingHandler(BaseHandler,HandlerMixin):
         data = request.form.cleaned_data
         raw_data = request.raw_data
         klazz = getattr(self,'model')
+        
         uuid = raw_data.get('uuid',None)
-        logging.debug("uuid=%s" % uuid)
-        if raw_data.has_key('uuid'):
-            logging.info("RAW data has uuid: %s" % uuid)
-            data['uuid'] = raw_data.get('uuid')
-            #instance = klazz(**raw_data)
+        # Check if exists
         if uuid:
             logging.info("Has uuid: %s" % uuid)
-            if klazz.objects.filter(uuid=uuid).count() == 1:
+            qs = klazz.objects.filter(uuid=uuid)
+            if qs.count() == 1:
                 return self._update(request,uuid=uuid)
-            
+            elif qs.count() > 1:
+                raise MultipleObjectsReturned("{0} '{1}'".format(model.__name__, uuid))
+            else:
+                data['uuid'] = uuid
         instance = klazz(**data)
-        # don't commit until we return and check backends
-        #instance.save(commit=False)
         return instance
     
     
