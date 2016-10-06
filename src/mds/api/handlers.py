@@ -101,7 +101,7 @@ class DispatchingHandler(BaseHandler,HandlerMixin):
         try:
             # Always cache the object
             instance = self._create(request, args, kwargs)
-            logging.info('created object uuid=%s' % instance.uuid)
+            logging.info('successfully cached object')
             
             # Send to any linked backends
             _instance = backends.create(instance,auth=auth.parse_auth(request))
@@ -242,7 +242,7 @@ class DispatchingHandler(BaseHandler,HandlerMixin):
         # more than one raise
         else:
             raise MultipleObjectsReturned("{0} '{1}'".format(model.__name__, uuid))
-        return qs
+        return model.objects.get(uuid=uuid)
     
     def _delete(self,uuid):
         model = getattr(self,'model')
