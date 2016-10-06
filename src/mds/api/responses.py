@@ -55,7 +55,7 @@ class JSONResponse(HttpResponse):
                 message content
     """
     def __init__(self, data):
-        HttpResponse.__init__(self, data, mimetype="application/json; charset=utf-8")
+        HttpResponse.__init__(self, data, content_type="application/json; charset=utf-8")
         self['X-JSON'] = data
 
 def fail(data, code=404, errors=[]):
@@ -84,7 +84,7 @@ def succeed(data, code=200):
                 'message': data, }
     return response
 
-def error(exception):
+def error(exception, code=500):
     errors = traceback.format_exception_only(*sys.exc_info()[:2])
     response = {'status': 'FAILURE',
                 'code' : code,
