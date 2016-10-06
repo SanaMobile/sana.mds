@@ -8,6 +8,7 @@ import logging
 import cjson
 
 from django.conf import settings
+from django.core.exceptions import ObjectDoesNotExist, MultipleObjectsReturned
 from django.core.paginator import Paginator, InvalidPage, EmptyPage
 from django.db.models import ForeignKey
 from piston.handler import BaseHandler
@@ -228,20 +229,20 @@ class DispatchingHandler(BaseHandler,HandlerMixin):
     def _update(self,request, uuid):
         logging.info("_update() %s" % uuid)
         model = getattr(self,'model')
-        data = request.form.cleaned_data
-        raw_data = request.raw_data
+        data = request.raw_data
+        if 'uuid' in data.keys():
+            uuid = data.pop('uuid')
         
-        obj = model.objects.get(uuid=uuid)
-        if 'uuid' in raw_data.keys():
-            raw_data.pop('uuid')
-        for k,v in data.items():
-            if k in self.fks:
-                _obj = getattr(obj,k).__class__.objects.get(uuid=v)
-                v = _obj
-                setattr(obj,k,v)
-        model.objects.filter(uuid=uuid).update(**raw_data)
-        msg = model.objects.filter(uuid=uuid)
-        return msg
+        qs = model.objects.filter(uuid=uuid)
+        if qs.count() == 1:
+           qs.update(**data)
+        # No objects found raise
+        elif qs.count() == 0:
+            raise ObjectDoesNotExist("{0} '{1}'".format(model.__name__, uuid)) 
+        # more than one raise
+        else:
+            raise MultipleObjectsReturned("{0} '{1}'".format(model.__name__, uuid))
+        return qs
     
     def _delete(self,uuid):
         model = getattr(self,'model')
