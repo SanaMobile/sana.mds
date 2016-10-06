@@ -7,6 +7,8 @@ import datetime
 import os
 from PIL import Image
 from django.db import models
+from django.utils import timezone
+
 from mds.api.utils import make_uuid
 
 __all__ = ["AbstractSubject","Subject"]
@@ -19,7 +21,7 @@ class AbstractSubject(models.Model):
     uuid = models.SlugField(max_length=36, unique=True, default=make_uuid, editable=False)
     """ A universally unique identifier """
     
-    created = models.DateTimeField(auto_now_add=True)
+    created = models.DateTimeField(default=timezone.now)
     """ When the object was created """
     
     modified = models.DateTimeField(auto_now=True)
