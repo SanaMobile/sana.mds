@@ -6,7 +6,7 @@ Created on Feb 29, 2012
 '''
 import logging
 import cjson
-
+    
 from django.conf import settings
 from django.core.exceptions import ObjectDoesNotExist, MultipleObjectsReturned
 from django.core.paginator import Paginator, InvalidPage, EmptyPage, PageNotAnInteger
@@ -15,7 +15,7 @@ from piston.handler import BaseHandler
 from piston.utils import rc
 
 from .decorators import validate
-from .responses import succeed, error
+from .responses import succeed, error, bad_request
 from .utils import logstack, printstack, exception_value
 from mds.utils import auth
 from mds.api.contrib import backends
@@ -66,15 +66,13 @@ class HandlerMixin(object):
         if not foreign_keys:
             return []
         return foreign_keys
-        
+    
     def get_m2m_keys(self):
         m2m = []
         if hasattr(self,'model'):
             _meta = getattr(self,'model')._meta
-        else:
-            return None
-        for field in _meta.many_to_many:
-            m2m.append(field.name)
+            for field in _meta.many_to_many:
+                m2m.append(field.name)
         return m2m
 
 class DispatchingHandler(BaseHandler,HandlerMixin):
@@ -149,15 +147,33 @@ class DispatchingHandler(BaseHandler,HandlerMixin):
                 # get a mutable QueryDict so that any control
                 # params that aren't Model fields can be popped-i.e. page
                 query_dict = request.GET.copy()
-                attrs = self.flatten_dict(request.GET)
-                start = self.get_start(attrs)
-                limit = self.get_limit(attrs)
+                start = self.get_start(query_dict)
+                limit = self.get_limit(query_dict)
+                
+                attrs = self.flatten_dict(query_dict)
+                
+                
+                # handle m2m fields
+                for _m2m in self.m2m:
+                    m2m_value = attrs.pop(_m2m, None)
+                    if m2m_value:
+                        m2m_query = "{0}__uuid__in".format(_m2m)
+                        attrs[m2m_query] = m2m_value
+                
+                # Handle any explicit in queries
+                for k,v in attrs.items():
+                    if "__in" in k:
+                        attrs[k] = [x for x in v.split(",")]
+                        
+                
                 if len(attrs) > 0:
-                    qs = self.queryset(request, **attrs)
+                    qs = BaseHandler.read(self,request,**attrs)
                 else:
                     qs = self.queryset(request)
-                response, size = self.get_chunk(qs, start, limit)        
+                response, size = self.get_chunk(qs, start, limit)
             return succeed(response, size=size)
+        except ValueError, e:
+            return bad_request(exception=e)
         except Exception, e:
             return self.trace(request, e)
             
@@ -258,7 +274,7 @@ class DispatchingHandler(BaseHandler,HandlerMixin):
         """ Returns a zero or more length list of objects.
         """
         start, limit = get_start_limit(request)
-        model = getattr(self,'model')
+        model = self.get_model()
         obj_set = model.objects.all()
         if limit:
             paginator = Paginator(obj_set, limit, 
