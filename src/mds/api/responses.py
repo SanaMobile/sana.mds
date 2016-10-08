@@ -66,7 +66,7 @@ def fail(data, code=404, errors=[]):
                 'errors': errors, }
     return response
 
-def succeed(data, code=200):
+def succeed(data, code=200, size=0):
     ''' Success response as a python dict with data '''
     '''
     msg = []
@@ -78,10 +78,10 @@ def succeed(data, code=200):
     except:
         msg.append(data)
     '''
-    #msg = data if isinstance(data,collections.Iterable) else data
     response = {'status': 'SUCCESS',
                 'code' : code,
-                'message': data, }
+                'message': data,
+                'size' : size }
     return response
 
 def error(exception, code=500):
