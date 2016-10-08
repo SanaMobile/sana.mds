@@ -12,6 +12,10 @@ import cjson
 def render_json_response(data):
     return JSONResponse(data)
 
+CONTENT_TYPE_JSON = "application/json; charset=utf-8"
+SUCCESS = 'SUCCESS'
+FAILURE = 'FAILURE'
+
 _CODES = {
     'OK':200,
     'ACCEPTED':202,
@@ -55,16 +59,28 @@ class JSONResponse(HttpResponse):
                 message content
     """
     def __init__(self, data):
-        HttpResponse.__init__(self, data, content_type="application/json; charset=utf-8")
-        self['X-JSON'] = data
+        HttpResponse.__init__(self, data, content_type=CONTENT_TYPE_JSON)
+        #self['X-JSON'] = data
+
+class APIResponse(JSONResponse):
+    def __init__(self, status=SUCCESS, message=[], code=200, size=0, errors=[]):
+        JSONResponse.__init__(self, 
+            { status:status, "message": message, "code":code, "size":size, "errors":errors })
+    
 
 def fail(data, code=404, errors=[]):
     ''' Fail response as a python dict with data '''
-    response = {'status': 'FAILURE',
+    response = {'status': FAILURE,
                 'code' : code,
                 'message': data,
                 'errors': errors, }
     return response
+    
+def bad_request(errors=[], exception=None):
+    if exception:
+        return error(exception, code=500)
+    else:
+        return APIResponse(status=FAILURE, errors=errors, code=400)
 
 def succeed(data, code=200, size=0):
     ''' Success response as a python dict with data '''
@@ -85,12 +101,9 @@ def succeed(data, code=200, size=0):
     return response
 
 def error(exception, code=500):
-    errors = traceback.format_exception_only(*sys.exc_info()[:2])
-    response = {'status': 'FAILURE',
-                'code' : code,
-                'message': None,
-                'errors': errors, }
-    return response
+    #errors = [ x for x in traceback.format_exception_only(*sys.exc_info()[:2])]
+    errors = [ x.replace("\"","'").replace("\n",'') for x in traceback.format_tb(sys.exc_info()[2]) ]
+    return APIResponse(status=FAILURE, errors=errors, code=500)
 
 def unauthorized(message):
     return fail([], code=Codes.UNAUTHORIZED, errors=message)
