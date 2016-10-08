@@ -9,7 +9,7 @@ import cjson
 
 from django.conf import settings
 from django.core.exceptions import ObjectDoesNotExist, MultipleObjectsReturned
-from django.core.paginator import Paginator, InvalidPage, EmptyPage
+from django.core.paginator import Paginator, InvalidPage, EmptyPage, PageNotAnInteger
 from django.db.models import ForeignKey
 from piston.handler import BaseHandler
 from piston.utils import rc
@@ -41,6 +41,7 @@ def get_start_limit(request):
     limit = int(get.get('limit', 0))
     start = int(get.get('start', 1))
     return start, limit
+    
 
 class HandlerMixin(object):
     fks = None
@@ -51,6 +52,7 @@ class HandlerMixin(object):
         self.fks = self.get_foreign_keys()
         self.m2m = self.get_m2m_keys()
         self.model = getattr(self,'model',None)
+        self._model = None
             
     def get_foreign_keys(self):
         foreign_keys = []
@@ -83,12 +85,19 @@ class DispatchingHandler(BaseHandler,HandlerMixin):
     allowed_methods = ['GET','POST','PUT','DELETE']
 
     def queryset(self, request, uuid=None, **kwargs):
-        qs = self.model.objects.all()
+        model = self.get_model()
         if uuid:
-            return self.model.objects.get(uuid=uuid)
-        if kwargs:
-            qs.filter(**kwargs)
-        return qs
+            return self.self.get_model().objects.get(uuid=uuid)
+        else:
+            qs = self.get_model().objects.all()
+            if kwargs:
+                qs.filter(**kwargs)
+            return qs
+        
+    def get_model(self):
+        if not self._model:
+            self._model = getattr(self, 'model')
+        return self._model
 
     @validate('POST')
     def create(self,request, uuid=None, *args, **kwargs):
@@ -128,19 +137,27 @@ class DispatchingHandler(BaseHandler,HandlerMixin):
     def read(self,request, uuid=None, related=None,*args,**kwargs):
         """ GET Request handler. No validation is performed. """
         logging.info("read: %s, %s, %s" % (self.model,request.method,request.user))
+        size = -1
         try:
             if uuid and related:
                 response = self._read_by_uuid(request,uuid, related=related)
+                size = response.count() if response else 0
             elif uuid:
                 response = self._read_by_uuid(request,uuid)
+                size = response.count() if response else 0
             else:
-                q = request.REQUEST
-                if q:
-                    response = BaseHandler.read(self,request, **q)
+                # get a mutable QueryDict so that any control
+                # params that aren't Model fields can be popped-i.e. page
+                query_dict = request.GET.copy()
+                attrs = self.flatten_dict(request.GET)
+                start = self.get_start(attrs)
+                limit = self.get_limit(attrs)
+                if len(attrs) > 0:
+                    qs = self.queryset(request, **attrs)
                 else:
-                    logging.info("No querystring")
-                    response = BaseHandler.read(self,request)
-            return succeed(response)
+                    qs = self.queryset(request)
+                response, size = self.get_chunk(qs, start, limit)        
+            return succeed(response, size=size)
         except Exception, e:
             return self.trace(request, e)
             
@@ -169,6 +186,40 @@ class DispatchingHandler(BaseHandler,HandlerMixin):
             return succeed(msg)
         except Exception, e:
             return self.trace(request, e)
+
+
+    def get_start(self, query_dict):
+        try:
+            start = int(query_dict.pop('start'))
+        except:
+            start = 1
+        return start
+        
+    def get_limit(self, query_dict):
+        try:
+            limit = int(query_dict.pop('limit'))
+        except:
+            limit = None
+        return limit
+        
+    def get_chunk(self, qs, start=None, limit=None):
+        if start and limit:
+            paginator = Paginator(qs, limit)
+            try:
+                chunk = paginator.page(start).object_list
+                size = paginator.num_pages
+            except EmptyPage:
+                # If page is out of range deliver empty
+                chunk = self.empty()
+                size = 0 
+        else:
+            chunk = qs
+            size = qs.count() if qs else 0
+        return chunk, size
+        
+        
+    def empty(self):
+        return self.model.objects.none()
 
     def trace(self,request, ex=None):
         try:
