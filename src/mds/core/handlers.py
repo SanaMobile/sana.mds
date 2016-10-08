@@ -159,6 +159,7 @@ class EncounterHandler(DispatchingHandler):
         "created",
         "modified",
         "voided",
+        "location"
     )
     signals = { LOGGER:( EventSignal(), EventSignalHandler(Event))}
 
