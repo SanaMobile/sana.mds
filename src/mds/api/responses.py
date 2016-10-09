@@ -59,28 +59,38 @@ class JSONResponse(HttpResponse):
                 message content
     """
     def __init__(self, data):
-        HttpResponse.__init__(self, data, content_type=CONTENT_TYPE_JSON)
+        super(JSONResponse, self).__init__(content_type=CONTENT_TYPE_JSON)
+        #self.write(cjson.encode(data))
         #self['X-JSON'] = data
 
 class APIResponse(JSONResponse):
     def __init__(self, status=SUCCESS, message=[], code=200, size=0, errors=[]):
-        JSONResponse.__init__(self, 
-            { status:status, "message": message, "code":code, "size":size, "errors":errors })
-    
+        super(APIResponse, self).__init__(
+            { "status":status, 
+            "message": message, 
+            "code":code,
+            "size":size, 
+            "errors":errors })
+            
+class JSONAPIResponse(HttpResponse):
+    def __init__(self, status=SUCCESS, message=[], code=200, size=0, errors=[]):
+        super(JSONAPIResponse, self).__init__(cjson.encode({ "status":status, 
+            "message": message, "code":code, "size":size, "errors":errors }),
+            content_type=CONTENT_TYPE_JSON)
 
 def fail(data, code=404, errors=[]):
     ''' Fail response as a python dict with data '''
-    response = {'status': FAILURE,
-                'code' : code,
-                'message': data,
-                'errors': errors, }
-    return response
+    return { "status": FAILURE, 
+             "message": data, 
+             "code":code, 
+             "size": 0, 
+             "errors":errors }
     
 def bad_request(errors=[], exception=None):
     if exception:
         return error(exception, code=500)
     else:
-        return APIResponse(status=FAILURE, errors=errors, code=400)
+        return fail(data, code=400, errors=errors )
 
 def succeed(data, code=200, size=0):
     ''' Success response as a python dict with data '''
@@ -103,20 +113,24 @@ def succeed(data, code=200, size=0):
 def error(exception, code=500):
     #errors = [ x for x in traceback.format_exception_only(*sys.exc_info()[:2])]
     errors = [ x.replace("\"","'").replace("\n",'') for x in traceback.format_tb(sys.exc_info()[2]) ]
-    return APIResponse(status=FAILURE, errors=errors, code=500)
+    return { "status": FAILURE, 
+             "message": [], 
+             "code":code, 
+             "size": 0, 
+             "errors":errors }
 
 def unauthorized(message):
-    return fail([], code=Codes.UNAUTHORIZED, errors=message)
+    return fail([], code=404, errors=message)
     
-def json_succeed(data, code=200):
-    return JSONResponse(cjson.encode(succeed(data, code=code)))
+def json_succeed(data, code=200, size=0):
+    return JSONAPIResponse(**succeed(data, code=code, size=size))
     
 def json_fail(data, code=404, errors=[]):
-    return JSONResponse(cjson.encode(fail(data, code=code, errors=errors)))
+    return JSONAPIResponse(**fail(data, code=code, errors=errors))
     
 def json_error(exception):
-    return JSONResponse(cjson.encode(error(exception)))
+    return JSONAPIResponse(**error(exception))
     
 def json_unauthorized(message):
-    return JSONResponse(cjson.encode(unauthorized(message)))
+    return JSONAPIResponse(**unauthorized(message))
     
