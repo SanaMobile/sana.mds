@@ -147,11 +147,9 @@ class DispatchingHandler(BaseHandler,HandlerMixin):
                 # get a mutable QueryDict so that any control
                 # params that aren't Model fields can be popped-i.e. page
                 query_dict = request.GET.copy()
-                start = self.get_start(query_dict)
-                limit = self.get_limit(query_dict)
-                
                 attrs = self.flatten_dict(query_dict)
-                
+                start = self.get_start(attrs)
+                limit = self.get_limit(attrs)
                 
                 # handle m2m fields
                 for _m2m in self.m2m:
@@ -223,14 +221,13 @@ class DispatchingHandler(BaseHandler,HandlerMixin):
             paginator = Paginator(qs, limit)
             try:
                 chunk = paginator.page(start).object_list
-                size = paginator.num_pages
             except EmptyPage:
                 # If page is out of range deliver empty
                 chunk = self.empty()
                 size = 0 
         else:
             chunk = qs
-            size = qs.count() if qs else 0
+        size = qs.count() if qs else 0
         return chunk, size
         
         
