@@ -1,23 +1,33 @@
 # Create your views here.
 from django.conf import settings
-from django.http import HttpResponse
+from django.core import serializers
+from django.http import HttpResponse, StreamingHttpResponse
 
 from mds.api.responses import JSONResponse, json_succeed, json_fail, json_unauthorized
+from mds.api.responses import unauthorized, succeed
 
 from .forms import CrashReportForm
 from .models import Client, CrashReport
 
-FPATH = "/media/clients/app-android.apk"
 VERSION = "2"
 
 def version(request):
     authenticated = getattr(request, "authenticated", False)
     if not authenticated:
-        return json_unauthorized(["Invalid credentials",])
-    obj = Client.objects.order_by('-version_code').first()
-    if not obj:
+        result = []
+        result.append("Invalid credentials")
+        return json_unauthorized(result)
+    qs = Client.objects.order_by('-version_code')
+    if not qs:
         return json_succeed({ "version": -1 })
-    return json_succeed({ "version": obj.version_code })
+    obj = qs.first()
+    f = obj.app
+    size = f.size
+    return json_succeed({ 
+        "version": obj.version_code, 
+        "url": f.url,
+        "name" : obj.version },
+        size=size )
         
 def download_latest(request):
     authenticated = getattr(request, "authenticated", False)
