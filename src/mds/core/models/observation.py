@@ -7,6 +7,7 @@ Procedure.
 import mimetypes, os
 
 from django.db import models
+from django.utils import timezone
 from django.utils.translation import ugettext as _
 
 from mds.api.utils import make_uuid, guess_fext
@@ -54,7 +55,7 @@ class Observation(models.Model):
     _complex_progress = models.IntegerField(default=0)
     """ Bytes recieved for value_complex when packetized """
     
-    created = models.DateTimeField(auto_now_add=True)
+    created = models.DateTimeField(default=timezone.now)
     """ When the object was created """
     
     modified = models.DateTimeField(auto_now=True)
