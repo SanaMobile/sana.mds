@@ -153,7 +153,7 @@ class EncounterHandler(DispatchingHandler):
     form = EncounterForm
     fields = ("uuid",
         "concept", 
-        "observation",
+        "observer",
         ("subject",("uuid",)),
         ("procedure",("title","uuid")),
         "created",
