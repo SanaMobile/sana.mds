@@ -47,6 +47,8 @@ class Encounter(models.Model):
     """ The location of the encounter."""
 
     voided = models.BooleanField(default=False)
+    
+    uploaded = models.DateTimeField(auto_now_add=True, default=timezone.now)
 
     @property
     def slug(self):
