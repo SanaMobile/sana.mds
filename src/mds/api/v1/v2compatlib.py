@@ -246,7 +246,8 @@ def responses_to_observations(encounter, responses,sort=False,reverse=False):
                 obs.save()
                 logging.debug("Created observation: %s" % obs.uuid)
             observations.append(obs)
-            # END LOOP    
+            # END LOOP
+    
     if sort:
         sorted_observations = sort_by_node(observations)
         logging.info("Return %d sorted observations" % len(sorted_observations))
@@ -358,14 +359,6 @@ def spform_to_encounter(form):
             concept=concept,
             location=location)
         encounter.save()
-    '''
-    encounter,created = v2.Encounter.objects.get_or_create(uuid=savedproc_guid,
-		    procedure=procedure,
-		    observer=observer,
-		    device=device,
-		    subject=subject,
-		    concept=concept)
-    '''
     data = strip_deprecated_observations(_json.decode(responses))
     return encounter, data,created
                                                             
@@ -428,6 +421,16 @@ def render_response_v1(response, version=2):
                 "data" : data }
     else:
         return response
+
+def set_created(encounter):
+    observation = Observation.objects.get(encounter=encounter.uuid,
+        concept__name="ENCOUNTER__CREATED")
+    created = datetime.strptime("%Y-%m-%d %H:%M:%S", observation.value_text)
+    encounter.created = created
+    encounter.save()
+    for obs in encounter.observation_set():
+        obs.created = created
+        obs.save()
 
 if __name__ == '__main__':
     """ Run this as 

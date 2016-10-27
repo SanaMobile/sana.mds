@@ -31,7 +31,7 @@ from mds.api.v1.json import (render_json_response,
                               binarychunk_hack_submit, patient_get, 
                               patient_list, parseOne, parseAll )
 
-from mds.api.v1.v2compatlib import spform_to_encounter, responses_to_observations      
+from mds.api.v1.v2compatlib import spform_to_encounter, responses_to_observations, set_created      
 from mds.api.v1.api import register_saved_procedure
 from .forms import ProcedureSubmitForm
 from .models import RequestLog
@@ -122,7 +122,9 @@ class SavedProcedureHandler(BaseHandler):
 	        
 	        if obs.is_complex:
 	            obs.create_file()
-	        
+                
+        # set the created time correctly
+	    set_created(encounter)
 	    #result, message = True, encounter
             
             if result:
