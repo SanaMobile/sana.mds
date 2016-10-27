@@ -206,7 +206,7 @@ def responses_to_observations(encounter, responses,sort=False,reverse=False):
                     obs.encounter=encounter
                     obs.node=node
                     obs.concept=concept
-                    obs.value_text=value_text
+                    obs.value_text=value_text)
                     obs.save()
                     logging.debug("Updated complex observation: %s" % obs.uuid)
                 except:
