@@ -5,6 +5,7 @@ Created on Aug 10, 2012
 :version: 2.0
 '''
 from django.db import models
+from django.utils import timezone
 
 from .utils import make_uuid
 
@@ -92,9 +93,27 @@ class RESTModel(models.Model):
     def default_representation(self, **kwargs):
         """ equivalent to self.get_representation() """
         return self._get_representation('default', **kwargs)
+        
 
-        
+def APIModel(models.Model):
+
+    class Meta:
+        abstract = True
     
+    uuid = models.SlugField(max_length=36, unique=True, default=make_uuid, editable=False)
+    """ A universally unique identifier """
     
+    created = models.DateTimeField(default=timezone.now)
+    """ When the object was created """
     
-        
+    modified = models.DateTimeField(auto_now=True)
+    """ updated on modification """
+    
+    def save(self, *args, **kwargs):
+        if not self.id:
+            if not self.created:
+                self.created = timezone.now()
+            if not self.uuid:
+                self.uuid = make_uuid()
+        super(APIModel, self).save(*args, **kwargs)
+                
