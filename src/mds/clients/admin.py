@@ -10,7 +10,7 @@ from .models import *
 class ClientAdmin(admin.ModelAdmin):
     list_display = ['version', 'version_code']
     list_filter = ['version', 'version_code']
-admin.site.register(Client)
+admin.site.register(Client, ClientAdmin)
 
 class CrashReportAdmin(admin.ModelAdmin):
     list_display = ['created', 'device']
