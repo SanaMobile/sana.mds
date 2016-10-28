@@ -434,7 +434,7 @@ def set_created(encounter):
         created = datetime.datetime.strptime(str(value), '%Y-%m-%d %H:%M:%S')
         encounter.created = created
         encounter.save()
-        for obs in encounter.observation_set:
+        for obs in encounter.observation_set.all():
             obs.created = created
             obs.save()
     elif observations.count() > 1:
