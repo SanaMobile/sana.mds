@@ -423,14 +423,21 @@ def render_response_v1(response, version=2):
         return response
 
 def set_created(encounter):
-    observation = Observation.objects.get(encounter=encounter.uuid,
+    observations = v2.Observation.objects.filter(encounter=encounter.uuid,
         concept__name="ENCOUNTER__CREATED")
-    created = datetime.strptime("%Y-%m-%d %H:%M:%S", observation.value_text)
-    encounter.created = created
-    encounter.save()
-    for obs in encounter.observation_set():
-        obs.created = created
-        obs.save()
+    logging.debug("count=%d" %  observations.count())
+    if observations.count() == 1:
+        observation = observations 
+        created = datetime.strptime("%Y-%m-%d %H:%M:%S", observation.value_text)
+        encounter.created = created
+        encounter.save()
+        for obs in encounter.observation_set():
+            obs.created = created
+            obs.save()
+    elif observations.count() > 1:
+        logging.warn("Multiple observations with ENCOUNTER__CREATED concept")
+    else:
+        logging.warn("No observations with ENCOUNTER__CREATED concept")
 
 if __name__ == '__main__':
     """ Run this as 
