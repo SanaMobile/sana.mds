@@ -427,7 +427,7 @@ def set_created(encounter):
         concept__name="ENCOUNTER__CREATED")
     logging.debug("count=%d" %  observations.count())
     if observations.count() == 1:
-        observation = observations 
+        observation = observations[0]
         created = datetime.strptime("%Y-%m-%d %H:%M:%S", observation.value_text)
         encounter.created = created
         encounter.save()
