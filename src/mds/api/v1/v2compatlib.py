@@ -428,7 +428,9 @@ def set_created(encounter):
     logging.debug("count=%d" %  observations.count())
     if observations.count() == 1:
         observation = observations[0]
-        created = datetime.datetime.strptime("%Y-%m-%d %H:%M:%S", observation.value_text)
+        value = observation.value
+        logging.debug("created value=%s" % value)
+        created = datetime.datetime.strptime("%Y-%m-%d %H:%M:%S", value)
         encounter.created = created
         encounter.save()
         for obs in encounter.observation_set():
