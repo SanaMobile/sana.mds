@@ -6,7 +6,7 @@ from mds.utils import csv_import
 
 class Command(BaseCommand):
     args = '<full path to file>'
-    help = 'Loads location list formatted as code, name. Code values must be unique'
+    help = 'user csv list formatted as <command>,<username>,<password,villages|villages>. Username values must be unique.'
 
     def _load_users(self, fname):
         csv_import.load_users(fname)
