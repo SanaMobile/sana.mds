@@ -18,27 +18,25 @@ def load_locations(fname,test=False):
         'name' values should be unique.
     """
     with open(fname) as f:
-        reader = csv.reader(f, delimiter=',')  
+        reader = csv.reader(f, delimiter=',')
+        index = 1  
         for row in reader:
-            code = row[0]
-            name = row[1]
+            created = False
             try:
-                location = Location.objects.get(code=code)
-                created = False
+                try:
+                    location = Location.objects.get(code=code)
+                except:
+                    location = Location()
+                    location.code = code
+                    created = True
                 location.name = name
                 if test:
                     print(location)
                 else:
                     location.save()
-            except:
-                location = Location()
-                location.code = code
-                location.name = name
-                if test:
-                    print(location)
-                else:
-                    location.save()
-                    
+            except Exception, e:
+                print("Line %d. FAIL. created=%s. %s" % (index,created, e))
+            index = index + 1
               
 # Format as
 # username,password,location;location
