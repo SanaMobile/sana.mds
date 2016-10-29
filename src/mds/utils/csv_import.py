@@ -49,11 +49,11 @@ def load_users(fname):
     """
     with open(fname) as f:
         reader = csv.reader(f, delimiter=',')
+        index = 1
         for row in reader:
             command = int(row[0])
             username=row[1]
             # 1 = add users
-            index = 1
             try:
                 if command == 1:
                     print("Adding user %s" % username)
@@ -100,6 +100,6 @@ def load_users(fname):
                     for code in location_str.split(';'):
                         anm.locations.remove(Location.objects.get(code=code))
                     anm.save()
-            except:
-                    print("Line %d. Load failed" % index)
+            except Exception, e:
+                    print("Line %d. Load failed. %s" % (index, e))
             index = index + 1
