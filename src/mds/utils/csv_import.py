@@ -95,7 +95,7 @@ def load_users(fname):
                 # 4=remove locations
                 elif command == 4:
                     print("Modifying user %s. Removing villages." % username)
-                    anm = ANM(user__username=username)
+                    anm = ANM.objects.get(user__username=username)
                     location_str = row[2]
                     for code in location_str.split(';'):
                         anm.locations.remove(Location.objects.get(code=code))
