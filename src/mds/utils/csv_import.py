@@ -28,6 +28,8 @@ def load_locations(fname,test=False):
         for row in reader:
             created = False
             try:
+                code = row[0]
+                name = row[1]
                 try:
                     location = Location.objects.get(code=code)
                 except:
