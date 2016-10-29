@@ -10,6 +10,11 @@ from mds.core.models import ANM, Location
 # format as
 # name,code
 DEFAULT_CODE = 1
+
+def parse_locations(location_str):location_str = row[2]
+    locations = [Location.objects.get(code=x) for x in location_str.split(';')]
+    return locations                
+
 def load_locations(fname,test=False):
     """ Loads a list of locations from a csv file fomatted as
             name
@@ -56,10 +61,6 @@ def load_users(fname):
                 if command == 1:
                     message = "Adding user %s" % username
                     password=row[2]
-                    location_str = row[3]
-                    locations = []
-                    for code in location_str.split(';'):
-                        locations.append(Location.objects.get(code=code))
             
                     # create User
                     user = User.objects.create_user(username=username, password=password)
@@ -67,6 +68,9 @@ def load_users(fname):
                     # Create ANM
                     anm = ANM(user=user)
                     anm.save()
+                    # parse and add locations
+                    location_str = row[3]
+                    locations = parse_locations(location_str)
                     for location in locations:
                         anm.locations.add(location)
                     anm.save()
@@ -75,28 +79,35 @@ def load_users(fname):
                     message = "Modifying user %s. Adding villages." % username
                     anm = ANM.objects.get(user__username=username)
                     location_str = row[2]
-                    for location in location_str.split(';'):
+                    locations = parse_locations(location_str)
+                    for location in locations:
                         anm.locations.add(location)
                     anm.save()
                 # 3=Modify(Replace villages)
                 elif command == 3:
                     message = "Modifying user %s. Replacing villages." % username
                     anm = ANM.objects.get(user__username=username)
-                    # remove villages
-                    for location in anm.locations.all():
+                    # remove old locations
+                    locations = anm.locations.all()
+                    for location in locations:
                         anm.locations.remove(location)
                     anm.save()
+                    # parse and add new locations
                     location_str = row[2]
-                    for code in location_str.split(';'):
-                        anm.locations.add(Location.objects.get(code=code))
+                    locations = parse_locations(location_str)
+                    for location in locations:
+                        anm.locations.add(location)
                     anm.save()
                 # 4=remove locations
                 elif command == 4:
                     message = "Modifying user %s. Removing villages." % username
+                    # Get ANM
                     anm = ANM.objects.get(user__username=username)
+                    # parse and remove locations
                     location_str = row[2]
-                    for code in location_str.split(';'):
-                        anm.locations.remove(Location.objects.get(code=code))
+                    locations = parse_locations(location_str)
+                    for location in locations:
+                        anm.locations.remove(location)
                     anm.save()
             except Exception, e:
                     print("Line %d. FAIL. %s %s" % (index, message, e))
