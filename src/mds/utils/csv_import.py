@@ -11,7 +11,7 @@ from mds.core.models import ANM, Location
 # name,code
 DEFAULT_CODE = 1
 
-def parse_locations(location_str):location_str = row[2]
+def parse_locations(location_str):
     locations = [Location.objects.get(code=x) for x in location_str.split(';')]
     return locations                
 
