@@ -46,6 +46,7 @@ class ObservationAdmin(admin.ModelAdmin):
     list_display = ['question','voided','concept','value', 
         'subject','device','created','modified', 'encounter', 'upload_progress']
     list_filter = ['node','concept', 'modified', 'encounter']
+    ordering = ['modified',]
     actions=[mark_voided,]
 
 class EncounterAdmin(admin.ModelAdmin):
@@ -53,6 +54,7 @@ class EncounterAdmin(admin.ModelAdmin):
     list_display = ['subject','voided','concept', 'procedure', 'created',"observer", 'location','uploaded','modified','uuid']
     #actions = [mark_encounter_voided,]
     actions=[mark_voided,]
+    ordering = ['modified',]
     readonly_fields = ['uuid',]
 
 class EncounterInline(admin.StackedInline):
