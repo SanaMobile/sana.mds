@@ -6,7 +6,7 @@ from mds.utils import csv_import
 
 class Command(BaseCommand):
     args = '<fname>'
-    help = 'user csv list formatted as <command>,<username>,<password,villages|villages>. Username values must be unique.'
+    help = 'user csv list formatted as <command>,<username>,<password,villages|villages>. Username values must be unique. Villages must be a semicolon separated list of village codes.'
 
     def __init__(self, *args, **kwargs):
         super(Command, self).__init__(*args, **kwargs)
