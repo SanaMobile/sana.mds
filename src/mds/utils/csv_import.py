@@ -10,7 +10,7 @@ from mds.core.models import ANM, Location
 # format as
 # name,code
 DEFAULT_CODE = 1
-def load_locations(fname):
+def load_locations(fname,test=False):
     """ Loads a list of locations from a csv file fomatted as
             name
         Code value may be provided or loaded as the default.
@@ -25,9 +25,20 @@ def load_locations(fname):
             try:
                 location = Location.objects.get(code=code)
                 created = False
+                location.name = name
+                if test:
+                    print(location)
+                else:
+                    location.save()
             except:
-                location, created = Location.objects.get_or_create(name=row[0], code=code)
-            
+                location = Location()
+                location.code = code
+                location.name = name
+                if test:
+                    print(location)
+                else:
+                    location.save()
+                    
               
 # Format as
 # username,password,location;location
@@ -45,34 +56,37 @@ def load_users(fname):
             if command == 1:
                 password=row[2]
                 location_str = row[3]
-                locations = ()
+                locations = []
                 for code in location_str.split(';'):
                     locations.append(Location.objects.get(code=code))
+                
                 # create User
-                user = User.objects.create_user(username=username, password=row[1])
+                user = User.objects.create_user(username=username, password=password)
                 user.save()
                 # Create ANM
                 anm = ANM(user=user)
+                anm.save()
                 for location in locations:
                     anm.locations.add(location)
                 anm.save()
             #2=Modify(add villages),
             elif command == 2:
-                anm = ANM(user__username=username)
+                anm = ANM.objects.get(user__username=username)
                 location_str = row[2]
                 for location in location_str.split(';'):
                     anm.locations.add(location)
                 anm.save()
             # 3=Modify(Replace villages)
             elif command == 3:
-                anm = ANM(user__username=username)
+                anm = ANM.objects.get(user__username=username)
                 # remove villages
                 for location in anm.locations.all():
                     anm.locations.remove(location)
                 anm.save()
                 location_str = row[2]
                 for code in location_str.split(';'):
-                    anm.locations.add(Location.objects.get(code=code))
+                    if not test:
+                        anm.locations.add(Location.objects.get(code=code))
                 anm.save()
             # 4=remove locations
             elif command == 4:
