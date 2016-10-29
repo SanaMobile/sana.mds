@@ -10,7 +10,7 @@ from mds.core.models import ANM, Location
 # format as
 # name,code
 DEFAULT_CODE = 1
-def load_locations(fname, code=DEFAULT_CODE):
+def load_locations(fname):
     """ Loads a list of locations from a csv file fomatted as
             name
         Code value may be provided or loaded as the default.
@@ -20,8 +20,14 @@ def load_locations(fname, code=DEFAULT_CODE):
     with open(fname) as f:
         reader = csv.reader(f, delimiter=',')  
         for row in reader:
-            location, created = Location.objects.get_or_create(name=row[0], code=code)
-                  
+            code = row[0]
+            name = row[1]
+            try:
+                location = Location.objects.get(code=code)
+                created = False
+            except:
+                location, created = Location.objects.get_or_create(name=row[0], code=code)
+            
               
 # Format as
 # username,password,location;location
@@ -33,13 +39,45 @@ def load_users(fname):
     with open(fname) as f:
         reader = csv.reader(f, delimiter=',')
         for row in reader:
-            # create User
-            user = User.objects.create_user(username=row[0], password=row[1])
-            user.save()
-            # Create ANM
-            anm = ANM(user=User)
-            location_str = row[2]
-            for location_name in location_str.split(';'):
-                location = Location.objects.get(name=location_name)
-                anm.add(location)
-            anm.save()
+            command = int(row[0])
+            username=row[1]
+            # 1 = add users
+            if command == 1:
+                password=row[2]
+                location_str = row[3]
+                locations = ()
+                for code in location_str.split(';'):
+                    locations.append(Location.objects.get(code=code))
+                # create User
+                user = User.objects.create_user(username=username, password=row[1])
+                user.save()
+                # Create ANM
+                anm = ANM(user=user)
+                for location in locations:
+                    anm.locations.add(location)
+                anm.save()
+            #2=Modify(add villages),
+            elif command == 2:
+                anm = ANM(user__username=username)
+                location_str = row[2]
+                for location in location_str.split(';'):
+                    anm.locations.add(location)
+                anm.save()
+            # 3=Modify(Replace villages)
+            elif command == 3:
+                anm = ANM(user__username=username)
+                # remove villages
+                for location in anm.locations.all():
+                    anm.locations.remove(location)
+                anm.save()
+                location_str = row[2]
+                for code in location_str.split(';'):
+                    anm.locations.add(Location.objects.get(code=code))
+                anm.save()
+            # 4=remove locations
+            elif command == 4:
+                anm = ANM(user__username=username)
+                location_str = row[2]
+                for code in location_str.split(';'):
+                    anm.locations.remove(Location.objects.get(code=code))
+                anm.save()
