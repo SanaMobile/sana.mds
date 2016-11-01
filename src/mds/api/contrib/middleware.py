@@ -38,6 +38,9 @@ class LoggingMiddleware(object):
     def process_response(self, request, response):
         if not hasattr(request, LOG_SIGNAL):
             return response
+        # Short circuit on get requests.
+        if request.method == "GET":
+            return response
         log = self.buildlog(request)
         self.send_save(request,event=log)
         return response
