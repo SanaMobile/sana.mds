@@ -88,11 +88,16 @@ class DispatchingHandler(BaseHandler,HandlerMixin):
             return self.get_model().objects.get(uuid=uuid)
         else:
             if kwargs:
-                kwargs['voided'] = False
+                #kwargs['voided'] = False
                 qs = self.get_model().objects.filter(**kwargs)
             else:
-                qs = self.get_model().objects.filter(voided=False)
+                qs = self.get_model().objects.all()
+            if self.fks:
+                qs = qs.select_related()
+            if self.m2m:
+                qs = qs.prefetch_related()
             return qs
+
         
     def get_model(self):
         if not self._model:
