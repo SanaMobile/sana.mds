@@ -85,11 +85,13 @@ class DispatchingHandler(BaseHandler,HandlerMixin):
     def queryset(self, request, uuid=None, **kwargs):
         model = self.get_model()
         if uuid:
-            return self.self.get_model().objects.get(uuid=uuid)
+            return self.get_model().objects.get(uuid=uuid)
         else:
-            qs = self.get_model().objects.all()
             if kwargs:
-                qs.filter(**kwargs)
+                kwargs['voided'] = False
+                qs = self.get_model().objects.filter(**kwargs)
+            else:
+                qs = self.get_model().objects.filter(voided=False)
             return qs
         
     def get_model(self):
@@ -168,8 +170,8 @@ class DispatchingHandler(BaseHandler,HandlerMixin):
                     qs = BaseHandler.read(self,request,**attrs)
                 else:
                     qs = self.queryset(request)
-                response, size = self.get_chunk(qs, start, limit)
-            return succeed(response, size=size)
+                response = qs#, size = self.get_chunk(qs, start, limit)
+            return succeed(response, size=qs.count())
         except ValueError, e:
             return bad_request(exception=e)
         except Exception, e:
