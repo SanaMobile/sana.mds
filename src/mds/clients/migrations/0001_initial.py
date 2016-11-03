@@ -46,7 +46,7 @@ class Migration(SchemaMigration):
         u'clients.crashreport': {
             'Meta': {'object_name': 'CrashReport'},
             'created': ('django.db.models.fields.DateTimeField', [], {'auto_now_add': 'True', 'blank': 'True'}),
-            'device': ('django.db.models.fields.CharField', [], {'max_length': '36', 'blank': 'True'}),
+            'device': ('django.db.models.fields.CharField', [], {'max_length': '10', 'blank': 'True'}),
             u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
             'report': ('django.db.models.fields.files.FileField', [], {'max_length': '100', 'blank': 'True'})
         }
