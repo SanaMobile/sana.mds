@@ -46,7 +46,7 @@ class ObservationAdmin(admin.ModelAdmin):
     list_display = ['question','voided','concept','value', 
         'subject','device','created','modified', 'encounter', 'upload_progress']
     list_filter = ['node','concept', 'modified', 'encounter']
-    ordering = ['modified',]
+    ordering = ['-modified',]
     actions=[mark_voided,]
 
 class EncounterAdmin(admin.ModelAdmin):
