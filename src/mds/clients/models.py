@@ -19,5 +19,5 @@ class Client(models.Model):
     
 class CrashReport(models.Model):
     created = models.DateTimeField(auto_now_add=True)
-    device = models.CharField(max_length=10, blank=True)
+    device = models.CharField(max_length=36, blank=True)
     report = models.FileField(upload_to='reports/', blank=True,)
