@@ -5,7 +5,18 @@
 """
 
 from django.contrib import admin
+from django.contrib.admin import widgets
 from .models import * 
+
+class CoreAdmin(admin.ModelAdmin):
+    def formfield_for_manytomany(self, db_field, request=None, **kwargs):
+        kwargs['widget']= widgets.FilteredSelectMultiple(
+            db_field.verbose_name,
+            db_field.name in self.filter_vertical
+        )
+
+        return super(admin.ModelAdmin, self).formfield_for_manytomany(
+            db_field, request=request, **kwargs)
 
 def mark_voided(modeladmin,request,queryset):
     queryset.update(voided=True)
@@ -95,7 +106,7 @@ admin.site.register(Subject,SubjectAdmin)
 admin.site.register(Event)
 
 #extension models
-class ANMAdmin(admin.ModelAdmin):
+class ANMAdmin(CoreAdmin):
     model = ANM
 admin.site.register(ANM, ANMAdmin)
 class PatientAdmin(admin.ModelAdmin):
