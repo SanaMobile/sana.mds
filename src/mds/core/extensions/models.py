@@ -5,7 +5,8 @@ Extensions for core models
 :Version: 2.0
 """
 from django.db import models
-
+from django.utils import timezone
+ 
 from mds.core.models.encounter import Encounter
 from mds.core.models.location import Location
 from mds.core.models.observer import Observer
@@ -35,5 +36,9 @@ class Patient(Subject):
     
     secondary_caregiver_name = models.CharField(max_length=128, blank=True)
     """Father's name"""
-
-
+    
+    def save(self, *args, **kwargs):
+        tz = timezone.utc
+        adj = self.dob.replace(hour=12,minute=0,second=0,microsecond=0,tzinfo=tz)
+        self.dob = adj
+        super(Subject, self).save(*args, **kwargs)
