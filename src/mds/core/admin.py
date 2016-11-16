@@ -65,7 +65,7 @@ class EncounterAdmin(admin.ModelAdmin):
     list_display = ['subject','voided','concept', 'procedure', 'created',"observer", 'location','uploaded','modified','uuid']
     #actions = [mark_encounter_voided,]
     actions=[mark_voided,]
-    ordering = ['modified',]
+    ordering = ['-modified',]
     readonly_fields = ['uuid',]
 
 class EncounterInline(admin.StackedInline):
@@ -111,6 +111,7 @@ class ANMAdmin(CoreAdmin):
 admin.site.register(ANM, ANMAdmin)
 class PatientAdmin(admin.ModelAdmin):
     model = Patient
+    list_display = ['system_id', 'given_name', 'family_name', 'dob']
 admin.site.register(Patient, PatientAdmin)
 
 #admin.site.register(ClientEventLog, ClientEventLogAdmin)
