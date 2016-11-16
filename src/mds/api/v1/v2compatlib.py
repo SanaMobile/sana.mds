@@ -432,10 +432,12 @@ def set_created(encounter):
         value = observation.value
         logging.debug("created value=%s" % value)
         created = datetime.datetime.strptime(str(value), '%Y-%m-%d %H:%M:%S')
-        encounter.created = created
+        tz = timezone.utc
+        adj = created.replace(hour=12,minute=0,second=0,microsecond=0,tzinfo=tz)
+        encounter.created = adj
         encounter.save()
         for obs in encounter.observation_set.all():
-            obs.created = created
+            obs.created = adj
             obs.save()
     elif observations.count() > 1:
         logging.warn("Multiple observations with ENCOUNTER__CREATED concept")
