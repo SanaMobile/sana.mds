@@ -11,6 +11,7 @@ import shutil, os
 import datetime
 
 from django.contrib.auth.models import User, UserManager
+from django.utils import timezone
 
 from django.views.generic import RedirectView
 #from django.views.generic import redirect_to
