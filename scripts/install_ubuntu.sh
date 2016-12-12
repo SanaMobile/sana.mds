@@ -1,6 +1,8 @@
 apt-get install                 \
     apache2                     \
-    mysql-server                \
+    postgresql                  \
+    postgresql-contrib          \
+    python-psycopg2             \
     libapache2-mod-wsgi         \
     libapache2-mod-jk           \
     python-cjson                \
