@@ -93,16 +93,16 @@ class EventAdmin(admin.ModelAdmin):
     model = Event
 
 admin.site.register(Concept, ConceptAdmin)
-admin.site.register(Relationship)
-admin.site.register(RelationshipCategory)
+#admin.site.register(Relationship)
+#admin.site.register(RelationshipCategory)
 admin.site.register(Device, DeviceAdmin)
 admin.site.register(Encounter, EncounterAdmin)
 admin.site.register(Observation,ObservationAdmin)
 admin.site.register(Location,LocationAdmin)
-admin.site.register(Notification)
+#admin.site.register(Notification)
 admin.site.register(Observer,ObserverAdmin)
 admin.site.register(Procedure,ProcedureAdmin)
-admin.site.register(Subject,SubjectAdmin)
+#admin.site.register(Subject,SubjectAdmin)
 admin.site.register(Event)
 
 #extension models
