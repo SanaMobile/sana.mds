@@ -122,3 +122,28 @@ class PatientHandler(DispatchingHandler):
         "voided",
     )
     signals = { LOGGER:( EventSignal(), EventSignalHandler(Event))}
+    
+    def _update(self,request, uuid):
+        '''Override super method to handle extra_data. Raw data stored
+           should not be overridden if empty
+        '''
+        logging.info("_update() %s" % uuid)
+        model = getattr(self,'model')
+        data = request.raw_data
+        if 'uuid' in data.keys():
+            uuid = data.pop('uuid')
+        
+        qs = model.objects.filter(uuid=uuid)
+        if qs.count() == 1:
+            obj = qs[0]
+            # 'extra_data' should be a write once if not None
+            if obj.extra_data:
+                data['extra_data'] = obj.extra_data
+            qs.update(**data)
+        # No objects found raise
+        elif qs.count() == 0:
+            raise ObjectDoesNotExist("{0} '{1}'".format(model.__name__, uuid)) 
+        # more than one raise
+        else:
+            raise MultipleObjectsReturned("{0} '{1}'".format(model.__name__, uuid))
+        return model.objects.get(uuid=uuid)
