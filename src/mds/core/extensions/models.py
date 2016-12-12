@@ -37,6 +37,9 @@ class Patient(Subject):
     secondary_caregiver_name = models.CharField(max_length=128, blank=True)
     """Father's name"""
     
+    extra_data = models.TextField(blank=True)
+    """Raw data to be stored with patient.""" 
+    
     def save(self, *args, **kwargs):
         tz = timezone.utc
         adj = self.dob.replace(hour=12,minute=0,second=0,microsecond=0,tzinfo=tz)
