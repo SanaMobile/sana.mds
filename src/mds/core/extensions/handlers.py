@@ -137,7 +137,10 @@ class PatientHandler(DispatchingHandler):
         if qs.count() == 1:
             obj = qs[0]
             # 'extra_data' should be a write once if not None
-            if obj.extra_data:
+            extra_data = data.pop('extra_data', None)
+            if extra_data:
+                data['extra_data'] = extra_data
+            elif obj.extra_data:
                 data['extra_data'] = obj.extra_data
             qs.update(**data)
         # No objects found raise
