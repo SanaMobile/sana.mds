@@ -56,7 +56,7 @@ class ObservationAdmin(admin.ModelAdmin):
     readonly_fields = ['_complex_size','uuid','value']
     list_display = ['question','voided','concept','value', 
         'subject','device','created','modified', 'encounter', 'upload_progress']
-    list_filter = ['node','concept', 'modified', 'encounter']
+    #list_filter = ['node','concept', 'modified', 'encounter']
     ordering = ['-modified',]
     actions=[mark_voided,]
 
