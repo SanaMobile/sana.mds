@@ -48,7 +48,7 @@ LOG_LEVELS = { 'CRITICAL': 32,
            'INFO' : 4,
            'DEBUG' : 2,
            'NOTSET' : 0 }
-LEVEL_CHOICES = ((16, 'ERROR'),(8,'WARNINIG'),(4, 'INFO'),(2, 'DEBUG'),(0, 'NOTSET'))
+LEVEL_CHOICES = ((16, 'ERROR'),(8,'WARNING'),(4, 'INFO'),(2, 'DEBUG'),(0, 'NOTSET'))
 
 CRUD = ("POST", "GET","PUT","DELETE")
 crud = ("create", "read","update","delete")
