@@ -91,6 +91,8 @@ class LocationAdmin(admin.ModelAdmin):
     
 class EventAdmin(admin.ModelAdmin):
     model = Event
+    list_display = ['level', 'name', 'client', 'path']
+    ordering = ['-created', ]
 
 admin.site.register(Concept, ConceptAdmin)
 #admin.site.register(Relationship)
@@ -103,7 +105,7 @@ admin.site.register(Location,LocationAdmin)
 admin.site.register(Observer,ObserverAdmin)
 admin.site.register(Procedure,ProcedureAdmin)
 #admin.site.register(Subject,SubjectAdmin)
-admin.site.register(Event)
+admin.site.register(Event, EventAdmin)
 
 #extension models
 class ANMAdmin(CoreAdmin):
