@@ -91,7 +91,7 @@ class LocationAdmin(admin.ModelAdmin):
     
 class EventAdmin(admin.ModelAdmin):
     model = Event
-    list_display = ['level', 'name', 'client', 'path']
+    list_display = ['created', 'level', 'name', 'client', 'path']
     ordering = ['-created', ]
 
 admin.site.register(Concept, ConceptAdmin)
