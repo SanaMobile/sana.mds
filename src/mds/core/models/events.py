@@ -63,7 +63,7 @@ class Event(models.Model):
             return self.messages
         
     def setmessage(self, value):
-        self.level = cjson.encode(value, True)
+        self.messages = cjson.encode(value, True)
         
     message = property(fget=getmessage, fset=setmessage)
         
