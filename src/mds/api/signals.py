@@ -5,6 +5,7 @@ Created on Aug 11, 2012
 :version: 2.0
 '''
 from django.dispatch import Signal
+from django.conf import settings
 
 class ExternalDispatch(Signal):
     """ Simple dispatching signal. The superclass providing_args are a 
@@ -93,6 +94,10 @@ class EventSignalHandler(object):
         try:
             data = kwargs.get('event',None)
             if not data:
+                return False
+            # Skip if level less than min setting
+            level = data.get('level', 0)
+            if level < settings.EVENT_LEVEL:
                 return False
             obj = self.model(**data)
             obj.save()
