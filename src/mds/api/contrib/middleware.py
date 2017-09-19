@@ -97,5 +97,5 @@ class LoggingMiddleware(object):
     def _level(self, records, initial=NOTSET):
         level = initial
         for record in records:
-            level = max(level, int(LOG_LEVELS.get(record.levelname)))
+            level = max(level, int(LOG_LEVELS.get(record.levelname, NOTSET)))
         return level
