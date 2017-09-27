@@ -12,6 +12,7 @@ from mds.api.handlers import DispatchingHandler
 from mds.api.decorators import logged
 from mds.api.responses import succeed, fail, error
 from mds.api.signals import EventSignal, EventSignalHandler
+from mds.api.utils import logtb
 from mds.core.forms import SessionForm
 from mds.core.models import Event
 
@@ -82,7 +83,7 @@ class ANMSessionHandler(DispatchingHandler):
         except Exception as e:
             msg = "Internal Server Error"
             logging.error(unicode(e))
-            logtb()
+            logtb(logging)
             return error(msg)
 
 @logged

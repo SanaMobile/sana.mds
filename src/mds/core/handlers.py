@@ -101,7 +101,7 @@ class SessionHandler(DispatchingHandler):
         except Exception as e:
             msg = "Internal Server Error"
             logging.error(unicode(e))
-            logtb()
+            logtb(logging)
             return error(msg)
         
     def read(self,request):

@@ -118,7 +118,7 @@ def dispatch(handlers, instance, auth=None,methodkwargs={}):
             result = _result if not result else result
         except:
             logging.exception("Dispatch to backend failed")
-            logtb()
+            logtb(logging)
     return result
 
 def create(instance, auth=None, methodkwargs={}):
