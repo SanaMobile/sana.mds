@@ -13,6 +13,6 @@ class ClientAdmin(admin.ModelAdmin):
 admin.site.register(Client, ClientAdmin)
 
 class CrashReportAdmin(admin.ModelAdmin):
-    list_display = ['created', 'device']
+    list_display = ['created', 'device', 'message']
     list_filter = ['created', 'device']
 admin.site.register(CrashReport, CrashReportAdmin)
