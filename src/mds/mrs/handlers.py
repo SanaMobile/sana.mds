@@ -115,10 +115,10 @@ class SavedProcedureHandler(BaseHandler):
             
             encounter.save()
             logging.debug("Saved encounter: " + encounter.uuid)
-            observations = responses_to_observations(encounter, data,sort=True)
+            observations = responses_to_observations(encounter, data,sort=False)
 	    
             for obs in observations:
-                obs.save()
+                # obs.save()
                 if obs.is_complex:
                     obs.create_file()
                 
