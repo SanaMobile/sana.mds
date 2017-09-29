@@ -423,7 +423,15 @@ def render_response_v1(response, version=2):
                 "data" : data }
     else:
         return response
+        
+_pattern = re.compile(r'([ \-:]{1})([0]{2})([0-9]{2})')
+_exclude = re.compile(r'.*([ \-:]{1}[0-9]{4}|\[+-][0-9]{2}:[0-9]:[0-9]{2})$')
 
+def fix_width(matchobj):
+    prefix = matchobj.group(1)
+    digits = matchobj.group(3)
+    return "{prefix}{digits}".format(prefix=prefix, digits=digits)
+    
 def set_created(encounter):
     observations = v2.Observation.objects.filter(encounter=encounter.uuid,
         concept__name="ENCOUNTER__CREATED")
@@ -432,7 +440,11 @@ def set_created(encounter):
         observation = observations[0]
         value = observation.value
         logging.debug("created value=%s" % value)
-        created = datetime.datetime.strptime(str(value), '%Y-%m-%d %H:%M:%S')
+        try:
+            created = datetime.datetime.strptime(str(value), '%Y-%m-%d %H:%M:%S')
+        except:
+            fixed_value = _pattern.sub(fix_width, str(value))
+            created = datetime.datetime.strptime(fixed_value, '%Y-%m-%d %H:%M:%S')
         tz = timezone.utc
         adj = created.replace(hour=12,minute=0,second=0,microsecond=0,tzinfo=tz)
         encounter.created = adj
