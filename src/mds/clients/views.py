@@ -73,7 +73,7 @@ def submit_crash(request):
         form = CrashReportForm(request.POST, request.FILES)
         if form.is_valid():
             form.save()
-            return json_succeed({ "created": form.instance.created })
+            return json_succeed({ "created": form.instance.created.strftime("%Y-%m-%d'T'%H:%M:%S") })
         else:
             return json_fail([], code=400, errors=form.errors)
     else:

@@ -5,4 +5,5 @@ from .models import CrashReport
 class CrashReportForm(forms.ModelForm):
     class Meta:
         model = CrashReport
-    report = forms.FileField()
+    report = forms.FileField(required=False)
+    
