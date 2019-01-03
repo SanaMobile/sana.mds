@@ -1,5 +1,4 @@
 import cjson
-import logging
 
 from django.http import HttpResponse, HttpResponseRedirect
 from django.conf import settings
@@ -35,7 +34,8 @@ from mds.web.generic.filtering import FilterMixin
 from .generic.sorting import SortMixin
 from mds.tasks.models import *
 from .portal import site as portal_site
-
+import logging
+logger = logging.getLogger(__name__)
 def login(request,*args,**kwargs):
     if request.method == "POST":
         form = {}
@@ -454,6 +454,7 @@ _core = [
     Observation, 
     Observer,
     Procedure,
+    ProcedureGroup,
     Subject,
 ]
 
@@ -558,7 +559,7 @@ class ModelFormMixin(object):
         super(ModelFormMixin,self)
         #if not hasattr(self,'fields'):
         #    self.fields = self.get_default_model_fields()
-        self._fields = self.field_names()
+        self._fields = ['title']
         if not hasattr(self,'form'):
             self.form = modelform_factory(self.model)
         if not hasattr(self,'exclude'):
@@ -653,6 +654,7 @@ class ModelFormMixin(object):
         return _obj
 
     def get_context_data(self, **kwargs):
+        logging.debug('getting context data')
         context = super(ModelFormMixin, self).get_context_data(**kwargs)
         context['model'] = self.model.__name__.lower()
         #context['form'] = self.form(self.object)
@@ -880,6 +882,32 @@ class ProcedureCreateView(ModelFormMixin,CreateView):
 class ProcedureUpdateView(ModelFormMixin, UpdateView):
     model = Procedure
     template_name = 'web/form.html'
+    
+# Procedure Groups
+class ProcedureGroupListView(ModelListMixin, ListView):
+    template_name = 'web/list.html'
+    title = 'Procedure Group List'
+    model = ProcedureGroup
+    default_sort_params = ('title', 'asc')
+    fields = ('title', 'author')#,'uuid')
+    paginate_by=3
+
+        
+class ProcedureGroupDetailView(ModelFormMixin,DetailView):
+    model = ProcedureGroup
+    template_name = 'web/detail.html'
+    context_object_name = 'proceduregroup'
+    slug_field = 'uuid'
+    
+class ProcedureGroupCreateView(ModelFormMixin, CreateView):
+    model = ProcedureGroup
+    template_name = "web/form_new.html"
+    form_class = ProcedureGroupForm
+
+class ProcedureGroupUpdateView(ModelFormMixin, UpdateView):
+    model = ProcedureGroup
+    template_name = 'web/form.html'
+    form_class = ProcedureGroupForm
 
 class SubjectListView(ModelListMixin, ListView):
     model = Subject

@@ -86,6 +86,12 @@ urlpatterns = patterns(
     url(r'^procedure/(?P<pk>\d+)/$', ProcedureUpdateView.as_view(), name='procedure-edit'),
     url(r'^procedure/(?P<pk>\d+)/detail/$', ProcedureDetailView.as_view(), name='procedure-detail'),
     
+    # Procedure groups
+    url(r'^proceduregroup/$', ProcedureGroupListView.as_view(),name='proceduregroup-list'),
+    url(r'^proceduregroup/new/$', ProcedureGroupCreateView.as_view(), name='proceduregroup-create'),
+    url(r'^proceduregroup/(?P<pk>\d+)/$',ProcedureGroupUpdateView.as_view(), name='proceduregroup-edit'),
+    url(r'^proceduregroup/(?P<pk>\d+)/detail/$', ProcedureGroupDetailView.as_view(), name='proceduregroup-detail'),
+    
     url(r'^subject/$', SubjectListView.as_view(),name='subject-list'),
     url(r'^subject/new/$', SubjectCreateView.as_view(),name='subject-create'),
     url(r'^subject/(?P<pk>[^/]+)/$', SubjectUpdateView.as_view(),name='subject-edit'),

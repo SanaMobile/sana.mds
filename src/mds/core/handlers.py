@@ -38,6 +38,7 @@ __all__ = ['ConceptHandler',
            'ObservationHandler', 
            'ObserverHandler',
            'ProcedureHandler',
+           'ProcedureGroupHandler',
            'DocHandler' ,
            'SessionHandler',
            'SubjectHandler',
@@ -235,6 +236,23 @@ class ProcedureHandler(DispatchingHandler):
         obj =  model.objects.get(uuid=uuid)
         return open(obj.src.path).read()
 
+@logged
+class ProcedureGroupHandler(DispatchingHandler):
+    allowed_methods = ('GET', 'POST','PUT')
+    model = ProcedureGroup
+    form = ProcedureGroupForm
+    fields = (
+        "uuid",
+        "title",
+        "description",
+        "author",
+        "modified",
+        "created",
+        "voided",
+    )
+    signals = { LOGGER:( EventSignal(), EventSignalHandler(Event))}
+
+        
 @logged
 class SubjectHandler(DispatchingHandler):
     """ Handles subject requests. """
