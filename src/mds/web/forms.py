@@ -150,6 +150,7 @@ class ProcedureForm(AllowReadonlyModelForm):
 class ProcedureGroupForm(forms.ModelForm):
     """ A simple procedure group form
     """
+    procedures = forms.ModelMultipleChoiceField(queryset=Procedure.objects.all(), required=False)
     class Media:
         css = {
             'all':('/mds/static/web/css/chosen.min.css',),
@@ -159,7 +160,6 @@ class ProcedureGroupForm(forms.ModelForm):
         model = ProcedureGroup
         fields = "__all__"
     
-        
 class UserInline(InlineFormSet):
     model = User
 
