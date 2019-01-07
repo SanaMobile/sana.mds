@@ -1,4 +1,5 @@
 import cjson
+import logging
 
 from django.http import HttpResponse, HttpResponseRedirect
 from django.conf import settings
@@ -13,7 +14,7 @@ from django.core.urlresolvers import reverse
 
 from django import forms
 from django.forms.models import modelformset_factory, modelform_factory
-from django.db.models import ForeignKey, FileField, ImageField, DateField, DateTimeField
+from django.db.models import ForeignKey, FileField, ImageField, DateField, DateTimeField, ManyToManyField
 
 from django.shortcuts import render_to_response,redirect
 from django.template import RequestContext
@@ -34,8 +35,7 @@ from mds.web.generic.filtering import FilterMixin
 from .generic.sorting import SortMixin
 from mds.tasks.models import *
 from .portal import site as portal_site
-import logging
-logger = logging.getLogger(__name__)
+
 def login(request,*args,**kwargs):
     if request.method == "POST":
         form = {}
@@ -559,7 +559,7 @@ class ModelFormMixin(object):
         super(ModelFormMixin,self)
         #if not hasattr(self,'fields'):
         #    self.fields = self.get_default_model_fields()
-        self._fields = ['title']
+        self._fields = self.field_names()
         if not hasattr(self,'form'):
             self.form = modelform_factory(self.model)
         if not hasattr(self,'exclude'):
@@ -619,7 +619,8 @@ class ModelFormMixin(object):
             #if field.name in self._fields:
             field = getattr(opts, f, None)
             _field = None
-            for x in obj._meta.fields:
+            fields_list = obj._meta.fields + obj._meta.many_to_many
+            for x in fields_list:
                 if x.name == f:
                     _field = x
             #_field = type(f)
@@ -647,6 +648,15 @@ class ModelFormMixin(object):
                 data['type'] = 'date'
             elif isinstance(_field, DateTimeField):
                 data['type'] = 'date'
+            elif isinstance(_field, ManyToManyField):
+                associated_objects = map(lambda x:str(x), data['value'].all())
+                if len(associated_objects) == 0:
+                    data['value'] = 'None'
+                    data['type'] = 'string'
+                else:
+                    data['value'] = associated_objects
+                    data['type'] = 'list'
+                
             fields[f] = data
         _obj['fields'] = fields
         _obj['id'] = obj.id
@@ -898,6 +908,7 @@ class ProcedureGroupDetailView(ModelFormMixin,DetailView):
     template_name = 'web/detail.html'
     context_object_name = 'proceduregroup'
     slug_field = 'uuid'
+    fields = ('uuid', 'created', 'modified', 'title', 'author', 'description', 'procedures', 'voided')
     
 class ProcedureGroupCreateView(ModelFormMixin, CreateView):
     model = ProcedureGroup

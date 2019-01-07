@@ -41,6 +41,12 @@
                     <a href="{{ field.url }}"><img src="{{ STATIC_PREFIX }}web/img/binary.png"</a>
                 {% elif field.type == "object" %}
                         <a href="{{ field.url }}">{{ field.value }}</a>
+                {% elif field.type == "list" %}
+                    <ul>
+                    {% for el in field.value %}
+                        <li> {{ el }} </li>
+                    {% endfor %}
+                    </ul>
                 {% else %}
                         {{ field.value }}
                 {% endif %}

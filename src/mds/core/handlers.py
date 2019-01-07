@@ -246,6 +246,7 @@ class ProcedureGroupHandler(DispatchingHandler):
         "title",
         "description",
         "author",
+        "procedures",
         "modified",
         "created",
         "voided",

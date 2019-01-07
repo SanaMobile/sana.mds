@@ -78,6 +78,10 @@ extra_patterns = patterns(
     url(r'^procedure/$', rsrc_procedure, name='procedure-list'),
     url(r'^procedure/(?P<uuid>[^/]+)/$', rsrc_procedure, name='procedure'),
     
+    # procedure groups
+    url(r'^proceduregroup/$', rsrc_procedure_group, name='proceduregroup-list'),
+    url(r'^proceduregroup/(?P<uuid>[^/]+)/$', rsrc_procedure_group, name='proceduregroup'),
+    
     # subjects
     url(r'^subject/$', rsrc_subject, name='subject-list'),
     url(r'^subject/(?P<uuid>[^/]+)/$', rsrc_subject, name='subject'),
