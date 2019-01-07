@@ -901,8 +901,7 @@ class ProcedureGroupListView(ModelListMixin, ListView):
     default_sort_params = ('title', 'asc')
     fields = ('title', 'author')#,'uuid')
     paginate_by=3
-
-        
+  
 class ProcedureGroupDetailView(ModelFormMixin,DetailView):
     model = ProcedureGroup
     template_name = 'web/detail.html'
