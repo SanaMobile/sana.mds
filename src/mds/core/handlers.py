@@ -238,7 +238,7 @@ class ProcedureHandler(DispatchingHandler):
 
 @logged
 class ProcedureGroupHandler(DispatchingHandler):
-    allowed_methods = ('GET', 'POST','PUT')
+    allowed_methods = ('GET', 'POST', 'PUT')
     model = ProcedureGroup
     form = ProcedureGroupForm
     fields = (
