@@ -5,8 +5,10 @@
 """
 
 from django.db import models
+from django.utils.encoding import python_2_unicode_compatible
 
 from mds.api.utils import make_uuid
+@python_2_unicode_compatible
 class ProcedureGroup(models.Model):
     """ A group of procedures"""
 
@@ -34,6 +36,6 @@ class ProcedureGroup(models.Model):
 
     voided = models.BooleanField(default=False)
 
-    def __unicode__(self):
+    def __str__(self):
         return "%s" % (self.title)
 

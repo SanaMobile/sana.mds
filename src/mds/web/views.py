@@ -552,6 +552,7 @@ class ModelFormMixin(object):
     default_sort_params = ('created', 'asc')
     exclude = ()
     _fields = []
+    fields = '__all__'
     success_url_format = "/{app}/{model}/%(id)s/"
     app = 'mds.web'
     
@@ -570,7 +571,7 @@ class ModelFormMixin(object):
                 self.success_url_format.format(app=_app,model=_model))
 
     def field_names(self):
-        if not getattr(self,'fields',None):
+        if not getattr(self,'fields',None) or self.fields == '__all__':
             return list(x.name for x in self.model._meta.fields)
         else:
             return self.fields
@@ -913,11 +914,13 @@ class ProcedureGroupCreateView(ModelFormMixin, CreateView):
     model = ProcedureGroup
     template_name = "web/form_new.html"
     form_class = ProcedureGroupForm
+    fields = None
 
 class ProcedureGroupUpdateView(ModelFormMixin, UpdateView):
     model = ProcedureGroup
     template_name = 'web/form.html'
     form_class = ProcedureGroupForm
+    fields = None
 
 class SubjectListView(ModelListMixin, ListView):
     model = Subject
