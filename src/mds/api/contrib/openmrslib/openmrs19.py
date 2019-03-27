@@ -224,16 +224,20 @@ class OpenMRS(openers.OpenMRSOpener):
     def open(self, url, username=None, password=None, use_json=False, **kwargs):
         #session_path = self.build_url("sessions",query=auth)
         opener, session = self.open_session(username, password)
+
         if not session["authenticated"]:
+            logging.info("username and password combination incorrect!")
             raise Exception(u"username and password combination incorrect!")
         
         # short circuit here
         if url ==  self.build_url("sessions"):
+            logging.info("username and password validated!")
             return u"username and password validated!"
         
         jsessionid = session.get("sessionId")
+        logging.info("Autenthicated?: %s, Session ID: %s" % (session["authenticated"],jsessionid))
         req = urllib2.Request(url)
-        req.add_header("jsessionid", jsessionid)
+        req.add_header("Cookie", "jsessionid=%s"%jsessionid)
         if kwargs:
             data = cjson.encode(kwargs) if use_json else urllib.urlencode(kwargs)
             req.add_data(data)
@@ -245,6 +249,7 @@ class OpenMRS(openers.OpenMRSOpener):
     def open_session(self, username=None, password=None):
         logging.debug("Opening session")
         url = self.build_url("sessions")
+        logging.info("URL: %s"% url)
         #opener = self.build_opener(url, username, password)
         cookies = cookielib.CookieJar()
         password_mgr = urllib2.HTTPPasswordMgrWithDefaultRealm()
@@ -255,11 +260,13 @@ class OpenMRS(openers.OpenMRSOpener):
         urllib2.install_opener(opener)
         req = urllib2.Request(url)
         basic64 = lambda x,y: base64.encodestring('%s:%s' % (x, y))[:-1]
+        logging.info("Base 64 encoded: %s" % basic64(username,password))
         print basic64(username, password), username, password
         if username and password:
             req.add_header("Authorization", "Basic %s" % basic64(username, password))
         #session = urllib2.urlopen(req)
         session = cjson.decode(opener.open(req).read())
+        logging.info("Before returning data")
         return opener, session
     
     def getPatient(self,username, password, patientid):
@@ -288,7 +295,7 @@ class OpenMRS(openers.OpenMRSOpener):
         wsname = 'subjects' 
         auth = {"username": username,
                  "password": password }
-        
+        logging.debug("Before doing the wsdispatch request")
         response = self.wsdispatch(wsname, query=query, response_handler=patient_reader, auth=auth)
         logging.debug(response)
         content = []

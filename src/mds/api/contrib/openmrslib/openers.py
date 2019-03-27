@@ -85,6 +85,7 @@ class OpenMRSOpener(AbstractHandler):
         
     def open(self, url, username=None, password=None, data=None):
         """ Opens a web service url resource """
+        logging.info("Entra a Open en Openers")
         opener, session_key = self.open_session(username, password)
         req = urllib2.Request(url)
         if session_key:
@@ -152,6 +153,7 @@ class OpenMRSOpener(AbstractHandler):
         password=auth.get("password","")
         response = self.open(path, username=username, 
                          password=password)
+        logging.info("Response en read: %s"% response)
         if response_handler:
             return response_handler(response)
         else:
@@ -182,6 +184,7 @@ class OpenMRSOpener(AbstractHandler):
         if data:
             return self.create(url, response_handler=response_handler, auth=auth, data=data)
         else:
+
             query = query if query else {}
             return self.read(url, response_handler=response_handler, auth=auth, **query)
     
