@@ -21,6 +21,7 @@ __all__ = ['ConceptForm', 'RelationshipForm', 'RelationshipCategoryForm',
            'ObservationForm', 
            'SubjectForm',
            'ProcedureForm',
+           'ProcedureGroupForm',
            'SessionForm',
            ]
 
@@ -88,7 +89,17 @@ class ProcedureForm(forms.ModelForm):
     
     class Meta:
         model = Procedure
-     
+
+class ProcedureGroupForm(forms.ModelForm):
+    """ A simple procedure group form
+    """
+    class Meta:
+        model = ProcedureGroup
+        fields = "__all__"
+        widgets = {
+            'procedures': forms.CheckboxSelectMultiple 
+        }
+        
 class SubjectForm(forms.ModelForm):
     """ A simple patient form
     """

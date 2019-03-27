@@ -536,3 +536,4 @@ def convert_binary(binary):
     result, message = FFmpeg().convert(binary, type, extension)
     logging.debug('FFmpeg: %s %s' % (result, message))
     return result
+'''

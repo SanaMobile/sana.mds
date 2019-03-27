@@ -20,6 +20,7 @@
     });
 {% endblock %}
 {% block content %}
+{{ form.media }}
 <form enctype="multipart/form-data" action="{% url 'web:'|add:model|add:'-create' %}" method="post">
     {{ csrftoken }}
     {% include "web/form_snippet.html" %}

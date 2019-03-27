@@ -16,6 +16,7 @@ from .notification import Notification
 from .observation import Observation
 from .observer import Observer
 from .procedure import Procedure
+from .procedure_group import ProcedureGroup
 from .subject import Subject
 from mds.core.extensions.models import *
 
@@ -29,5 +30,6 @@ __all__ = ['Concept', 'Relationship','RelationshipCategory',
            'Observation', 
            'Observer',
            'Procedure',
+           'ProcedureGroup',
            'Subject',
            ]

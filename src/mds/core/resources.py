@@ -11,6 +11,7 @@ __all__ = [
     'rsrc_subject',
     'rsrc_observer',
     'rsrc_procedure',
+    'rsrc_procedure_group',
     'rsrc_encounter',
     'rsrc_observation',
     'rsrc_notification',
@@ -27,7 +28,7 @@ rsrc_location = Resource(LocationHandler)
 rsrc_subject = Resource(SubjectHandler)
 rsrc_observer = Resource(ObserverHandler)
 rsrc_procedure = Resource(ProcedureHandler)
-
+rsrc_procedure_group = Resource(ProcedureGroupHandler)
 rsrc_encounter = Resource(EncounterHandler)
 rsrc_observation = Resource(ObservationHandler)
 

@@ -7,6 +7,7 @@ from datetime import datetime
 from django import forms
 from django.forms.extras.widgets import SelectDateWidget
 from  django.forms.widgets import PasswordInput
+from django.contrib.admin.widgets import FilteredSelectMultiple
 
 from django.contrib.auth.models import User
 
@@ -18,6 +19,7 @@ from mds.tasks.models import *
 
 __all__ = [
     "ProcedureForm",
+    "ProcedureGroupForm",
     "EmptyEncounterForm",
     "EncounterTaskForm",
     "AllowReadonly",
@@ -145,6 +147,16 @@ class ProcedureForm(AllowReadonlyModelForm):
     class NewMeta:
         readonly = ['uuid','created',]
 
+class ProcedureGroupForm(forms.ModelForm):
+    """ A simple procedure group form
+    """
+    procedures = forms.ModelMultipleChoiceField(queryset=Procedure.objects.all(), required=False)
+    class Media:
+        js = ('web/js/chosen.jquery.min.js','web/js/chosen-multiselect.js')
+    class Meta:
+        model = ProcedureGroup
+        fields = "__all__"
+    
 class UserInline(InlineFormSet):
     model = User
 

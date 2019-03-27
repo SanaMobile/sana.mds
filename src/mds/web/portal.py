@@ -220,6 +220,10 @@ site = {
                         'label': 'procedures',
                         'context_name':'procedure-list',
                     },
+                    {
+                        'label': 'Procedure Groups',
+                        'context_name':'proceduregroup-list',
+                    }
                 ]
             },
 

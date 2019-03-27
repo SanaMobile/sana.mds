@@ -14,7 +14,7 @@ from django.core.urlresolvers import reverse
 
 from django import forms
 from django.forms.models import modelformset_factory, modelform_factory
-from django.db.models import ForeignKey, FileField, ImageField, DateField, DateTimeField
+from django.db.models import ForeignKey, FileField, ImageField, DateField, DateTimeField, ManyToManyField
 
 from django.shortcuts import render_to_response,redirect
 from django.template import RequestContext
@@ -454,6 +454,7 @@ _core = [
     Observation, 
     Observer,
     Procedure,
+    ProcedureGroup,
     Subject,
 ]
 
@@ -551,6 +552,7 @@ class ModelFormMixin(object):
     default_sort_params = ('created', 'asc')
     exclude = ()
     _fields = []
+    fields = '__all__'
     success_url_format = "/{app}/{model}/%(id)s/"
     app = 'mds.web'
     
@@ -569,7 +571,7 @@ class ModelFormMixin(object):
                 self.success_url_format.format(app=_app,model=_model))
 
     def field_names(self):
-        if not getattr(self,'fields',None):
+        if not getattr(self,'fields',None) or self.fields == '__all__':
             return list(x.name for x in self.model._meta.fields)
         else:
             return self.fields
@@ -618,7 +620,8 @@ class ModelFormMixin(object):
             #if field.name in self._fields:
             field = getattr(opts, f, None)
             _field = None
-            for x in obj._meta.fields:
+            fields_list = obj._meta.fields + obj._meta.many_to_many
+            for x in fields_list:
                 if x.name == f:
                     _field = x
             #_field = type(f)
@@ -646,6 +649,15 @@ class ModelFormMixin(object):
                 data['type'] = 'date'
             elif isinstance(_field, DateTimeField):
                 data['type'] = 'date'
+            elif isinstance(_field, ManyToManyField):
+                associated_objects = map(lambda x:str(x), data['value'].all())
+                if len(associated_objects) == 0:
+                    data['value'] = 'None'
+                    data['type'] = 'string'
+                else:
+                    data['value'] = associated_objects
+                    data['type'] = 'list'
+                
             fields[f] = data
         _obj['fields'] = fields
         _obj['id'] = obj.id
@@ -653,6 +665,7 @@ class ModelFormMixin(object):
         return _obj
 
     def get_context_data(self, **kwargs):
+        logging.debug('getting context data')
         context = super(ModelFormMixin, self).get_context_data(**kwargs)
         context['model'] = self.model.__name__.lower()
         #context['form'] = self.form(self.object)
@@ -880,6 +893,34 @@ class ProcedureCreateView(ModelFormMixin,CreateView):
 class ProcedureUpdateView(ModelFormMixin, UpdateView):
     model = Procedure
     template_name = 'web/form.html'
+    
+# Procedure Groups
+class ProcedureGroupListView(ModelListMixin, ListView):
+    template_name = 'web/list.html'
+    title = 'Procedure Group List'
+    model = ProcedureGroup
+    default_sort_params = ('title', 'asc')
+    fields = ('title', 'author')#,'uuid')
+    paginate_by=3
+  
+class ProcedureGroupDetailView(ModelFormMixin,DetailView):
+    model = ProcedureGroup
+    template_name = 'web/detail.html'
+    context_object_name = 'proceduregroup'
+    slug_field = 'uuid'
+    fields = ('uuid', 'created', 'modified', 'title', 'author', 'description', 'procedures', 'voided')
+    
+class ProcedureGroupCreateView(ModelFormMixin, CreateView):
+    model = ProcedureGroup
+    template_name = "web/form_new.html"
+    form_class = ProcedureGroupForm
+    fields = None
+
+class ProcedureGroupUpdateView(ModelFormMixin, UpdateView):
+    model = ProcedureGroup
+    template_name = 'web/form.html'
+    form_class = ProcedureGroupForm
+    fields = None
 
 class SubjectListView(ModelListMixin, ListView):
     model = Subject
